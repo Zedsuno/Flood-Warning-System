@@ -52,10 +52,14 @@
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
               <li>
-                <a class="dropdown-item" href="#">การบริหารจัดการน้ำท่วม</a>
+                <router-link to="/FloodManage" class="dropdown-item" active-class="active">
+                  การบริหารจัดการน้ำท่วม
+                </router-link>
               </li>
               <li>
-                <a class="dropdown-item" href="#">ประวัติเหตุการณ์น้ำท่วม</a>
+                <router-link to="/HisTory" class="dropdown-item" active-class="active">
+                  ประวัติเหตุการณ์น้ำท่วม
+                </router-link>
               </li>
               <li>
                 <a class="dropdown-item" href="#"
