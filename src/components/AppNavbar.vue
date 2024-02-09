@@ -58,9 +58,9 @@
                 <a class="dropdown-item" href="#">ประวัติเหตุการณ์น้ำท่วม</a>
               </li>
               <li>
-                <a class="dropdown-item" href="#"
-                  >คู่มือรับมือสถานกาณ์น้ำท่วม</a
-                >
+                <router-link to="/FloodBook" class="dropdown-item" active-class="active">
+                  คู่มือสถานการณ์น้ำท่วม
+                </router-link>
               </li>
               <li><a class="dropdown-item" href="#">วิธีป้องกันน้ำท่วม</a></li>
             </ul>
