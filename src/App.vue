@@ -1,7 +1,7 @@
 <template>
   <div id="app">
-    <AppTopbar />
-    <AppNavbar />
+    <AppTopbar v-if="showTopbarAndNavbar" />
+    <AppNavbar v-if="showTopbarAndNavbar" />
     <router-view />
   </div>
 </template>
@@ -14,7 +14,14 @@ export default {
   name: 'App',
   components: {
     AppTopbar,
-    AppNavbar
+    AppNavbar,
+},
+  computed: {
+    showTopbarAndNavbar() {
+      // Add all paths where the top bar and navbar should not be shown
+      const pathsWithoutTopbarAndNavbar = ['/login', '/Register'];
+      return !pathsWithoutTopbarAndNavbar.includes(this.$route.path);
+    }
   }
 };
 </script>
