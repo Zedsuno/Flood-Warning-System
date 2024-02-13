@@ -3,6 +3,8 @@ import HomePage from '../view/HomePage.vue';
 import FloodBook from '../view/FloodBook.vue';
 import HisTory from '../view/HisTory.vue';
 import FloodManage from '../view/FloodManage.vue';
+import LoginPage from '../view/LoginPage.vue';
+import RegisterPage from '../view/RegisterPage.vue';
 
 const routes = [
   {
@@ -26,6 +28,16 @@ const routes = [
     path: '/FloodManage',
     name: 'FloodManage',
     component: FloodManage,
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: LoginPage,
+  },
+  {
+    path: '/register',
+    name: 'register',
+    component: RegisterPage,
   },
   
   // ...more routes here
