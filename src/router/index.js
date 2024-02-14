@@ -1,12 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomePage from '../view/HomePage.vue';
-
+import DefendFlood from '../view/DefendFlood.vue';
 
 const routes = [
   {
     path: '/',
     name: 'HomePage',
     component: HomePage,
+  },
+  {
+    path: '/DefendFlood',
+    name: 'DefendFlood',
+    component: DefendFlood ,
   },
   
   // ...more routes here
