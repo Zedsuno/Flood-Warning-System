@@ -25,8 +25,9 @@
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
               <li><a class="dropdown-item" href="#/help">ช่วยเหลือ</a></li>
-              <li><a class="dropdown-item" href="#/login">เข้าสู่ระบบ</a></li>
-            </ul>
+              <li>
+  <router-link class="dropdown-item" to="/login">เข้าสู่ระบบ</router-link>
+</li>            </ul>
           </li>
         </ul>
       </div>
