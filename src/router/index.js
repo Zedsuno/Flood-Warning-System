@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomePage from '../view/HomePage.vue';
+import DefendFlood from '../view/DefendFlood.vue';
 import FloodBook from '../view/FloodBook.vue';
 import HisTory from '../view/HisTory.vue';
 import FloodManage from '../view/FloodManage.vue';
@@ -12,6 +13,10 @@ const routes = [
     name: 'HomePage',
     component: HomePage,
   },
+  {
+    path: '/DefendFlood',
+    name: 'DefendFlood',
+    component: DefendFlood ,},
   {
     path: '/FloodBook',
     name: 'FloodBook',

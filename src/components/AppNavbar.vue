@@ -66,7 +66,11 @@
                   คู่มือสถานการณ์น้ำท่วม
                 </router-link>
               </li>
-              <li><a class="dropdown-item" href="#">วิธีป้องกันน้ำท่วม</a></li>
+              <li>
+                <router-link to="/DefendFlood" class="dropdown-item" active-class="active">
+                  วิธีป้องกันน้ำท่วม
+                </router-link>
+              </li>
             </ul>
           </li>
           <li class="nav-item dropdown">
