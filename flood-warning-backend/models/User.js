@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
+// Create a new UserSchema using Mongoose
 const UserSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -17,6 +18,7 @@ const UserSchema = new mongoose.Schema({
   },
 }, );
 
+// Create a new UserSchema method to hash the password before saving it in the database
 UserSchema.pre('save', async function (next) {
   if (this.isModified('password') || this.isNew) {
     console.log('Hashing password for user:', this.username);
@@ -27,6 +29,7 @@ UserSchema.pre('save', async function (next) {
   next();
 });
 
+// compare password 
 UserSchema.methods.comparePassword = async function (candidatePassword) {
   console.log('Comparing password for user:', this.username);
   const isMatch = await bcrypt.compare(candidatePassword, this.password);
@@ -34,8 +37,8 @@ UserSchema.methods.comparePassword = async function (candidatePassword) {
   return isMatch;
 };
 
-
+// kept the data in to the collection login 
 const User = mongoose.model('User', UserSchema, 'login');
 
-// 
+
 module.exports = User;

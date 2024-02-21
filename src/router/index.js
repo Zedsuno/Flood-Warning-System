@@ -6,6 +6,8 @@ import HisTory from '../view/HisTory.vue';
 import FloodManage from '../view/FloodManage.vue';
 import LoginPage from '../view/LoginPage.vue';
 import RegisterPage from '../view/RegisterPage.vue';
+import AdminPage from '../view/AdminPage.vue';
+import AddStationPage from '../view/AddStationPage.vue';
 
 const routes = [
   {
@@ -44,6 +46,19 @@ const routes = [
     name: 'register',
     component: RegisterPage,
   },
+  {
+    path: '/admin',
+    name: 'admin',
+    component: AdminPage,
+  },
+  {
+    path: '/admin/AddStation',
+    name: 'AddStation',
+    component: AddStationPage,
+  },
+{
+
+}
   
   // ...more routes here
 ];
