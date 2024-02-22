@@ -19,7 +19,7 @@ export default {
   computed: {
     showTopbarAndNavbar() {
       // Add all paths where the top bar and navbar should not be shown
-      const pathsWithoutTopbarAndNavbar = ['/login', '/Register'];
+      const pathsWithoutTopbarAndNavbar = ['/login', '/Register', '/Admin'];
       return !pathsWithoutTopbarAndNavbar.includes(this.$route.path);
     }
   }
