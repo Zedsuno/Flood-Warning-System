@@ -1,0 +1,602 @@
+<template>
+  <div class="row-teb mt-4-teb">
+    <div class="col-12-teb">
+      <div class="card-teb">
+        <div class="card-teb-header">
+          <h5-teb class="mb-0">ตารางข้อมูลแต่ละสถานี</h5-teb>
+          <p class="text-sm mb-0"></p>
+        </div>
+        <div class="table-responsive">
+          <div
+            class="dataTable-wrapper dataTable-loading no-footer sortable fixed-height fixed-columns"
+          >
+            <div class="dataTable-top">
+              <div class="dataTable-dropdown">
+                <label
+                  ><select
+                    class="dataTable-selector"
+                    v-model="itemsPerPage"
+                    @change="onItemsPerPageChange"
+                  >
+                    <option :value="5" :selected="allStations.length <= 5">
+                      5
+                    </option>
+                    <option :value="10" :selected="allStations.length > 5">
+                      10
+                    </option>
+                    <option value="15">15</option>
+                    <option value="20">20</option>
+                    <option value="25">25</option>
+                  </select>
+                  รายการต่อหน้า</label
+                >
+              </div>
+              <div class="dataTable-search">
+                <input
+                  class="dataTable-input"
+                  placeholder="Search..."
+                  type="text"
+                  v-model="searchQuery"
+                />
+              </div>
+            </div>
+            <div class="dataTable-container">
+              <table
+                class="table table-flush dataTable-table"
+                id="datatable-basic"
+              >
+                <thead class="thead-light">
+                  <tr>
+                    <th
+                      class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                      data-sortable=""
+                      style="width: 22.5724%"
+                    >
+                      <a href="#" class="dataTable-sorter">ชื่อสถานี</a>
+                    </th>
+                    <th
+                      class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                      data-sortable=""
+                      style="width: 25.4117%"
+                    >
+                      <a href="#" class="dataTable-sorter">พื้นที่ติดตั้ง</a>
+                    </th>
+                    <th
+                      class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                      data-sortable=""
+                      style="width: 19.3072%"
+                    >
+                      <a href="#" class="dataTable-sorter">ระดับน้ำ</a>
+                    </th>
+                    <th
+                      class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                      data-sortable=""
+                      style="width: 9.65361%"
+                    >
+                      <a href="#" class="dataTable-sorter">พื้นที่อ้างอิง</a>
+                    </th>
+                    <th
+                      class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                      data-sortable=""
+                      style="width: 17.3197%"
+                    >
+                      <a href="#" class="dataTable-sorter">ค่าเกณฑ์ระดับน้ำ</a>
+                    </th>
+                    <th
+                      class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                      data-sortable=""
+                      style="width: 15.0483%"
+                    >
+                      <a href="#" class="dataTable-sorter">สถานะ</a>
+                    </th>
+                    <th
+                      class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                      style="width: 15.0483%"
+                    ></th>
+                    <th
+                      class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                      style="width: 15.0483%"
+                    ></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="station in paginatedStations" :key="station._id">
+                    <td class="text-sm font-weight-normal">
+                      {{ station.stationId }}
+                    </td>
+                    <td class="text-sm font-weight-normal">
+                      {{ station.location.river }},
+                      {{ station.location.address }},
+                      {{ station.location.state }}
+                    </td>
+                    <td class="text-sm font-weight-normal">
+                      {{ station.waterLevel }}
+                    </td>
+                    <td class="text-sm font-weight-normal">
+                      {{ station.referenceArea }}
+                    </td>
+                    <td class="text-sm font-weight-normal">
+                      {{ station.waterLevelThreshold }}
+                    </td>
+
+                    <td class="text-sm font-weight-normal">
+                      <span
+                        class="status-badge"
+                        :class="{ inactive: station.active === 'INACTIVE' }"
+                      >
+                        {{ station.active }}
+                      </span>
+                    </td>
+                    <td class="text-sm font-weight-normal">
+                      <button class="dashboard-button">Dashboard</button>
+                    </td>
+
+                    <td class="text-sm font-weight-normal">
+                      <router-link
+                        :to="{
+                          name: 'EditStation',
+                          params: { stationId: station._id },
+                        }"
+                        class="edit-button"
+                        >แก้ไข</router-link
+                      >
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="dataTable-bottom">
+              <div class="dataTable-info">{{ pageInfo }}</div>
+              <nav class="dataTable-pagination">
+                <ul class="dataTable-pagination-list">
+                  <li class="pager" v-if="currentPage > 1">
+                    <a href="#" @click="changePage(currentPage - 1)">‹</a>
+                  </li>
+                  <li
+                    v-for="pageNum in paginationRange"
+                    :key="pageNum"
+                    :class="{ active: currentPage === pageNum }"
+                  >
+                    <a href="#" @click.prevent="changePage(pageNum)">{{
+                      pageNum
+                    }}</a>
+                  </li>
+                  <li class="pager" v-if="currentPage < totalPages">
+                    <a href="#" @click="changePage(currentPage + 1)">›</a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      currentPage: 1,
+      itemsPerPage: 5,
+      searchQuery: "", // Used for the v-model on the search input
+    };
+  },
+  props: {
+    allStations: Array,
+  },
+  computed: {
+    filteredStations() {
+    // Filter the stations based on the searchQuery
+    return this.searchQuery
+      ? this.allStations.filter((station) => 
+      station.stationId && station.stationId.toLowerCase().includes(this.searchQuery.toLowerCase())
+        )
+      : this.allStations;
+  },
+    totalPages() {
+      return Math.ceil(this.filteredStations.length / this.itemsPerPage);
+    },
+    paginatedStations() {
+      const start = (this.currentPage - 1) * this.itemsPerPage;
+      return this.filteredStations.slice(start, start + this.itemsPerPage);
+    },
+    paginationRange() {
+      let rangeStart = this.currentPage - 2;
+      let rangeEnd = this.currentPage + 2;
+
+      if (rangeStart < 1) {
+        rangeStart = 1;
+        rangeEnd = Math.min(5, this.totalPages);
+      }
+
+      if (rangeEnd > this.totalPages) {
+        rangeEnd = this.totalPages;
+        rangeStart = Math.max(1, this.totalPages - 4);
+      }
+
+      return Array.from(
+        { length: rangeEnd - rangeStart + 1 },
+        (_, i) => i + rangeStart
+      );
+    },
+    pageInfo() {
+      const startItem = (this.currentPage - 1) * this.itemsPerPage + 1;
+      const endItem = Math.min(
+        startItem + this.itemsPerPage - 1,
+        this.filteredStations.length
+      );
+      return `Showing ${startItem} to ${endItem} of ${this.filteredStations.length} items.`;
+    },
+  },
+  methods: {
+    changePage(newPage) {
+      this.currentPage = newPage;
+    },
+    onItemsPerPageChange() {
+      this.currentPage = 1; // Reset to first page when items per page changes
+      this.itemsPerPage = parseInt(this.itemsPerPage); // Ensure itemsPerPage is a number
+    },
+  },
+  watch: {
+    itemsPerPage() {
+      // Watcher to make sure the stations are re-paginated when itemsPerPage changes
+      this.changePage(1); // Go back to the first page
+    },
+  },
+};
+</script>
+
+<style>
+.mt-4-teb {
+  margin-top: 1.5rem !important;
+}
+.row-teb {
+  --bs-gutter-x: 1.5rem;
+  --bs-gutter-y: 0;
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: calc(-1 * var(--bs-gutter-y));
+  margin-right: calc(-0.5 * var(--bs-gutter-x));
+  margin-left: calc(-0.5 * var(--bs-gutter-x));
+}
+
+.col-12-teb {
+  flex: 0 0 auto;
+  width: 100%;
+}
+.row-teb > * {
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 100%;
+  padding-right: calc(var(--bs-gutter-x) * 0.5);
+  padding-left: calc(var(--bs-gutter-x) * 0.5);
+  margin-top: var(--bs-gutter-y);
+}
+
+.card-teb {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+.card-teb {
+  --bs-card-teb-spacer-y: 1rem;
+  --bs-card-teb-spacer-x: 1rem;
+  --bs-card-teb-title-spacer-y: 0.5rem;
+  --bs-card-teb-border-width: 0;
+  --bs-card-teb-border-color: rgba(0, 0, 0, 0.125);
+  --bs-card-teb-border-radius: 0.75rem;
+  --bs-card-teb-box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --bs-card-teb-inner-border-radius: 0.75rem;
+  --bs-card-teb-cap-padding-y: 0.5rem;
+  --bs-card-teb-cap-padding-x: 1rem;
+  --bs-card-teb-cap-bg: #fff;
+  --bs-card-teb-bg: #fff;
+  --bs-card-teb-img-overlay-padding: 1rem;
+  --bs-card-teb-group-margin: 0.75rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  height: var(--bs-card-teb-height);
+  word-wrap: break-word;
+  background-color: var(--bs-card-teb-bg);
+  background-clip: border-box;
+  border: var(--bs-card-teb-border-width) solid var(--bs-card-teb-border-color);
+  border-radius: var(--bs-card-teb-border-radius);
+}
+
+.card-teb .card-teb-header {
+  padding: 1.5rem;
+}
+.card-teb-header:first-child {
+  border-radius: var(--bs-card-teb-inner-border-radius)
+    var(--bs-card-teb-inner-border-radius) 0 0;
+}
+.card-teb-header {
+  padding: var(--bs-card-teb-cap-padding-y) var(--bs-card-teb-cap-padding-x);
+  margin-bottom: 0;
+  color: var(--bs-card-teb-cap-color);
+  background-color: var(--bs-card-teb-cap-bg);
+  border-bottom: var(--bs-card-teb-border-width) solid
+    var(--bs-card-teb-border-color);
+}
+
+.mb-0-teb {
+  margin-bottom: 0 !important;
+}
+.h4-teb,
+.h5-teb,
+.h6-teb,
+h4-teb,
+h5-teb,
+h6-teb {
+  font-weight: 600;
+}
+.h5-teb,
+h5-teb {
+  font-size: 2.25rem;
+  line-height: 1.375;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.mb-0-teb {
+  margin-bottom: 0;
+}
+p {
+  line-height: 1.625;
+  font-weight: 300;
+}
+.p,
+p {
+  font-size: 1rem;
+}
+
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.dataTable-wrapper .dataTable-top {
+  padding: 1.5rem;
+}
+
+.dataTable-wrapper .dataTable-top .dataTable-dropdown {
+  float: left;
+}
+
+.dataTable-bottom:after,
+.dataTable-top:after {
+  clear: both;
+  content: " ";
+  display: table;
+}
+*,
+:after,
+:before {
+  box-sizing: border-box;
+}
+
+.dataTable-wrapper .dataTable-top .dataTable-dropdown label {
+  margin-bottom: 0;
+  margin-left: 0;
+  color: #7b809a;
+  font-weight: 400;
+}
+
+.dataTable-wrapper
+  .dataTable-top
+  .dataTable-dropdown
+  label
+  .dataTable-selector {
+  border-color: #f0f2f5;
+  border-radius: 0.375rem;
+}
+.dataTable-selector {
+  padding: 6px;
+}
+
+.dataTable-wrapper.no-footer .dataTable-container {
+  border-bottom: 0;
+}
+
+.dataTable-table {
+  max-width: 100%;
+  width: 100%;
+  border-spacing: 0;
+  border-collapse: separate;
+}
+.table {
+  --bs-table-color: #7b809a;
+  --bs-table-bg: transparent;
+  --bs-table-border-color: #f0f2f5;
+  --bs-table-accent-bg: transparent;
+  --bs-table-striped-color: #7b809a;
+  --bs-table-striped-bg: rgba(0, 0, 0, 0.05);
+  --bs-table-active-color: #7b809a;
+  --bs-table-active-bg: rgba(0, 0, 0, 0.1);
+  --bs-table-hover-color: #7b809a;
+  --bs-table-hover-bg: rgba(0, 0, 0, 0.075);
+  width: 100%;
+  margin-bottom: 1rem;
+  color: var(--bs-table-color);
+  vertical-align: top;
+  border-color: var(--bs-table-border-color);
+}
+.dataTable-bottom > div:last-child,
+.dataTable-bottom > nav:last-child,
+.dataTable-top > div:last-child,
+.dataTable-top > nav:last-child {
+  float: right;
+}
+
+.dataTable-wrapper .dataTable-top .dataTable-search input {
+  font-size: 0.875rem;
+  color: #495057;
+  border: 1px solid #f0f2f5;
+  border-radius: 0.375rem;
+  margin-left: auto;
+}
+
+.dataTable-input {
+  padding: 6px 12px;
+}
+
+.table > thead {
+  vertical-align: bottom;
+}
+
+tbody,
+td,
+tfoot,
+th,
+thead,
+tr {
+  border-color: inherit;
+  border-style: solid;
+  border-width: 0;
+}
+
+.dataTable-wrapper .dataTable-container .table thead tr th {
+  padding: 0.75rem 1.5rem;
+  opacity: 0.7;
+  font-weight: bolder;
+  color: #7b809a;
+  text-transform: uppercase;
+  font-size: 1rem;
+}
+.table > :not(:last-child) > :last-child > * {
+  border-bottom-color: #f0f2f5;
+}
+.dataTable-table > thead > tr > th {
+  background-color: #f8f9fa; /* Light background for table head */
+  text-transform: uppercase; /* Uppercase header text */
+  color: #6c757d; /* Light font color for header text */
+  font-weight: normal; /* Normal font weight for header text */
+  border-bottom: 2px solid #dee2e6; /* Lighter border for the bottom */
+  vertical-align: bottom;
+  text-align: left;
+}
+
+.dataTable-wrapper .dataTable-container .table tbody tr td {
+  padding: 0.75rem 1.5rem;
+  vertical-align: bottom;
+  text-align: left;
+}
+
+.table td,
+.table th {
+  white-space: nowrap;
+}
+
+.dataTable-wrapper .dataTable-bottom {
+  padding: 1.5rem;
+  padding-top: 0;
+}
+
+.dataTable-wrapper .dataTable-bottom .dataTable-info {
+  color: #7b809a;
+  font-size: 0.875rem;
+}
+
+.dataTable-bottom > div:last-child,
+.dataTable-bottom > nav:last-child,
+.dataTable-top > div:last-child,
+.dataTable-top > nav:last-child {
+  float: right;
+}
+
+.dataTable-pagination ul {
+  margin: 0;
+  padding-left: 0;
+}
+
+.dataTable-pagination li {
+  list-style: none;
+  float: left;
+}
+
+.dataTable-wrapper
+  .dataTable-bottom
+  .dataTable-pagination
+  .dataTable-pagination-list
+  li
+  a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #7b809a;
+  padding: 0;
+  margin: 0 3px;
+  border: 1px solid #dee2e6;
+  border-radius: 50% !important;
+  width: 36px;
+  height: 36px;
+  font-size: 0.875rem;
+  margin-left: 0;
+}
+
+.dataTable-wrapper
+  .dataTable-bottom
+  .dataTable-pagination
+  .dataTable-pagination-list
+  .active
+  a {
+  background: transparent;
+  background-image: linear-gradient(195deg, #50cce8, #11abcd);
+  box-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.09),
+    0 2px 3px -1px rgba(0, 0, 0, 0.07);
+  color: #fff;
+  border: none;
+  border-radius: 50% !important;
+}
+
+.dataTable-pagination .pager a {
+  font-weight: 700;
+}
+
+.dataTable-table th a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.dataTable-sorter {
+  display: inline-block;
+  height: 100%;
+  position: relative;
+  width: 100%;
+}
+a {
+  letter-spacing: 0;
+  color: #344767;
+}
+
+.dashboard-button {
+  padding: 5px 10px;
+  margin-right: 2px; /* Reduced right margin to bring buttons closer */
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background-color: #333;
+  color: white;
+  cursor: pointer;
+  display: inline-block; /* Aligns the buttons inline */
+  text-align: center;
+}
+
+.edit-button {
+  padding: 5px 10px;
+  margin-left: 2px; /* Reduced left margin to bring buttons closer */
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background-color: #333;
+  color: white;
+  cursor: pointer;
+  display: inline-block; /* Aligns the buttons inline */
+  text-align: center;
+}
+</style>

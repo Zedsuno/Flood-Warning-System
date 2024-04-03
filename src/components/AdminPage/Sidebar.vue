@@ -68,11 +68,6 @@
         ><p class="text-home">Home</p></a
       >
     </router-link>
-      <div class="footer-support">
-        <a href="https://www.pwsweather.com/support" class="support-nave"
-          ><p class="text-support">Support</p></a
-        >
-      </div>
       <router-link class="footer-logout" to="/login"
         ><p class="text-logout">Logout</p></router-link
       >

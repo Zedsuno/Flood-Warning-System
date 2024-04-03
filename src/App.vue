@@ -16,16 +16,15 @@ export default {
     AppTopbar,
     AppNavbar,
 },
-  computed: {
-    showTopbarAndNavbar() {
-      // Add all paths where the top bar and navbar should not be shown
-<<<<<<< HEAD
-      const pathsWithoutTopbarAndNavbar = ['/login', '/Register', '/Admin'];
-=======
-      const pathsWithoutTopbarAndNavbar = ['/login', '/Register','/Admin','/Admin/AddStation'];
->>>>>>> f39275a94ee0081fbb318a75651c677a56c7ed6a
-      return !pathsWithoutTopbarAndNavbar.includes(this.$route.path);
-    }
+
+computed: {
+  showTopbarAndNavbar() {
+    // Add all route names where the top bar and navbar should not be shown
+    const routesWithoutTopbarAndNavbar = ['login', 'register', 'AddStation', 'EditStation', 'admin'];
+    // Check if the current route name is not in the list of excluded routes
+    return !routesWithoutTopbarAndNavbar.includes(this.$route.name);
+  }
+
   }
 };
 </script>
