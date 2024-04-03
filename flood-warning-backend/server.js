@@ -3,6 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
+const stationRoutes = require('./routes/stationRoutes');
 
 const app = express();
 
@@ -25,7 +26,7 @@ app.use(express.json());
 
 // Use authRoutes with a prefix of '/api'
 app.use('/api', authRoutes);
-
+app.use('/api', stationRoutes);
 // Start the server
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
