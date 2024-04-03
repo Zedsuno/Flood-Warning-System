@@ -16,6 +16,7 @@ export default {
     AppTopbar,
     AppNavbar,
 },
+
 computed: {
   showTopbarAndNavbar() {
     // Add all route names where the top bar and navbar should not be shown
@@ -23,6 +24,7 @@ computed: {
     // Check if the current route name is not in the list of excluded routes
     return !routesWithoutTopbarAndNavbar.includes(this.$route.name);
   }
+
   }
 };
 </script>
