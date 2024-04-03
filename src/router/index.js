@@ -8,7 +8,9 @@ import LoginPage from '../view/LoginPage.vue';
 import RegisterPage from '../view/RegisterPage.vue';
 import AdminPage from '../view/AdminPage.vue';
 import AddStationPage from '../view/AddStationPage.vue';
-
+import StationPage from '../view/StationPage.vue';
+import FormAddStation from '@/components/AdminPage/FormAddStation.vue';
+import MapPage from '../components/MapPage.vue';
 const routes = [
   {
     path: '/',
@@ -55,9 +57,24 @@ const routes = [
     path: '/admin/AddStation',
     name: 'AddStation',
     component: AddStationPage,
+    props: false 
+  },
+  {
+    path: '/Station',
+    name: 'Station',
+    component: StationPage,
+  },
+  
+  {
+    path: '/admin/edit-station/:stationId',
+    name: 'EditStation',
+    component: FormAddStation, // If you are using the same component for add and edit
+    props: (route) => ({ isEditMode: true, stationId: route.params.stationId })
   },
 {
-
+  path: '/Map',
+  name: 'MapPage',
+  component: MapPage,
 }
   
   // ...more routes here
