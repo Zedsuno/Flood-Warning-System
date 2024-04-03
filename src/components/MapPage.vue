@@ -1,131 +1,161 @@
-
-
-
 <template>
-    <div>
-        <!-- Map container -->
-        <div id="map"></div>
-
-        <!-- Sidebar -->
-        <div id="sidebar">
-            <!-- Sort district -->
-            <div>
-                <input type="text" v-model="searchQuery" placeholder="Search district">
-                <ul>
-                    <li v-for="district in sortedDistricts" :key="district.id">
-                        {{ district.name }}
-                    </li>
-                </ul>
-            </div>
-
-            <!-- Sort sensors -->
-            <div>
-                <select v-model="selectedSensor">
-                    <option value="">All Sensors</option>
-                    <option v-for="sensor in sortedSensors" :key="sensor.id" :value="sensor.id">
-                        {{ sensor.name }}
-                    </option>
-                </select>
-                <ul>
-                    <li v-for="sensor in filteredSensors" :key="sensor.id">
-                        {{ sensor.name }}
-                    </li>
-                </ul>
-            </div>
-
-            <!-- Sort river -->
-            <div>
-                <select v-model="selectedRiver">
-                    <option value="">All Rivers</option>
-                    <option v-for="river in sortedRivers" :key="river.id" :value="river.id">
-                        {{ river.name }}
-                    </option>
-                </select>
-                <ul>
-                    <li v-for="station in filteredStations" :key="station.id">
-                        {{ station.name }}
-                    </li>
-                </ul>
-            </div>
-        </div>
+  <div class="container-map-main">
+    <div id="sidebar-map-main">
+    <!-- sidebar-map-main header with logo and menu icons -->
+    <div class="sidebar-map-main-header">
+      <div class="logo">LOGO</div>
+      <div class="menu-icons">
+        <!-- Add icons here -->
+      </div>
     </div>
+
+    <!-- Search and filter section -->
+    <div class="search-filter-section">
+      <div class="search-box">
+        <input type="text" placeholder="ค้นหา" v-model="searchQuery" />
+      </div>
+      <div class="filter-box">
+        <select v-model="selectedFilter">
+          <option disabled value="">เลือกอำเภอ</option>
+          <!-- options should be rendered from the data properties -->
+        </select>
+      </div>
+      <div class="filter-status">
+        <!-- Status indicators can be rendered here -->
+      </div>
+    </div>
+
+    <!-- Additional sidebar-map-main content -->
+  </div>
+    <div id="map" style="height: 750px;">
+    
+    </div>
+    
+  </div>
+  
 </template>
 
 <script>
+import L from 'leaflet';
+
 export default {
-    data() {
-        return {
-            searchQuery: '',
-            selectedSensor: '',
-            selectedRiver: '',
-            districts: [], // Array of district objects
-            sensors: [], // Array of sensor objects
-            rivers: [], // Array of river objects
-            stations: [], // Array of station objects
-        };
+  data() {
+    return {
+      
+      selectedFilter: '',
+      // Your existing data properties
+      map: null, // For storing the Leaflet map instance
+    };
+  },
+  methods: {
+    initializeMap() {
+      const chiangRaiCoords = [19.91048, 99.840576];
+      const map = L.map("map").setView(chiangRaiCoords, 13); // Example center and zoom
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      }).addTo(map);
+
+      // Example: Add a marker
+      L.marker([19.91048, 99.840576]).addTo(map)
+        .bindPopup('นางแล.')
+        .openPopup();
+      
+      // Add more initialization code as needed (layers, controls, etc.)
     },
-    computed: {
-        sortedDistricts() {
-            // Sort districts based on search query
-            return this.districts.filter(district => district.name.toLowerCase().includes(this.searchQuery.toLowerCase()));
-        },
-        sortedSensors() {
-            // Sort sensors based on selected sensor type
-            if (this.selectedSensor) {
-                return this.sensors.filter(sensor => sensor.type === this.selectedSensor);
-            } else {
-                return this.sensors;
-            }
-        },
-        filteredSensors() {
-            // Filter sensors based on search query
-            return this.sortedSensors.filter(sensor => sensor.name.toLowerCase().includes(this.searchQuery.toLowerCase()));
-        },
-        sortedRivers() {
-            // Sort rivers based on selected river
-            if (this.selectedRiver) {
-                return this.rivers.filter(river => river.id === this.selectedRiver);
-            } else {
-                return this.rivers;
-            }
-        },
-        filteredStations() {
-            // Filter stations based on selected river and search query
-            return this.stations.filter(station => {
-                const matchesRiver = !this.selectedRiver || station.riverId === this.selectedRiver;
-                const matchesSearch = station.name.toLowerCase().includes(this.searchQuery.toLowerCase());
-                return matchesRiver && matchesSearch;
-            });
-        },
-    },
-    mounted() {
-        // Initialize and configure the Google Map
-        const map = new google.maps.Map(document.getElementById('map'), {
-            // Map options
-        });
-
-        // Add map layer switch function
-
-        // Add zoom in and zoom out functionality
-
-        // Add marker and popup functionality for stations
-
-        // Add navigation functionality
-
-        // Add graph and threshold functionality for sensors
-
-        // Add river layer functionality
-    },
+  },
+  mounted() {
+    this.initializeMap();
+  },
 };
 </script>
 
 <style>
-#map {
-    width: 100%;
-    height: 400px;
+
+
+.container-map-main {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  width: 100%; /* Full viewport height */
+  margin: 0; /* Remove default margins */
+  overflow: hidden; /* Prevent scrollbars if content overflows */
 }
 
-#sidebar {
-    /* Sidebar styles */
+.map {
+  flex-grow: 1;
+  height: 700px;
+  width: 300px; /* Takes up remaining space */
 }
+.leaflet-container-map-main {
+  height: 100%;
+  width: 100%;
+}
+
+#sidebar-map-main {
+  width: 300px; /* Reduced width for the sidebar-map-main */
+  background-color: #fff; /* Background color for the sidebar-map-main */
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Shadow effect */
+  display: flex;
+  flex-direction: column; /* Align sidebar-map-main content vertically */
+  justify-content: flex-start; /* Align content to the top */
+  padding: 1rem; /* Padding inside the sidebar-map-main */
+}
+
+#sidebar-map-main .search-section,
+#sidebar-map-main .filter-section {
+  margin-bottom: 1rem; /* Space between sections */
+}
+
+#sidebar-map-main input[type="text"],
+#sidebar-map-main select {
+  width: 100%;
+  padding: 0.5rem;
+  margin: 0.5rem 0;
+  border: 1px solid #ddd; /* Light grey border */
+  border-radius: 0.25rem; /* Slightly rounded corners */
+}
+
+#sidebar-map-main ul {
+  list-style: none; /* Remove list bullets */
+  padding: 0;
+  margin: 0;
+}
+
+#sidebar-map-main .search-button {
+  width: 100%;
+  padding: 0.5rem;
+  background-color: #11abcd; /* Bootstrap primary color for example */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#sidebar-map-main .search-button:hover {
+  background-color: #0056b3; /* Darken button on hover */
+}
+
+/* Logo styles */
+#sidebar-map-main .logo {
+  font-size: 1.5rem; /* Larger font size for the logo */
+  font-weight: bold; /* Make the logo text bold */
+  margin-bottom: 2rem; /* Space below the logo */
+}
+
+/* Remove default list styles for any lists in the sidebar-map-main */
+
+
+
+#sidebar-map-main li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee; /* Light border between items */
+  cursor: pointer;
+}
+
+#sidebar-map-main li:hover {
+  background-color: #f9f9f9; /* Light grey on hover */
+}
+
+/* Additional styles for popups or other elements can be added here */
 </style>

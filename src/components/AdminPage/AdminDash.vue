@@ -39,77 +39,114 @@
               </button>
             </div>
           </div>
-        <router-link to="/Admin/AddStation" class="Botton_Ad_Station">
+          <router-link to="/Admin/AddStation" class="Botton_Ad_Station">
             <svg
-                viewBox="0 0 24 24"
-                focusable="false"
-                role="presentation"
-                class="SVG_Botton_Station"
+              viewBox="0 0 24 24"
+              focusable="false"
+              role="presentation"
+              class="SVG_Botton_Station"
             >
-                <path
-                    fill="currentColor"
-                    d="M0,12a1.5,1.5,0,0,0,1.5,1.5h8.75a.25.25,0,0,1,.25.25V22.5a1.5,1.5,0,0,0,3,0V13.75a.25.25,0,0,1,.25-.25H22.5a1.5,1.5,0,0,0,0-3H13.75a.25.25,0,0,1-.25-.25V1.5a1.5,1.5,0,0,0-3,0v8.75a.25.25,0,0,1-.25.25H1.5A1.5,1.5,0,0,0,0,12Z"
-                ></path>
+              <path
+                fill="currentColor"
+                d="M0,12a1.5,1.5,0,0,0,1.5,1.5h8.75a.25.25,0,0,1,.25.25V22.5a1.5,1.5,0,0,0,3,0V13.75a.25.25,0,0,1,.25-.25H22.5a1.5,1.5,0,0,0,0-3H13.75a.25.25,0,0,1-.25-.25V1.5a1.5,1.5,0,0,0-3,0v8.75a.25.25,0,0,1-.25.25H1.5A1.5,1.5,0,0,0,0,12Z"
+              ></path>
             </svg>
-        </router-link>
+          </router-link>
         </div>
       </div>
       <div v-show="currentView === 'grid'" class="css-0">
         <div class="Div Space"></div>
         <div class="Section_Blog_Ad_All">
-            <router-link to="/Admin/AddStation" class="Section_Blog_Ad_Link">
-          <div class="Section_Blog_Ad" >
-            <div class="Div_Ad_In_Blog">
-              <div class="Div_Ad_Plus">
-                <div class="Div_Space_Ad_Plus">
-                  <div class="Div_Ad_In_Blog">
-                    <svg
-                      viewBox="0 0 24 24"
-                      focusable="false"
-                      role="presentation"
-                      class="Plus_Botton"
-                    >
-                      <path
-                        fill="currentColor"
-                        d="M0,12a1.5,1.5,0,0,0,1.5,1.5h8.75a.25.25,0,0,1,.25.25V22.5a1.5,1.5,0,0,0,3,0V13.75a.25.25,0,0,1,.25-.25H22.5a1.5,1.5,0,0,0,0-3H13.75a.25.25,0,0,1-.25-.25V1.5a1.5,1.5,0,0,0-3,0v8.75a.25.25,0,0,1-.25.25H1.5A1.5,1.5,0,0,0,0,12Z"
-                      ></path>
-                    </svg>
+          <AddStationDash
+            :station-id="currentStationId"
+            @stationSaved="handleStationSaved"
+          />
+          <router-link to="/Admin/AddStation" class="Section_Blog_Ad_Link">
+            <div class="Section_Blog_Ad">
+              <div class="Div_Ad_In_Blog">
+                <div class="Div_Ad_Plus">
+                  <div class="Div_Space_Ad_Plus">
+                    <div class="Div_Ad_In_Blog">
+                      <svg
+                        viewBox="0 0 24 24"
+                        focusable="false"
+                        role="presentation"
+                        class="Plus_Botton"
+                      >
+                        <path
+                          fill="currentColor"
+                          d="M0,12a1.5,1.5,0,0,0,1.5,1.5h8.75a.25.25,0,0,1,.25.25V22.5a1.5,1.5,0,0,0,3,0V13.75a.25.25,0,0,1,.25-.25H22.5a1.5,1.5,0,0,0,0-3H13.75a.25.25,0,0,1-.25-.25V1.5a1.5,1.5,0,0,0-3,0v8.75a.25.25,0,0,1-.25.25H1.5A1.5,1.5,0,0,0,0,12Z"
+                        ></path>
+                      </svg>
+                    </div>
                   </div>
                 </div>
+                <p class="Test_AdStation">เพิ่มสถานี</p>
               </div>
-              <p class="Test_AdStation">เพิ่มสถานี</p>
             </div>
-          </div>
-        </router-link>
+          </router-link>
         </div>
       </div>
       <div v-show="currentView === 'tabular'">
-<Tebular/>
-    </div>
+        <TebularNew :allStations="allStations" />
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import Tebular from '../AdminPage/Tebular.vue'
+import TebularNew from "../AdminPage/TebularNew.vue"
+import AddStationDash from "../AdminPage/AddStationDash";
+import axios from "axios";
+
 export default {
-    
   name: "StationManagement",
   components: {
-    Tebular
+    TebularNew,
+    AddStationDash,
   },
   data() {
     return {
-      currentView: 'grid', // default view
+      currentView: "grid",
+      currentStationId: null,
+      allStations: [],
+      loading: false,
+      error: null,
     };
+  },
+  async mounted() {
+    await this.fetchAllStations();
   },
   methods: {
     setCurrentView(view) {
       this.currentView = view;
     },
+    handleStationSaved(newStation) {
+      console.log("New station saved, ID:", newStation._id);
+      // After a new station is saved, fetch all stations again and reset currentStationId
+      this.fetchAllStations().then(() => {
+        this.currentStationId = null; // Reset currentStationId
+      });
+    },
+    async fetchAllStations() {
+      this.loading = true;
+      try {
+        const response = await axios.get("http://localhost:3001/api/stations");
+        this.allStations = response.data;
+        if (this.allStations.length > 0 && !this.currentStationId) {
+          this.currentStationId = this.allStations[0]._id; // Set to the first station by default
+        }
+        this.loading = false;
+      } catch (error) {
+        console.error("Error fetching all stations:", error);
+        this.error = error;
+        this.loading = false;
+      }
+    },
   },
 };
 </script>
+
 
 <style scoped>
 .Admin-Dash {
@@ -166,11 +203,14 @@ export default {
 }
 .Radio-Group {
   display: flex;
-  background-color: rgb(23, 25, 28);
+  background-color: #17191C; /* Dark background for the button group */
   padding: 2px;
-  border-radius: 9999px;
+  border-radius: 20px; /* Rounded corners for the button group */
+  align-items: center; /* Center buttons vertically */
 }
-.Grid_Radio {
+
+.Grid_Radio,
+.Tabular_Radio { /* Common styles for both buttons */
   border-radius: 9999px;
   font-weight: 700;
   display: inline-flex;
@@ -186,44 +226,9 @@ export default {
   vertical-align: middle;
   line-height: normal;
   outline: none;
-  height: 1.5rem;
+  height: 2rem;
   min-width: 2.5rem;
-  font-size: 0.625rem;
-  padding-left: 12px;
-  padding-right: 12px;
-  background-color: rgb(23, 25, 28);
-  border-color: rgb(255, 255, 255);
-  border-style: solid;
-  border-width: 2px;
-  color: rgb(255, 255, 255);
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  cursor: pointer;
-  -webkit-box-flex: 1;
-  flex-grow: 1;
-  margin-right: 0px;
-}
-.Tabular_Radio {
-  border-radius: 9999px;
-  font-weight: 700;
-  display: inline-flex;
-  appearance: none;
-  -webkit-box-align: center;
-  align-items: center;
-  -webkit-box-pack: center;
-  justify-content: center;
-  transition: all 150ms ease 0s;
-  user-select: none;
-  position: relative;
-  white-space: nowrap;
-  vertical-align: middle;
-  line-height: normal;
-  outline: none;
-  height: 1.5rem;
-  min-width: 2.5rem;
-  font-size: 0.625rem;
+  font-size: 1rem;
   padding-left: 12px;
   padding-right: 12px;
   background-color: transparent;
@@ -235,8 +240,31 @@ export default {
   letter-spacing: 0.1em;
   cursor: pointer;
   -webkit-box-flex: 1;
-  flex-grow: 1;
+  flex-grow: 1;/* Smooth transition for background and text color */
 }
+
+/* Grid button non-active style */
+.Grid_Radio {
+  background-color: #17191C; /* Dark background */
+  color: #FFFFFF; /* White text */
+  border-radius: 20px; /* Matched border-radius */
+}
+
+/* Tabular button non-active style */
+.Tabular_Radio {
+  background-color: transparent;
+  color: #FFFFFF; /* White text */
+  border-radius: 20px; /* Matched border-radius */
+}
+
+/* Active button style */
+.Grid_Radio[aria-checked="true"],
+.Tabular_Radio[aria-checked="true"] {
+  background-color: #11abcd; /* Active button background color */
+  color: #ffffff; /* Active button text color */
+  border-color: #11abcd; /* Active button border color */
+}
+
 .Botton_Ad_Station {
   border-radius: 9999px;
   font-weight: 700;
@@ -308,7 +336,6 @@ export default {
 .Section_Blog_Ad:hover {
   border-color: #11abcd; /* Changes the border color on hover */
 }
-
 
 .Div_Ad_In_Blog {
   position: absolute;
