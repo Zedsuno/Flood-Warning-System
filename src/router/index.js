@@ -10,7 +10,8 @@ import AdminPage from '../view/AdminPage.vue';
 import AddStationPage from '../view/AddStationPage.vue';
 import StationPage from '../view/StationPage.vue';
 import FormAddStation from '@/components/AdminPage/FormAddStation.vue';
-import MapPage from '../components/MapPage.vue';
+import MapPage from "../view/MapPage.vue";
+import AccountPage from '../view/AccoutPage.vue';
 const routes = [
   {
     path: '/',
@@ -75,6 +76,11 @@ const routes = [
   path: '/Map',
   name: 'MapPage',
   component: MapPage,
+},
+{
+  path: '/Account',
+  name: 'Account',
+  component: AccountPage,
 }
   
   // ...more routes here
