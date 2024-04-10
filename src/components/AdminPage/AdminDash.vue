@@ -1,5 +1,6 @@
 <template>
   <div class="Admin-Dash">
+    <Notification v-if="notification.show" :message="notification.message" :type="notification.type" />
     <div class="AdminDiv">
       <div class="css-kow2w3"></div>
     </div>
@@ -58,7 +59,9 @@
         <div class="Div Space"></div>
         <div class="Section_Blog_Ad_All">
           <AddStationDash
-            :station-id="currentStationId"
+            v-for="station in allStations"
+            :key="station._id"
+            :stationId="station._id"
             @stationSaved="handleStationSaved"
           />
           <router-link to="/Admin/AddStation" class="Section_Blog_Ad_Link">
@@ -95,15 +98,43 @@
 </template>
 
 <script>
-import TebularNew from "../AdminPage/TebularNew.vue"
+import { reactive, onMounted, onUnmounted } from 'vue';
+import TebularNew from "../AdminPage/TebularNew.vue";
 import AddStationDash from "../AdminPage/AddStationDash";
 import axios from "axios";
+import { EventBus } from "../../event-bus.js";
+import Notification from '../NotiEventBus.vue';
+
+
 
 export default {
   name: "StationManagement",
   components: {
     TebularNew,
     AddStationDash,
+    Notification,
+  },
+  setup() {
+    const notification = reactive({
+      message: '',
+      type: '',
+      show: false,
+    });
+
+    const showNotification = (data) => {
+      notification.message = data.message;
+      notification.type = data.type;
+      notification.show = true;
+
+      setTimeout(() => notification.show = false, 3000);
+    };
+
+    onMounted(() => EventBus.on('notify', showNotification));
+    onUnmounted(() => EventBus.off('notify', showNotification));
+
+    return {
+      notification,
+    };
   },
   data() {
     return {
@@ -122,11 +153,10 @@ export default {
       this.currentView = view;
     },
     handleStationSaved(newStation) {
-      console.log("New station saved, ID:", newStation._id);
-      // After a new station is saved, fetch all stations again and reset currentStationId
-      this.fetchAllStations().then(() => {
-        this.currentStationId = null; // Reset currentStationId
-      });
+      // Push the new station to the allStations array
+      this.allStations.push(newStation);
+      // Or if you prefer to refetch the entire list (which will include the new station):
+      this.fetchAllStations();
     },
     async fetchAllStations() {
       this.loading = true;
@@ -146,7 +176,6 @@ export default {
   },
 };
 </script>
-
 
 <style scoped>
 .Admin-Dash {
@@ -203,14 +232,15 @@ export default {
 }
 .Radio-Group {
   display: flex;
-  background-color: #17191C; /* Dark background for the button group */
+  background-color: #17191c; /* Dark background for the button group */
   padding: 2px;
   border-radius: 20px; /* Rounded corners for the button group */
   align-items: center; /* Center buttons vertically */
 }
 
 .Grid_Radio,
-.Tabular_Radio { /* Common styles for both buttons */
+.Tabular_Radio {
+  /* Common styles for both buttons */
   border-radius: 9999px;
   font-weight: 700;
   display: inline-flex;
@@ -240,20 +270,20 @@ export default {
   letter-spacing: 0.1em;
   cursor: pointer;
   -webkit-box-flex: 1;
-  flex-grow: 1;/* Smooth transition for background and text color */
+  flex-grow: 1; /* Smooth transition for background and text color */
 }
 
 /* Grid button non-active style */
 .Grid_Radio {
-  background-color: #17191C; /* Dark background */
-  color: #FFFFFF; /* White text */
+  background-color: #17191c; /* Dark background */
+  color: #ffffff; /* White text */
   border-radius: 20px; /* Matched border-radius */
 }
 
 /* Tabular button non-active style */
 .Tabular_Radio {
   background-color: transparent;
-  color: #FFFFFF; /* White text */
+  color: #ffffff; /* White text */
   border-radius: 20px; /* Matched border-radius */
 }
 

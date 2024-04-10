@@ -64,7 +64,7 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.85);
+  background: rgba(0, 0, 0, 0.5);
 }
 
 .toggle-popup__content {
@@ -74,7 +74,7 @@ export default {
 .toggle-popup__box {
   background-color: #fff;
   color: #333;
-  padding: 32px;
+  padding: 40px;
   border-radius: 0.75em;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   width: auto;
@@ -84,13 +84,14 @@ export default {
 .toggle-popup__title {
   font-family: Calibre, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   font-weight: 700;
-  font-size: 1.5rem;
+  font-size: 2rem;
 }
 
 .toggle-popup__description {
   font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   font-weight: 400;
-  font-size: 0.875rem;
+  font-size: 1rem;
+  margin-bottom: 32px;
 }
 
 .toggle-popup__manufacturer-list {
@@ -101,19 +102,20 @@ export default {
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.16);
   border-radius: 0.25em;
-  height: 80px;
+  height: 100px;
   width: 200px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   margin-top: 8px;
+  padding: 16px;
 }
 
 .toggle-popup__manufacturer-name {
   font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 1.25rem;
   color: #718096;
   text-align: center;
 }
@@ -122,7 +124,7 @@ export default {
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
-  margin-top: 32px;
+  margin-top: 40px;
 }
 
 .toggle-popup__button--cancel,
@@ -139,23 +141,24 @@ export default {
   outline: none;
   height: 2rem;
   min-width: 2.5rem;
-  font-size: 0.75rem;
-  padding: 0 16px;
+  font-size: 0.875rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   cursor: pointer;
-  margin-right: 8px;
+  padding: 0 1rem; /* Adjust padding to match DeletePopup.vue */
 }
 
 .toggle-popup__button--cancel {
   background-color: transparent;
   border: 2px solid #282B2E;
   color: #282B2E;
+  margin-right: 8px; /* Space between buttons */
 }
 
 .toggle-popup__button--continue {
-  background-color: #EDEDF7;
-  color: #282B2E;
+  background-color: #11abcd; /* Red background to match Delete button */
+  color: white;
+  border: none; /* No border for continue button */
 }
 
 .toggle-popup__button--continue:disabled {

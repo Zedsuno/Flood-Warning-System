@@ -1,5 +1,21 @@
 <template>
   <div class="Div-Add-Station-All">
+    <DeletePopup
+      v-if="showDeletePopup"
+      @confirmDelete="confirmDelete"
+      @cancelDelete="cancelDelete"
+    />
+    <UpdatePopup
+      v-if="showUpdatePopup"
+      @confirmUpdate="confirmUpdate"
+      @cancelUpdate="cancelUpdate"
+    />
+
+    <SavePopup
+      v-if="showSavePopup"
+      @confirmSave="confirmSave"
+      @cancelSave="cancelSave"
+    />
     <div class="Div-Add-Station">
       <div class="Div-Header-Text">
         <div class="Blog-Text-Add-Header">
@@ -35,7 +51,7 @@
         <div class="botton-Save-All">
           <button
             v-if="isEditMode"
-            @click="deleteStation"
+            @click="showDeleteConfirmation"
             type="button"
             aria-label="Delete Station"
             class="css-1r8mp7n"
@@ -58,7 +74,9 @@
           </button>
           <div class="Botton-Save">
             <button
-              @click="isEditMode ? updateStation() : saveStation()"
+              @click="
+                isEditMode ? showUpdateConfirmation() : showSaveConfirmation()
+              "
               class="Botton-Save-Text"
             >
               {{ isEditMode ? "อัพเดทสถานี" : "สร้างสถานี" }}
@@ -68,16 +86,17 @@
       </div>
 
       <div class="Space-Btw"></div>
-      <form @submit.prevent="isEditMode ? updateStation() : saveStation()">
-        <StationProfile
-          :existingData="stationData"
-          @update-profile="updateStationProfile"
-        />
-        <StationLocation
-          :existingData="stationData.location"
-          @update-location="updateStationLocation"
-        />
-      </form>
+        <form  class="formStationInput " @submit.prevent="isEditMode ? updateStation() : saveStation()">
+          <StationProfile
+            :existingData="stationData"
+            @update-profile="updateStationProfile"
+          />
+          <StationLocation
+            :existingData="stationData.location"
+            @update-location="updateStationLocation"
+            :isEditMode="isEditMode"
+          />
+        </form>
     </div>
   </div>
 </template>
@@ -87,11 +106,17 @@ import axios from "axios";
 import StationProfile from "./StationProfile.vue";
 import StationLocation from "./StationLocation.vue";
 import { mapActions, mapState } from "vuex";
-
+import DeletePopup from "../AdminPage/DeletePopup.vue";
+import UpdatePopup from "../AdminPage/UpdatePopup.vue";
+import SavePopup from "../AdminPage/SavePopup.vue";
+import { EventBus } from "../../event-bus"
 export default {
   components: {
     StationProfile,
     StationLocation,
+    DeletePopup,
+    UpdatePopup,
+    SavePopup,
   },
   props: {
     isEditMode: {
@@ -106,6 +131,9 @@ export default {
   data() {
     return {
       stationData: this.defaultStationData(),
+      showDeletePopup: false,
+      showUpdatePopup: false,
+      showSavePopup: false,
     };
   },
   created() {
@@ -196,63 +224,114 @@ export default {
         this.loading = false;
       }
     },
+    showSaveConfirmation() {
+      this.showSavePopup = true; // Set the flag to true to show the popup
+    },
     // Call this method when the save button is clicked
-    async saveStation() {
+    async confirmSave() {
       if (!this.isEditMode) {
         // Creating a new station
         const postData = { ...this.stationData };
         delete postData._id; // Remove _id when creating a new document
         try {
-          const response = await axios.post(
+           await axios.post(
             "http://localhost:3001/api/stations",
             postData
           );
-          this.$emit("station-saved", response.data);
+          // Notify success
+          EventBus.emit("notify", {
+            message: "Station saved successfully",
+            type: "success",
+          });
           this.$router.push("/Admin");
         } catch (error) {
-          console.error("Error saving the station:", error.response.data);
+          // Notify error
+          EventBus.emit("notify", {
+            message: "Error saving station: " + error.message,
+            type: "error",   
+          });
         }
       } else {
-        // Updating an existing station
+        // If in edit mode, call the update method instead
         await this.updateStation();
       }
+      this.showSavePopup = false;
     },
-    async updateStation() {
+    cancelSave() {
+      this.showSavePopup = false; // Hide the popup
+    },
+    showUpdateConfirmation() {
+      this.showUpdatePopup = true;
+    },
+    async confirmUpdate() {
       try {
         const updateData = { ...this.stationData };
         // Don't delete _id here since it's required for identifying the document to update
-        const response = await axios.put(
+        await axios.put(
           `http://localhost:3001/api/stations/${updateData._id}`,
           updateData
         );
-        console.log("Station updated:", response.data);
+        EventBus.emit('notify', { message: 'Station updated successfully', type: 'success' });
         this.$router.push("/Admin");
       } catch (error) {
         console.error("Error updating the station:", error.response.data);
       }
+
+      this.showUpdatePopup = false;
     },
-    async deleteStation() {
-      if (confirm("คุณแน่ใจใช่มั้ยว่าจะลบสถานีแห่งนี้")) {
-        axios
-          .delete(`http://localhost:3001/api/stations/${this.stationData._id}`)
-          .then(() => {
-            console.log("Station deleted successfully");
-            this.$router.push("/Admin");
-          })
-          .catch((error) => {
-            console.error("Error deleting the station:", error);
-          });
+    cancelUpdate() {
+      this.showUpdatePopup = false;
+    },
+    showDeleteConfirmation() {
+      this.showDeletePopup = true;
+    },
+    async confirmDelete() {
+      try {
+        await axios.delete(
+          `http://localhost:3001/api/stations/${this.stationData._id}`
+        );
+        EventBus.emit('notify', { message: 'Station deleted successfully', type: 'success' });
+        this.$router.push("/Admin");
+      } catch (error) {
+        console.error("Error deleting the station:", error);
       }
+      this.showDeletePopup = false; // Hide the popup regardless of the outcome
+    },
+
+    // Called when the deletion is cancelled from the DeletePopup component
+    cancelDelete() {
+      this.showDeletePopup = false;
     },
   },
 };
 </script>
 
 <style scoped>
-@media screen and (min-width: 62em) {
+
+
+.formStationInput {
+  display: flex; /* Enables flexbox layout */
+  justify-content: space-between; /* Spacing between the child elements */
+  align-items: flex-start; /* Align items to the start of the flex container */
+}
+@media screen and (max-width: 1024px) {
   .Div-Add-Station-All {
-    overflow-y: scroll;
+    flex-direction: column; /* Stack children on top of each other */
+    align-items: center; /* Center the children */
+     /* Stack children in a column on smaller screens */
   }
+
+  .DivStationProfileAll, .Div_Location_Form_All {
+    width: 100%; /* Children take full width */
+    max-width: none; /* Remove max-width restriction */
+  }
+}
+.DivStationProfileAll, .Div_Location_Form_All {
+  width: 50%; /* Children take up half the width */
+  max-width: 600px; /* Or adjust to your design preference */
+   /* Background color for each child */
+   /* Internal spacing */
+  
 }
 .Div-Add-Station-All {
   overflow-y: auto;
