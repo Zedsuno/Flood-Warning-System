@@ -103,8 +103,12 @@
                     <option value="อำเภอป่าแดด">อำเภอป่าแดด</option>
                     <option value="อำเภอเวียงชัย">อำเภอเวียงชัย</option>
                     <option value="อำเภอพญาเม็งราย">อำเภอพญาเม็งราย</option>
-                    <option value="กิ่งอำเภอเวียงแก่น">กิ่งอำเภอเวียงแก่น</option>
-                    <option value="กิ่งอำเภอแม่ฟ้าหลวง">กิ่งอำเภอแม่ฟ้าหลวง</option>
+                    <option value="กิ่งอำเภอเวียงแก่น">
+                      กิ่งอำเภอเวียงแก่น
+                    </option>
+                    <option value="กิ่งอำเภอแม่ฟ้าหลวง">
+                      กิ่งอำเภอแม่ฟ้าหลวง
+                    </option>
                     <option value="กิ่งอำเภอขุนตาล">กิ่งอำเภอขุนตาล</option>
                     <option value="กิ่งอำเภอแม่ลาว">กิ่งอำเภอแม่ลาว</option>
                   </select>
@@ -361,7 +365,6 @@ export default {
         this.latitude = newData.latitude;
         this.longitude = newData.longitude;
         this.elevation = newData.elevation;
-        
 
         // Other properties are updated in a similar fashion...
       },
@@ -418,6 +421,7 @@ export default {
 <style scoped>
 .Div_Location_Form_All {
   box-sizing: border-box;
+  flex-direction: row;
   padding-right: 16px;
   padding-left: 16px;
   width: 100%;
@@ -430,7 +434,7 @@ export default {
   }
 }
 .Div_Location_Form {
-  background-color: whitesmoke;
+  background-color: #fff;
   box-shadow: rgba(0, 0, 0, 0.04) 0px 0px 2px 0px,
     rgba(0, 0, 0, 0.16) 0px 1px 4px 0px;
   margin-bottom: 16px;
@@ -470,7 +474,6 @@ export default {
   border-radius: 9999px;
   margin-top: -8px;
 }
-
 
 .Radio_Botton_Address,
 .Radio_Botton_Coordinate {
@@ -566,24 +569,21 @@ export default {
 .selection-info {
   width: 100%;
   display: flex;
-  -webkit-box-align: center;
   align-items: center;
   position: relative;
   transition: all 0.2s ease 0s;
   outline: none;
   appearance: none;
   font-size: 1rem;
-  padding-right: 2rem;
   height: 2.5rem;
-  border-radius: 0px;
-  border-bottom-width: 2px;
-  border-bottom-style: solid;
-  border-color: inherit;
   background-color: transparent;
-  line-height: normal;
-  color: inherit;
+  border-radius: 0px;
+  border: none; /* Removes the border */
+  border-bottom: 2px solid #aaa; /* Default color for the bottom border */
 }
-
+.selection-info:focus {
+  border-bottom: 2px solid #11abcd; /* Change #00f to the color you want */
+}
 .arrow-selection {
   position: absolute;
   display: inline-flex;
@@ -702,7 +702,6 @@ arrow-selection-svg:not(:root) {
 .input-information {
   width: 100%;
   display: flex;
-  -webkit-box-align: center;
   align-items: center;
   position: relative;
   transition: all 0.2s ease 0s;
@@ -710,17 +709,17 @@ arrow-selection-svg:not(:root) {
   appearance: none;
   font-size: 1rem;
   height: 2.5rem;
-  border-radius: 0px;
-  border-bottom-width: 2px;
-  border-bottom-style: solid;
-  border-color: inherit;
   background-color: transparent;
+  border-radius: 0px;
+  border: none; /* Removes the border */
+  border-bottom: 2px solid #aaa; /* Default color for the bottom border */
 }
-
+.input-information:focus {
+  border-bottom: 2px solid #11abcd; /* Change #00f to the color you want */
+}
 .elevation-input {
   width: 100%;
   display: flex;
-  -webkit-box-align: center;
   align-items: center;
   position: relative;
   transition: all 0.2s ease 0s;
@@ -728,13 +727,14 @@ arrow-selection-svg:not(:root) {
   appearance: none;
   font-size: 1rem;
   height: 2.5rem;
-  border-radius: 0px;
-  border-bottom-width: 2px;
-  border-bottom-style: solid;
-  border-color: inherit;
   background-color: transparent;
+  border-radius: 0px;
+  border: none; /* Removes the border */
+  border-bottom: 2px solid #aaa; /* Default color for the bottom border */
 }
-
+.elevation-input:focus {
+  border-bottom: 2px solid #11abcd; /* Change #00f to the color you want */
+}
 .sl-precision-container {
   margin-top: 16px;
   margin-bottom: 8px;
@@ -817,8 +817,6 @@ input[type="radio"][aria-checked="mixed"] + .sl-radio-custom > * {
   position: absolute;
 }
 
-
-
 .sl-radio-inner {
   background-color: currentcolor;
   border-radius: 9999px;
@@ -883,12 +881,9 @@ input[type="radio"][aria-checked="mixed"] + .sl-radio-custom > * {
 
 .Botton-Geo {
   border-radius: 9999px;
-  font-weight: 700;
+  font-weight: bold; /* Make the font bolder */
   display: inline-flex;
-  appearance: none;
-  -webkit-box-align: center;
   align-items: center;
-  -webkit-box-pack: center;
   justify-content: center;
   transition: all 150ms ease 0s;
   user-select: none;
@@ -897,11 +892,10 @@ input[type="radio"][aria-checked="mixed"] + .sl-radio-custom > * {
   vertical-align: middle;
   line-height: normal;
   outline: none;
-  height: 1.5rem;
-  min-width: 2.5rem;
-  font-size: 0.625rem;
-  padding-left: 12px;
-  padding-right: 12px;
+  height: 2rem; /* Increased height for a larger button */
+  min-width: 3rem; /* Increased minimum width */
+  font-size: 0.75rem; /* Increased font size for readability */
+  padding: 0.75rem 1rem; /* Increased padding for a larger button */
   background-color: rgb(40, 43, 46);
   border: 2px solid transparent;
   color: rgb(250, 251, 253);
@@ -910,17 +904,15 @@ input[type="radio"][aria-checked="mixed"] + .sl-radio-custom > * {
   text-transform: uppercase;
   letter-spacing: 0.1em;
   cursor: pointer;
-  margin-top: 30px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Optional: add shadow for depth */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Optional: add text shadow for better contrast */
 }
 
-.elevation-button {
+.elevation-button{
   border-radius: 9999px;
-  font-weight: 700;
+  font-weight: bold; /* Make the font bolder */
   display: inline-flex;
-  appearance: none;
-  -webkit-box-align: center;
   align-items: center;
-  -webkit-box-pack: center;
   justify-content: center;
   transition: all 150ms ease 0s;
   user-select: none;
@@ -929,11 +921,10 @@ input[type="radio"][aria-checked="mixed"] + .sl-radio-custom > * {
   vertical-align: middle;
   line-height: normal;
   outline: none;
-  height: 1.5rem;
-  min-width: 2.5rem;
-  font-size: 0.625rem;
-  padding-left: 12px;
-  padding-right: 12px;
+  height: 2rem; /* Increased height for a larger button */
+  min-width: 3rem; /* Increased minimum width */
+  font-size: 0.75rem; /* Increased font size for readability */
+  padding: 0.75rem 1rem; /* Increased padding for a larger button */
   background-color: rgb(40, 43, 46);
   border: 2px solid transparent;
   color: rgb(250, 251, 253);
@@ -942,7 +933,8 @@ input[type="radio"][aria-checked="mixed"] + .sl-radio-custom > * {
   text-transform: uppercase;
   letter-spacing: 0.1em;
   cursor: pointer;
-  margin-top: 30px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Optional: add shadow for depth */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Optional: add text shadow for better contrast */
 }
 
 .elevation-description {

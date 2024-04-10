@@ -57,14 +57,23 @@
             <div class="css-0">
               <label class="Labelname">เกณฑ์ระดับน้ำ</label>
               <div class="DivInput">
-                <input
-                  v-model="waterLevelThreshold"
-                  class="Inputclass"
-                  @blur="updateData"
-                />
+                <button
+                  type="button"
+                  class="ButtonClassThreshold"
+                  @click="showThresholdModal"
+                >
+                  ตั้งค่าเกณฑ์ระดับน้ำ
+                </button>
               </div>
             </div>
           </div>
+          <!-- ThresholdFormModal Component -->
+          <ThresholdFormModal
+            v-if="isThresholdModalVisible"
+            :initialThresholds="waterLevelThresholds"
+            @save="saveThresholds"
+            @close="closeThresholdModal"
+          />
         </div>
         <div class="Div-From-input"></div>
       </div>
@@ -74,18 +83,19 @@
 
 <script>
 import TogglePopup from "../AdminPage/togglePopup.vue";
-
+import ThresholdFormModal from "./ThresholdFormModal.vue";
 export default {
   components: {
     TogglePopup,
+    ThresholdFormModal,
   },
   props: {
     existingData: {
       type: Object,
       default: () => ({
-        stationId: '',
-        hardware: '',
-        software: '',
+        stationId: "",
+        hardware: "",
+        software: "",
       }),
     },
   },
@@ -96,8 +106,16 @@ export default {
       software: this.existingData.software,
       active: this.existingData.active || false,
       waterLevel: this.existingData.waterLevel || 0,
-      referenceArea: this.existingData.referenceArea || '',
+      referenceArea: this.existingData.referenceArea || "",
       waterLevelThreshold: this.existingData.waterLevelThreshold,
+      isThresholdModalVisible: false, // Data property to control the visibility of the modal
+      waterLevelThresholds: {
+        // Example structure of threshold data
+        low: { value: 20, color: "#3498db" },
+        moderate: { value: 50, color: "#f1c40f" },
+        high: { value: 80, color: "#e74c3c" },
+        critical: { value: 100, color: "#c0392b" },
+      },
     };
   },
   watch: {
@@ -119,7 +137,7 @@ export default {
       this.$refs.togglePopup.open();
     },
     updateData() {
-      this.$emit('update-profile', {
+      this.$emit("update-profile", {
         stationId: this.stationId,
         hardware: this.hardware,
         software: this.software,
@@ -129,6 +147,16 @@ export default {
         waterLevelThreshold: this.waterLevelThreshold,
       });
     },
+    showThresholdModal() {
+      this.isThresholdModalVisible = true; // Method to open the modal
+    },
+    closeThresholdModal() {
+      this.isThresholdModalVisible = false; // Method to close the modal
+    },
+    saveThresholds(newThresholds) {
+      this.waterLevelThresholds = newThresholds; // Method to update thresholds
+      this.isThresholdModalVisible = false; // Close the modal after saving
+    },
   },
 };
 </script>
@@ -136,9 +164,10 @@ export default {
 <style scoped>
 .DivStationProfileAll {
   box-sizing: border-box;
+  flex-direction: row;
   padding-right: 16px;
   padding-left: 16px;
-  width: 100%;
+  width: 100%; /* Center the form in the page */
 }
 
 @media screen and (min-width: 62em) {
@@ -149,7 +178,7 @@ export default {
 }
 
 .DivStationProfile {
-  background-color: whitesmoke;
+  background-color: #fff;
   box-shadow: rgba(0, 0, 0, 0.04) 0px 0px 2px 0px,
     rgba(0, 0, 0, 0.16) 0px 1px 4px 0px;
   margin-bottom: 16px;
@@ -198,7 +227,6 @@ export default {
 .Inputclass {
   width: 100%;
   display: flex;
-  -webkit-box-align: center;
   align-items: center;
   position: relative;
   transition: all 0.2s ease 0s;
@@ -206,11 +234,15 @@ export default {
   appearance: none;
   font-size: 1rem;
   height: 2.5rem;
-  border-radius: 0px;
-  border-bottom-width: 2px;
-  border-bottom-style: solid;
-  border-color: inherit;
   background-color: transparent;
+  border-radius: 0px;
+  border: none; /* Removes the border */
+  border-bottom: 2px solid #aaa; /* Default color for the bottom border */
+}
+
+/* Changes the bottom border color on input focus */
+.Inputclass:focus {
+  border-bottom: 2px solid #11abcd; /* Change #00f to the color you want */
 }
 
 .TextP {
@@ -236,15 +268,11 @@ export default {
   flex-grow: 1;
   text-align: left;
 }
-
-.Botton-link-hardware {
+.ButtonClassThreshold {
   border-radius: 9999px;
-  font-weight: 700;
+  font-weight: bold; /* Make the font bolder */
   display: inline-flex;
-  appearance: none;
-  -webkit-box-align: center;
   align-items: center;
-  -webkit-box-pack: center;
   justify-content: center;
   transition: all 150ms ease 0s;
   user-select: none;
@@ -253,11 +281,10 @@ export default {
   vertical-align: middle;
   line-height: normal;
   outline: none;
-  height: 1.5rem;
-  min-width: 2.5rem;
-  font-size: 0.625rem;
-  padding-left: 12px;
-  padding-right: 12px;
+  height: 2rem; /* Increased height for a larger button */
+  min-width: 3rem; /* Increased minimum width */
+  font-size: 0.75rem; /* Increased font size for readability */
+  padding: 0.75rem 1rem; /* Increased padding for a larger button */
   background-color: rgb(40, 43, 46);
   border: 2px solid transparent;
   color: rgb(250, 251, 253);
@@ -266,76 +293,35 @@ export default {
   text-transform: uppercase;
   letter-spacing: 0.1em;
   cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Optional: add shadow for depth */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Optional: add text shadow for better contrast */
 }
-
-.Labelname {
+.Botton-link-hardware {
+  border-radius: 9999px;
+  font-weight: bold; /* Make the font bolder */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 150ms ease 0s;
+  user-select: none;
+  position: relative;
+  white-space: nowrap;
+  vertical-align: middle;
+  line-height: normal;
+  outline: none;
+  height: 2rem; /* Increased height for a larger button */
+  min-width: 3rem; /* Increased minimum width */
+  font-size: 0.75rem; /* Increased font size for readability */
+  padding: 0.75rem 1rem; /* Increased padding for a larger button */
+  background-color: rgb(40, 43, 46);
+  border: 2px solid transparent;
+  color: rgb(250, 251, 253);
   font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
     Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-  margin: 0px;
-  font-weight: 700;
-  font-size: 0.875rem;
-}
-
-.DivInput {
-  display: flex;
-  position: relative;
-}
-
-.Inputclass {
-  width: 100%;
-  display: flex;
-  -webkit-box-align: center;
-  align-items: center;
-  position: relative;
-  transition: all 0.2s ease 0s;
-  outline: none;
-  appearance: none;
-  font-size: 1rem;
-  height: 2.5rem;
-  border-radius: 0px;
-  border-bottom-width: 2px;
-  border-bottom-style: solid;
-  border-color: inherit;
-  background-color: transparent;
-}
-
-.Div-From-input-Station {
-  margin-bottom: 32px;
-}
-
-.Labelname {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-  margin: 0px;
-  font-weight: 700;
-  font-size: 0.875rem;
-}
-
-.DivInput {
-  display: flex;
-  position: relative;
-}
-
-.Inputclass {
-  width: 100%;
-  display: flex;
-  -webkit-box-align: center;
-  align-items: center;
-  position: relative;
-  transition: all 0.2s ease 0s;
-  outline: none;
-  appearance: none;
-  font-size: 1rem;
-  height: 2.5rem;
-  border-radius: 0px;
-  border-bottom-width: 2px;
-  border-bottom-style: solid;
-  border-color: inherit;
-  background-color: transparent;
-}
-
-.Div-From-input {
-  display: flex;
-  flex-direction: column;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Optional: add shadow for depth */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Optional: add text shadow for better contrast */
 }
 </style>

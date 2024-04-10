@@ -5,7 +5,7 @@
     </div>
     <!-- Centered marker overlay -->
     <div class="map-center-marker">
-      <div class="marker-icon"></div>
+
       <div class="marker-circle"></div>
     </div>
   </div>
@@ -18,15 +18,21 @@ import "leaflet/dist/leaflet.css";
 export default {
   name: "MapBlogStation",
   props: {
-  latitude: Number,
-  longtitude: Number,
+  latitude: {
+    type: Number,
+    default: 19.91048, // Default latitude if not provided
+  },
+  longitude: {
+    type: Number,
+    default: 99.840576, // Default longitude if not provided
+  },
 },
 
 mounted() {
   this.initMap(this.latitude, this.longitude);
 },
 methods: {
-  initMap(lat = 19.91048, lng = 99.840576) {
+  initMap(lat, lng ) {
     const mapCoords = [lat, lng]; // Default coordinates if none are provided
     this.map = L.map("map").setView(mapCoords, 13);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -40,6 +46,14 @@ methods: {
       });
     },
   },
+  watch: {
+  latitude(newLat) {
+    this.updateMapCenter(newLat, this.longitude);
+  },
+  longitude(newLng) {
+    this.updateMapCenter(this.latitude, newLng);
+  }
+},
 };
 </script>
 
@@ -72,10 +86,23 @@ methods: {
 .marker-circle {
   width: 20px;
   height: 20px;
-  background-color: rgb(35, 187, 241);
-  border-color: rgb(255, 255, 255);
-  border-width: 3px;
-  border-style: solid;
-  border-radius: 9999px;
+  border-radius: 50%;
+  background: rgb(35, 187, 241);
+  border: 3px solid #fff;
+  animation: pulseAnimation 2s infinite;
+  /* Adjust the box-shadow to create a marker pin effect */
+ 
+}
+
+@keyframes pulseAnimation {
+  0% {
+    box-shadow: 0 0 0 0 rgba(35, 187, 241, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 20px rgba(35, 187, 241, 0); /* Increased maximum spread */
+  }
+  100% {
+    box-shadow: 0 0 0 20px rgba(35, 187, 241, 0);
+  }
 }
 </style>
