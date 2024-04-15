@@ -1,14 +1,14 @@
 <template>
     <div class="threshold-modal">
       <div class="modal-content">
-        <h3>Set Water Level Thresholds</h3>
+        <h3>ตั้งค่าเกณฑ์ระดับน้ำ</h3>
         <form @submit.prevent="saveThresholds">
           <div v-for="(threshold, index) in thresholds" :key="index" class="form-group">
             <span class="remove-icon" @click="removeThreshold(index)">&#10005;</span> <!-- Changed button to span for X -->
             <div class="threshold-details">
               <input 
                 type="text" 
-                placeholder="Threshold Name"
+                placeholder="ชื่อเกณฑ์"
                 v-model="threshold.name" 
               />
               <input 
@@ -19,10 +19,10 @@
               <input type="color" v-model="threshold.color" class="color-input"> <!-- Added class for styling -->
             </div>
           </div>
-          <button type="button" @click="addThreshold" class="add-button">Add Threshold</button>
+          <button type="button" @click="addThreshold" class="add-button">เพิ่มการตั้งค่าเกณฑ์</button>
           <div class="form-actions">
-            <button type="submit" class="save-button">Save Thresholds</button>
-            <button type="button" @click="$emit('close')" class="cancel-button">Cancel</button>
+            <button type="submit" class="save-button">บันทึกการตั้งค่าเกณฑ์</button>
+            <button type="button" @click="$emit('close')" class="cancel-button">ยกเลิก</button>
           </div>
         </form>
       </div>

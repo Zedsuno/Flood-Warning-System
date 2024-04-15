@@ -1,3 +1,4 @@
+@/assets/Logo/Logo (Replace).png"
 <template>
   <div class="site ">
     <div class="header-nave">
@@ -68,9 +69,9 @@
         ><p class="text-home">Home</p></a
       >
     </router-link>
-      <router-link class="footer-logout" to="/login"
-        ><p class="text-logout">Logout</p></router-link
-      >
+    <button class="footer-logout" @click="logout">
+      <p class="text-logout">ออกจากระบบ</p>
+    </button>
     </div>
   </div>
 </template>
@@ -78,6 +79,15 @@
 <script>
 export default {
   name: "Sidebar-AdminPage",
+  methods: {
+    logout() {
+      // Clear the token from local storage
+      localStorage.removeItem('token');
+
+      // Redirect to the login page
+      this.$router.push('/login');
+    }
+  }
 };
 </script>
 
@@ -121,10 +131,10 @@ export default {
 .logo-link {
   display: flex;
   align-items: center;
-  color: var(--jet); /* Adjust as needed */
-  text-decoration: none; /* Remove underline from link */
-  font-weight: bold; /* Bold text for the header */
-  font-size: 18px; /* Adjust the font size as needed */
+  text-decoration: none;
+  color: #111827;
+  font-weight: 600;
+  margin-bottom: 16px;
 }
 
 .logo-link:hover {
@@ -319,27 +329,28 @@ export default {
 }
 
 .footer-logout {
-  color: inherit;
-  text-decoration: inherit;
-  transition: all 0.15s ease-out 0s;
+  color: var(--jet);
+  text-decoration: none;
+  transition: color 0.15s ease-out;
   cursor: pointer;
   outline: none;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   margin-top: 16px;
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  display: flex;
-  color: var(--jet);
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+  display: block;
 }
 
-.footer-logout:hover{
-  color: var(--pacific-cyan);
+.footer-logout:hover {
+  color: #11abcd
 }
 
 .text-logout {
   font-family: Calibre, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   margin: 0px;
   font-weight: 700;
   font-size: 1.125rem;

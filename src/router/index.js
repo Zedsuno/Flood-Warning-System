@@ -12,6 +12,7 @@ import StationPage from '../view/StationPage.vue';
 import FormAddStation from '@/components/AdminPage/FormAddStation.vue';
 import MapPage from "../view/MapPage.vue";
 import AccountPage from '../view/AccoutPage.vue';
+import authGuard from '@/router/auth-guard';
 const routes = [
   {
     path: '/',
@@ -50,9 +51,10 @@ const routes = [
     component: RegisterPage,
   },
   {
-    path: '/admin',
+    path: '/Admin',
     name: 'admin',
     component: AdminPage,
+    beforeEnter: authGuard
   },
   {
     path: '/admin/AddStation',

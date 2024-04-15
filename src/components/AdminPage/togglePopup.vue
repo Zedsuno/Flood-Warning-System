@@ -11,14 +11,25 @@
           ในผู้ให้บริการฮาร์ดแวร์ของคุณ
         </p>
         <div class="toggle-popup__manufacturer-list">
-          <div class="toggle-popup__manufacturer-item" @click="selectManufacturer('Davis Instruments')">
-            <p class="toggle-popup__manufacturer-name">Davis Instruments</p>
+          <div
+            class="toggle-popup__manufacturer-item"
+            @click="selectManufacturer('OMEGA')"
+          >
+            <p class="toggle-popup__manufacturer-name">OMEGA</p>
           </div>
           <!-- Add more manufacturers here -->
         </div>
         <div class="toggle-popup__buttons">
-          <button class="toggle-popup__button--cancel" @click="close">Cancel</button>
-          <button class="toggle-popup__button--continue" :disabled="!selectedManufacturer">Continue</button>
+          <button class="toggle-popup__button--cancel" @click="close">
+            Cancel
+          </button>
+          <button
+            class="toggle-popup__button--continue"
+            :disabled="!selectedManufacturer"
+            @click="continueToApiSetup"
+          >
+            Continue
+          </button>
         </div>
       </div>
     </div>
@@ -43,8 +54,14 @@ export default {
     selectManufacturer(manufacturer) {
       this.selectedManufacturer = manufacturer;
       // Handle the selection
-    }
-  }
+    },
+    continueToApiSetup() {
+      if (this.selectedManufacturer) {
+        // Emit an event to the parent component to change the view
+        this.$emit('continue');
+      }
+    },
+  },
 };
 </script>
 
@@ -82,13 +99,15 @@ export default {
 }
 
 .toggle-popup__title {
-  font-family: Calibre, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-family: Calibre, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
+    Arial, sans-serif;
   font-weight: 700;
   font-size: 2rem;
 }
 
 .toggle-popup__description {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
+    Arial, sans-serif;
   font-weight: 400;
   font-size: 1rem;
   margin-bottom: 32px;
@@ -113,7 +132,8 @@ export default {
 }
 
 .toggle-popup__manufacturer-name {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
+    Arial, sans-serif;
   font-weight: 700;
   font-size: 1.25rem;
   color: #718096;
@@ -150,8 +170,8 @@ export default {
 
 .toggle-popup__button--cancel {
   background-color: transparent;
-  border: 2px solid #282B2E;
-  color: #282B2E;
+  border: 2px solid #282b2e;
+  color: #282b2e;
   margin-right: 8px; /* Space between buttons */
 }
 
