@@ -36,7 +36,11 @@
           <button type="button" class="Botton-link-hardware" @click="openPopup">
             เชื่อมโยงเซนเซอร์
           </button>
-          <TogglePopup ref="togglePopup" />
+          <TogglePopup ref="togglePopup" @continue="handleContinue" />
+          <ApiToggle
+            v-if="showApiPopup"
+            @close-api-popup="showApiPopup = false"
+          />
         </div>
         <div class="Div-From-input-Station">
           <div class="Div-From-input-blog">
@@ -84,10 +88,12 @@
 <script>
 import TogglePopup from "../AdminPage/togglePopup.vue";
 import ThresholdFormModal from "./ThresholdFormModal.vue";
+import ApiToggle from "../AdminPage/ApiPopup.vue";
 export default {
   components: {
     TogglePopup,
     ThresholdFormModal,
+    ApiToggle
   },
   props: {
     existingData: {
@@ -108,6 +114,7 @@ export default {
       waterLevel: this.existingData.waterLevel || 0,
       referenceArea: this.existingData.referenceArea || "",
       waterLevelThreshold: this.existingData.waterLevelThreshold,
+      showApiPopup: false,
       isThresholdModalVisible: false, // Data property to control the visibility of the modal
       waterLevelThresholds: {
         // Example structure of threshold data
@@ -156,6 +163,11 @@ export default {
     saveThresholds(newThresholds) {
       this.waterLevelThresholds = newThresholds; // Method to update thresholds
       this.isThresholdModalVisible = false; // Close the modal after saving
+    },
+    handleContinue() {
+      // Set showApiPopup to true to show the ApiToggle component
+      this.showApiPopup = true;
+      this.$refs.togglePopup.close()  ;
     },
   },
 };
