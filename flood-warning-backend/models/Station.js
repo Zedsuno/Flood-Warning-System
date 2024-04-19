@@ -1,24 +1,15 @@
 const mongoose = require('mongoose');
-
-const SensorReadingSchema = new mongoose.Schema({
-  timestamp: {
-    type: Date,
-    default: Date.now
-  },
-  value: Number, // The actual reading from the sensor
-  // Add additional fields for other sensor data if needed
+// Define ThresholdSchema next
+const ThresholdSchema = new mongoose.Schema({
+  name: String,
+  value: Number,
+  color: String,
 }, { _id: false });
 
-const HardwareSchema = new mongoose.Schema({
-  name: String, // Name or description of the hardware
-  apiKey: String, // Unique API key for the sensor
-  sensorType: String, // Type of the sensor, e.g., "Water Level Sensor"
-  readings: [SensorReadingSchema], // Array to store multiple readings over time
-}, { _id: false });
-
+// Now define StationSchema
 const StationSchema = new mongoose.Schema({
   stationId: String,
-  hardware: [HardwareSchema], // Now an array to support multiple hardware devices
+  hardware: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Hardware' }],
   software: String,
   location: {
     address: String,
@@ -30,16 +21,24 @@ const StationSchema = new mongoose.Schema({
     elevation: Number,
     precision: String,
   },
-  active: Boolean, // Whether the station is active or not
-  waterLevel: Number, // Current water level
-  referenceArea: String, // The area that the station is monitoring
-  waterLevelThreshold: Number, // The threshold of water level for alerts
-  status: {
-    type: String,
-    enum: ['active', 'inactive'],
-    default: 'active'
-  },
-  apiKey: String, // Unique API key for the station
+  active: Boolean,
+  thresholds: [ThresholdSchema],
+  status: String,
+  apiKey: String,
+  sensorDistance: Number, // The fixed distance from the sensor to a reference point
+  riverbedDistance: Number, // The distance from the reference point to the riverbed
+});
+
+StationSchema.virtual('waterSurfaceToSensor').get(function() {
+  // Assuming 'sensorDistance' is the height of the sensor from the riverbed
+  // and the latest sensor value is the distance to the water surface
+  const latestReading = this.hardware.map(h => h.readings[h.readings.length - 1]).reduce((a, b) => a.timestamp > b.timestamp ? a : b, {value: 0});
+  return this.sensorDistance - latestReading.value;
+});
+
+StationSchema.virtual('totalWaterDepth').get(function() {
+  // 'riverbedDistance' is the total depth from riverbed to water surface
+  return this.riverbedDistance - this.waterSurfaceToSensor;
 });
 
 module.exports = mongoose.model('Station', StationSchema);

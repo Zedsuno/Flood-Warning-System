@@ -257,8 +257,7 @@ export default {
   font-size: 1.875rem;
   line-height: 1;
   font-weight: 700;
-  font-family: Calibre, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: 'Prompt', sans-serif;
   margin-bottom: 0px;
   margin-top: 8px;
   margin-right: 32px;
@@ -297,8 +296,7 @@ export default {
   border-style: solid;
   border-width: 2px;
   color: rgb(255, 255, 255);
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: 'Prompt', sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   cursor: pointer;
@@ -331,8 +329,7 @@ export default {
   background-color: transparent;
   border: 2px solid transparent;
   color: rgb(255, 255, 255);
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: 'Prompt', sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   cursor: pointer;
@@ -363,8 +360,7 @@ export default {
 }
 
 .Text-P {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: 'Prompt', sans-serif;
   margin: 0px;
   font-weight: 400;
   font-size: 0.875rem;
@@ -493,8 +489,7 @@ arrow-selection-svg:not(:root) {
 }
 
 .text-p-mapblog {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: 'Prompt', sans-serif;
   margin: 0px 0px 8px;
   font-weight: 400;
   font-size: 0.75rem;
@@ -567,8 +562,7 @@ arrow-selection-svg:not(:root) {
   margin-bottom: 8px;
 }
 .Label-Text-name {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: 'Prompt', sans-serif;
   margin: 0px;
   font-weight: 700;
   font-size: 0.875rem;
@@ -613,8 +607,7 @@ input[type="radio"][aria-checked="mixed"] + .sl-radio-custom > * {
 }
 
 .Text-P {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: 'Prompt', sans-serif;
   margin: 0px;
   font-weight: 400;
   font-size: 0.875rem;
@@ -675,8 +668,7 @@ input[type="radio"][aria-checked="mixed"] + .sl-radio-custom > * {
 }
 
 .Text-P {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: 'Prompt', sans-serif;
   margin: 0px;
   font-weight: 400;
   font-size: 0.875rem;
@@ -684,8 +676,7 @@ input[type="radio"][aria-checked="mixed"] + .sl-radio-custom > * {
 }
 
 .sl-description {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: 'Prompt', sans-serif;
   margin: 4px 0px;
   font-weight: 400;
   font-size: 0.75rem;
@@ -715,8 +706,7 @@ input[type="radio"][aria-checked="mixed"] + .sl-radio-custom > * {
   }
 }
 .elevation-units {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: 'Prompt', sans-serif;
   margin: 0px 16px 0px 0px;
   font-weight: 400;
   font-size: 1rem;
@@ -746,8 +736,7 @@ input[type="radio"][aria-checked="mixed"] + .sl-radio-custom > * {
   background-color: rgb(40, 43, 46);
   border: 2px solid transparent;
   color: rgb(250, 251, 253);
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: 'Prompt', sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   cursor: pointer;
@@ -778,8 +767,7 @@ input[type="radio"][aria-checked="mixed"] + .sl-radio-custom > * {
   background-color: rgb(40, 43, 46);
   border: 2px solid transparent;
   color: rgb(250, 251, 253);
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: 'Prompt', sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   cursor: pointer;
@@ -787,8 +775,7 @@ input[type="radio"][aria-checked="mixed"] + .sl-radio-custom > * {
 }
 
 .elevation-description {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: 'Prompt', sans-serif;
   margin: 8px 0px 0px;
   font-weight: 400;
   font-size: 0.75rem;

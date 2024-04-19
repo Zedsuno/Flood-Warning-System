@@ -128,8 +128,7 @@ export default {
 }
 
 .temperature-text {
-  font-family: Calibre, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: 'Prompt', sans-serif;
   margin: 0px;
   font-weight: 600;
   font-size: 22px;
@@ -150,7 +149,7 @@ export default {
   height: 20px;
 }
 .station-name-text {
-  font-family: "Calibre", Helvetica, Arial;
+  font-family: 'Prompt', sans-serif;
   font-weight: 800;
   font-size: 20px;
   fill: #333;

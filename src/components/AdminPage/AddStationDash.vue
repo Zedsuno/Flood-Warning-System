@@ -13,16 +13,23 @@
     </div>
     <div class="station-details">
       <div class="station-status">
-        <span class="status-indicator" :class="{ active: stationData.active }"
-          >ไม่ได้ใช้งาน</span
+        <span
+          class="status-badge"
+          :class="{ inactive: stationData.active === false }"
         >
+          {{ stationData.active ? "ใช้งานอยู่" : "ไม่ได้ใช้งาน" }}
+        </span>
         <p class="station-name">{{ stationData.stationId }}</p>
       </div>
-      <p class="station-location">{{ stationData.location.address }},{{ stationData.location.state }},{{ stationData.location.river }},{{ stationData.location.postalCode }}</p>
+      <p class="station-location">
+        {{ stationData.location.address }},{{ stationData.location.state }},{{
+          stationData.location.river
+        }},{{ stationData.location.postalCode }}
+      </p>
       <div class="separator"></div>
       <div class="station-info">
         <p class="data-status">
-          {{ stationData.dataStatus || "ไม่ได้ส่ง Data เข้ามา"}}
+          {{ stationData.dataStatus || "ไม่ได้ส่ง Data เข้ามา" }}
         </p>
       </div>
       <div class="station-actions">
@@ -68,9 +75,9 @@ export default {
   },
   methods: {
     navigateToEditStation(stationId) {
-    // Optionally, you can include additional logic here before navigating.
-    this.$router.push({ name: 'EditStation', params: { stationId } });
-  },
+      // Optionally, you can include additional logic here before navigating.
+      this.$router.push({ name: "EditStation", params: { stationId } });
+    },
     async fetchStationData(stationId) {
       if (!stationId) {
         console.error("fetchStationData was called without a stationId.");
@@ -118,20 +125,17 @@ export default {
   }
 }
 .station-map-card {
-  background-color: #333740; /* Dark background color for the card */
-  color: #ffffff; /* White text color for legibility */
-  border: 2px solid #2d2f33; /* Dark border for definition */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); /* Shadow for depth */
-  border-radius: 0px; /* Rounded corners as seen in the image */
-  overflow: hidden; /* Ensure content does not overflow the card boundaries */
+  background: rgba(255, 255, 255, 0.5);
+  border: 2px solid #e7eaf3; /* Subtle border like login card */
+  box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08); /* Shadow like login card */
+  border-radius: 10px; /* Rounded corners like login card */
+  overflow: hidden; /* Content does not overflow */
   transition: transform 0.1s ease-in-out; /* Smooth transition for hover effect */
-  position: relative; /* Relative positioning for internal positioning */
-  display: flex; /* Flex layout for internal structure */
-  flex-direction: column; /* Stack children vertically */
-  margin-right: 16px;
-  margin-bottom: 16px;
-  border-color: transparent;
-  border-width: 3px; /* Space below the card */
+  position: relative; /* Relative positioning */
+  display: flex; /* Flex layout */
+  flex-direction: column; /* Children are stacked vertically */
+  margin-right: 16px; /* Consistent spacing */
+  margin-bottom: 16px; /* Consistent spacing */
 }
 
 .map-container {
@@ -178,33 +182,25 @@ export default {
 }
 
 .loader-svg .awxjs__fill-path {
-  fill: #23bbf1; /* Loader color to match theme */
+  fill: #11abcd; /* Loader color to match theme */
 }
 
 .station-details {
-  border-radius: 0;
-  padding: 16px; /* Padding around the station details */
+  padding: 1rem; /* Consistent padding */
 }
 
 .station-status {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px; /* Space between status and station name */
+  margin-bottom: 0.75rem; /* Adjusted space */
 }
 
-.status-indicator {
-  border-radius: 0;
-  background-color: #1a1c1e; /* Background for status indicator */
-  color: #909296; /* Color for the status text */
-  border-radius: 15px; /* Rounded corners for the status indicator */
-  padding: 6px 12px; /* Padding inside the status indicator */
-  font-size: 14px; /* Font size for status text */
-}
 
 .station-name {
-  font-weight: 700;
-  font-size: 24px; /* Larger font size for the station name */
+  font-weight: 600; /* Bold font */
+  font-size: 1.5rem; /* Larger font size */
+  color: #212529; /* Text color consistent with LoginPage.vue */
 }
 
 .station-location {
@@ -213,14 +209,14 @@ export default {
 }
 
 .separator {
-  height: 1px; /* Height of the separator */
-  background-color: #2d2f33; /* Color for the separator */
-  margin: 12px 0; /* Margin around the separator */
+  height: 1px;
+  background-color: #e7eaf3; /* Separator color from LoginPage.vue */
+  margin: 1rem 0;
 }
 
 .station-actions .action-btn {
-  border-radius: 0;
-  background-color: #23bbf1; /* Background color for buttons */
+  border-radius: 30px;
+  /* Background color for buttons */
   color: #fff; /* Text color for buttons */
   border: none; /* No border for buttons */
   padding: 8px 16px; /* Padding inside the buttons */
@@ -231,11 +227,11 @@ export default {
   border-radius: 9999px; /* Fully rounded corners for buttons */
 }
 
-.dashboard {
+.station-actions .action-btn.dashboard {
   background-color: #4a90e2; /* Different background color for dashboard button */
 }
 
-.edit {
+.station-actions .action-btn.edit {
   background-color: #f5a623; /* Different background color for edit button */
 }
 
@@ -244,7 +240,6 @@ export default {
   transform: scale(1.02); /* Slightly scale up the card on hover */
   border-color: #23bbf1; /* Highlight border color on hover */
 }
-
 
 /* Add any more custom styles needed to fine-tune the UI */
 </style>

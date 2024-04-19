@@ -179,11 +179,12 @@ export default {
 
 <style scoped>
 .Admin-Dash {
-  background-color: rgb(219, 226, 226);
+  background-color: var(--color-background);
   -webkit-box-flex: 1;
   flex-grow: 1;
   z-index: 1;
   min-height: 100vh;
+  font-family: 'Prompt', sans-serif;
 }
 .Section-Dash {
   padding: 32px;
@@ -196,29 +197,18 @@ export default {
   align-items: center;
   -webkit-box-pack: justify;
   justify-content: space-between;
-  margin-bottom: 32px;
+  margin-bottom: 2rem;
 }
 
-.Station-Text-Top {
-  margin-right: 8px;
-}
-
-.Div-Text-Blog {
+.Div-Text-Blog, .Station-Text-Top {
   display: flex;
-  flex-direction: row;
-  -webkit-box-align: center;
   align-items: center;
 }
 
 .Test-H1-Station {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 2.25rem;
-  line-height: 1;
-  font-weight: 700;
-  font-family: Calibre, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  color: #344767; /* Same color as headers in LoginPage.vue */
+  font-size: 2rem; /* Same font size as LoginPage.vue header */
+  font-weight: 600; /* Same font weight as LoginPage.vue header */
 }
 
 .Div-Text-Blog {
@@ -228,73 +218,73 @@ export default {
   align-items: center;
 }
 .Blog-Radio {
-  margin-right: 32px;
-}
-.Radio-Group {
-  display: flex;
-  background-color: #17191c; /* Dark background for the button group */
-  padding: 2px;
-  border-radius: 20px; /* Rounded corners for the button group */
-  align-items: center; /* Center buttons vertically */
+  margin-right: 32px; /* Align right margin with InfoSection.vue if necessary */
 }
 
+.Radio-Group {
+  display: flex;
+  background-color: #ffffff; /* Light background for light mode */
+  padding: 2px;
+  border-radius: 1rem; /* Consistent border-radius */
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24); /* Softer shadow for light mode */
+}
+
+/* Consistent button styles */
 .Grid_Radio,
 .Tabular_Radio {
-  /* Common styles for both buttons */
-  border-radius: 9999px;
-  font-weight: 700;
+  border-radius: 1rem;
+  font-weight: 600;
   display: inline-flex;
-  appearance: none;
-  -webkit-box-align: center;
   align-items: center;
-  -webkit-box-pack: center;
   justify-content: center;
-  transition: all 150ms ease 0s;
+  transition: all 0.2s;
   user-select: none;
   position: relative;
-  white-space: nowrap;
   vertical-align: middle;
   line-height: normal;
   outline: none;
   height: 2rem;
   min-width: 2.5rem;
   font-size: 1rem;
-  padding-left: 12px;
-  padding-right: 12px;
-  background-color: transparent;
-  border: 2px solid transparent;
-  color: rgb(255, 255, 255);
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  padding: 10px 20px;
+  background-color: #f8f9fa; /* Slightly off-white background */
+  border: 1px solid #dcdcdc; /* Lighter border color */
+  color: #212529; /* Darker text color for contrast */
+  font-family: 'Prompt', sans-serif;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: normal;
   cursor: pointer;
-  -webkit-box-flex: 1;
-  flex-grow: 1; /* Smooth transition for background and text color */
 }
 
-/* Grid button non-active style */
-.Grid_Radio {
-  background-color: #17191c; /* Dark background */
-  color: #ffffff; /* White text */
-  border-radius: 20px; /* Matched border-radius */
-}
 
-/* Tabular button non-active style */
-.Tabular_Radio {
-  background-color: transparent;
-  color: #ffffff; /* White text */
-  border-radius: 20px; /* Matched border-radius */
-}
-
-/* Active button style */
+/* Active button styles - Match the styles from InfoSection.vue */
 .Grid_Radio[aria-checked="true"],
 .Tabular_Radio[aria-checked="true"] {
-  background-color: #11abcd; /* Active button background color */
-  color: #ffffff; /* Active button text color */
-  border-color: #11abcd; /* Active button border color */
+  background-image: linear-gradient(to right, #11abcd, #25adfc); /* Gradient background like InfoSection.vue button */
+  color: #ffffff; /* White text for active state */
+  box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08); /* Shadow for a 'lifted' effect */
 }
 
+/* Hover effect to match InfoSection.vue button */
+.Grid_Radio:hover,
+.Tabular_Radio:hover {
+  transform: translateY(-2px); /* Slightly raise the button on hover */
+  box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08); /* Increase box shadow on hover */
+}
+
+/* Active state to match InfoSection.vue button */
+.Grid_Radio:active,
+.Tabular_Radio:active {
+  transform: translateY(0); /* Button returns to original state on click */
+  box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08); /* Shadow returns to normal on click */
+}
+
+.Botton_Ad_Station:hover{
+  background-color: #0f9cb7;
+  transform: translateY(-2px); /* Slightly raise the button on hover */
+  box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+}
 .Botton_Ad_Station {
   border-radius: 9999px;
   font-weight: 700;
@@ -317,11 +307,10 @@ export default {
   font-size: 0.875rem;
   padding-left: 0px;
   padding-right: 0px;
-  background-color: rgb(35, 187, 241);
+  background-image: linear-gradient(to right, #11abcd, #25adfc); 
   border: 2px solid transparent;
   color: rgb(250, 251, 253);
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: 'Prompt', sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   cursor: pointer;
@@ -340,12 +329,15 @@ export default {
 .Section_Blog_Ad_All {
   display: flex;
   flex-flow: wrap;
+  align-items: stretch;
+  gap: 1rem; /* Consistent gap */
 }
 
 @media screen and (min-width: 30em) {
   .Section_Blog_Ad {
     width: 300px;
-    min-height: 350px;
+    min-height: 450px;
+    
   }
 }
 
@@ -362,9 +354,12 @@ export default {
   overflow: hidden;
   position: relative;
   cursor: pointer;
+  transition: border-color 0.3s;
+  
 }
 .Section_Blog_Ad:hover {
   border-color: #11abcd; /* Changes the border color on hover */
+  box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
 }
 
 .Div_Ad_In_Blog {
@@ -402,8 +397,7 @@ export default {
   backface-visibility: hidden;
 }
 .Test_AdStation {
-  font-family: Calibre, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: 'Prompt', sans-serif;
   margin: 16px 0px 0px;
   font-weight: 700;
   font-size: 1rem;

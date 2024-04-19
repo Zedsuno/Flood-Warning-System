@@ -11,6 +11,7 @@
           </div>
         </div>
         <div class="dashboard-actions">
+          <button type="button" class="save-settings-btn">บันทึกการตั้งค่า</button>
           <button
             @click="showDeleteConfirmation"
             type="button"
@@ -33,7 +34,6 @@
               </g>
             </svg>
           </button>
-          <button type="button" class="save-settings-btn">บันทึกการตั้งค่า</button>
         </div>
       </div>
       <div class="Space-Btw "></div>
@@ -90,7 +90,7 @@ export default {
 
 <style scoped>
 .dashboard-container {
-  background-color: rgb(219, 226, 226); /* Light gray background */
+  background-color: var(--color-background);
   flex-grow: 1;
   z-index: 1;
   min-height: 100vh;
@@ -188,17 +188,18 @@ export default {
   background-color: rgb(40, 43, 46);
   border: 2px solid transparent;
   color: rgb(250, 251, 253);
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: 'Prompt', sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   cursor: pointer;
-  margin-right: 16px;
+  margin-left: 16px;
 }
 
 .css-1r8mp7n:hover {
   background-color: #ff4d4d; /* red background */
   color: white; /* white text */
+  transform: translateY(-2px); /* Slightly raise the button on hover */
+  box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
 }
 .css-19a9efo:not(:root) {
   overflow: hidden;
@@ -212,7 +213,11 @@ export default {
   flex-shrink: 0;
   backface-visibility: hidden;
 }
-
+.save-settings-btn:hover{
+  background-color: #0f9cb7;
+  transform: translateY(-2px); /* Slightly raise the button on hover */
+  box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+}
 .save-settings-btn {
   border-radius: 9999px;
   font-weight: 700;
@@ -234,11 +239,10 @@ export default {
   font-size: 0.875rem;
   padding-left: 32px;
   padding-right: 32px;
-  background-color: rgb(35, 187, 241);
+  background-image: linear-gradient(to right, #11abcd, #25adfc); 
   border: 2px solid transparent;
   color: rgb(250, 251, 253);
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: 'Prompt', sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   cursor: pointer;

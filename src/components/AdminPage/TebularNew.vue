@@ -49,42 +49,38 @@
                   <tr>
                     <th
                       class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
-                      data-sortable=""
                       style="width: 22.5724%"
                     >
                       <a href="#" class="dataTable-sorter">ชื่อสถานี</a>
                     </th>
                     <th
                       class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
-                      data-sortable=""
                       style="width: 25.4117%"
                     >
-                      <a href="#" class="dataTable-sorter">พื้นที่ติดตั้ง</a>
+                      <a href="#" class="dataTable-sorter">ที่ตั้งสถานี</a>
                     </th>
                     <th
                       class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
-                      data-sortable=""
                       style="width: 19.3072%"
                     >
-                      <a href="#" class="dataTable-sorter">ระดับน้ำ</a>
+                      <a href="#" class="dataTable-sorter">ระดับน้ำปัจจุบัน</a>
                     </th>
                     <th
                       class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
-                      data-sortable=""
                       style="width: 9.65361%"
                     >
-                      <a href="#" class="dataTable-sorter">พื้นที่อ้างอิง</a>
+                      <a href="#" class="dataTable-sorter"
+                        >ระยะจากเซ็นเซอร์ถึงน้ำ</a
+                      >
                     </th>
                     <th
                       class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
-                      data-sortable=""
                       style="width: 17.3197%"
                     >
                       <a href="#" class="dataTable-sorter">ค่าเกณฑ์ระดับน้ำ</a>
                     </th>
                     <th
                       class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
-                      data-sortable=""
                       style="width: 15.0483%"
                     >
                       <a href="#" class="dataTable-sorter">สถานะ</a>
@@ -93,10 +89,7 @@
                       class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
                       style="width: 15.0483%"
                     ></th>
-                    <th
-                      class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
-                      style="width: 15.0483%"
-                    ></th>
+                   
                   </tr>
                 </thead>
                 <tbody>
@@ -105,33 +98,42 @@
                       {{ station.stationId }}
                     </td>
                     <td class="text-sm font-weight-normal">
-                      {{ station.location.river }},
                       {{ station.location.address }},
-                      {{ station.location.state }}
+                      {{ station.location.river }}, {{ station.location.state }}
                     </td>
                     <td class="text-sm font-weight-normal">
-                      {{ station.waterLevel }}
+                      {{ station.waterLevel }} cm
                     </td>
                     <td class="text-sm font-weight-normal">
-                      {{ station.referenceArea }}
+                      {{ station.sensorDistance }} cm
                     </td>
                     <td class="text-sm font-weight-normal">
-                      {{ station.waterLevelThreshold }}
+                      <ul class="threshold-list">
+                        <li
+                          v-for="threshold in station.thresholds"
+                          :key="threshold.name"
+                        >
+                          <span
+                            class="threshold-indicator"
+                            :style="{ backgroundColor: threshold.color }"
+                          ></span>
+                          <span class="threshold-text"
+                            >{{ threshold.name }}:
+                            {{ threshold.value }} cm</span
+                          >
+                        </li>
+                      </ul>
                     </td>
-
                     <td class="text-sm font-weight-normal">
                       <span
                         class="status-badge"
-                        :class="{ inactive: station.active === 'INACTIVE' }"
+                        :class="{ inactive: station.active === false }"
                       >
-                        {{ station.active }}
+                        {{ station.active ? "ใช้งานอยู่" : "ไม่ได้ใช้งาน" }}
                       </span>
                     </td>
                     <td class="text-sm font-weight-normal">
-                      <button class="dashboard-button">Dashboard</button>
-                    </td>
-
-                    <td class="text-sm font-weight-normal">
+                      <button class="dashboard-button">แดชบอร์ด</button>
                       <router-link
                         :to="{
                           name: 'EditStation',
@@ -141,6 +143,7 @@
                         >แก้ไข</router-link
                       >
                     </td>
+                    
                   </tr>
                 </tbody>
               </table>
@@ -188,13 +191,17 @@ export default {
   },
   computed: {
     filteredStations() {
-    // Filter the stations based on the searchQuery
-    return this.searchQuery
-      ? this.allStations.filter((station) => 
-      station.stationId && station.stationId.toLowerCase().includes(this.searchQuery.toLowerCase())
-        )
-      : this.allStations;
-  },
+      // Filter the stations based on the searchQuery
+      return this.searchQuery
+        ? this.allStations.filter(
+            (station) =>
+              station.stationId &&
+              station.stationId
+                .toLowerCase()
+                .includes(this.searchQuery.toLowerCase())
+          )
+        : this.allStations;
+    },
     totalPages() {
       return Math.ceil(this.filteredStations.length / this.itemsPerPage);
     },
@@ -250,7 +257,7 @@ export default {
 
 <style>
 .mt-4-teb {
-  margin-top: 1.5rem !important;
+  margin-top: 1.5rem;
 }
 .row-teb {
   --bs-gutter-x: 1.5rem;
@@ -308,7 +315,7 @@ export default {
 }
 
 .card-teb .card-teb-header {
-  padding: 1.5rem;
+  padding: 0.5rem;
 }
 .card-teb-header:first-child {
   border-radius: var(--bs-card-teb-inner-border-radius)
@@ -324,7 +331,7 @@ export default {
 }
 
 .mb-0-teb {
-  margin-bottom: 0 !important;
+  margin-bottom: 0 ;
 }
 .h4-teb,
 .h5-teb,
@@ -410,6 +417,7 @@ p {
   width: 100%;
   border-spacing: 0;
   border-collapse: separate;
+  
 }
 .table {
   --bs-table-color: #7b809a;
@@ -464,7 +472,6 @@ tr {
 
 .dataTable-wrapper .dataTable-container .table thead tr th {
   padding: 0.75rem 1.5rem;
-  opacity: 0.7;
   font-weight: bolder;
   color: #7b809a;
   text-transform: uppercase;
@@ -485,8 +492,8 @@ tr {
 
 .dataTable-wrapper .dataTable-container .table tbody tr td {
   padding: 0.75rem 1.5rem;
-  vertical-align: bottom;
-  text-align: left;
+  text-align: left; /* Aligns text to the center horizontally */
+  vertical-align: middle; /* Aligns content to the middle vertically */
 }
 
 .table td,
@@ -560,9 +567,13 @@ tr {
   font-weight: 700;
 }
 
+
+
 .dataTable-table th a {
   text-decoration: none;
   color: inherit;
+  
+  
 }
 
 .dataTable-sorter {
@@ -570,33 +581,92 @@ tr {
   height: 100%;
   position: relative;
   width: 100%;
+  font-size: 1rem;
 }
 a {
   letter-spacing: 0;
   color: #344767;
 }
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.375rem;
+    transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+  }
 
+  /* Style for active status */
+  .status-badge:not(.inactive) {
+    background-color: #28a745; /* Green background for active status */
+    color: #ffffff; /* White text for active status */
+  }
+
+  /* Style for inactive status */
+  .status-badge.inactive {
+    background-color: #dc3545; /* Red background for inactive status */
+    color: #ffffff; /* White text for inactive status */
+  }
 .dashboard-button {
-  padding: 5px 10px;
-  margin-right: 2px; /* Reduced right margin to bring buttons closer */
-  border: 1px solid transparent;
-  border-radius: 4px;
-  background-color: #333;
-  color: white;
+  border-radius: 30px;
+  /* Background color for buttons */
+  color: #fff; /* Text color for buttons */
+  border: none; /* No border for buttons */
+  padding: 8px 16px; /* Padding inside the buttons */
+  font-size: 14px; /* Font size for button text */
+  margin-right: 8px; /* Right margin for buttons */
   cursor: pointer;
-  display: inline-block; /* Aligns the buttons inline */
-  text-align: center;
+  text-transform: uppercase; /* Uppercase text for buttons */
+  border-radius: 9999px; /* Fully rounded corners for buttons */
+  background-color: #4a90e2;
+  display: inline-block; /* Inline-block allows for margin auto to work */
+  
 }
 
 .edit-button {
-  padding: 5px 10px;
-  margin-left: 2px; /* Reduced left margin to bring buttons closer */
-  border: 1px solid transparent;
-  border-radius: 4px;
-  background-color: #333;
-  color: white;
+  border-radius: 30px;
+  /* Background color for buttons */
+  color: #fff; /* Text color for buttons */
+  border: none; /* No border for buttons */
+  padding: 8px 16px; /* Padding inside the buttons */
+  font-size: 14px; /* Font size for button text */
+  margin-right: 8px; /* Right margin for buttons */
   cursor: pointer;
-  display: inline-block; /* Aligns the buttons inline */
-  text-align: center;
+  text-transform: uppercase; /* Uppercase text for buttons */
+  border-radius: 9999px; /* Fully rounded corners for buttons */
+  background-color: #f5a623;
+  display: inline-block; /* Inline-block allows for margin auto to work */
+ 
+}
+
+.threshold-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  
+}
+
+.threshold-list li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px; /* Adjust as needed */
+  
+}
+
+.threshold-indicator {
+  width: 12px; /* Adjust as needed */
+  height: 12px; /* Adjust as needed */
+  display: inline-block;
+  margin-right: 5px; /* Adjust as needed */
+  border-radius: 50%; /* Makes the color indicator circular */
+  
+}
+
+.threshold-text {
+  color: #000; /* Keeps text color black */
 }
 </style>

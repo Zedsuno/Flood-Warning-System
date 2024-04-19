@@ -99,15 +99,13 @@ export default {
 }
 
 .toggle-popup__title {
-  font-family: Calibre, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif;
+  font-family: 'Prompt', sans-serif;
   font-weight: 700;
   font-size: 2rem;
 }
 
 .toggle-popup__description {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif;
+  font-family: 'Prompt', sans-serif;
   font-weight: 400;
   font-size: 1rem;
   margin-bottom: 32px;
@@ -132,8 +130,7 @@ export default {
 }
 
 .toggle-popup__manufacturer-name {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif;
+  font-family: 'Prompt', sans-serif;
   font-weight: 700;
   font-size: 1.25rem;
   color: #718096;

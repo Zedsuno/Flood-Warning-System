@@ -117,7 +117,7 @@ export default {
 
 <style scoped>
 .body-card {
-  font-family: "Poppins", sans-serif;
+  font-family: 'Prompt', sans-serif;
   min-height: 100vh;
   background: linear-gradient(to right, #11abcd, #f7eff5);
   display: flex;

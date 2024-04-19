@@ -1,13 +1,12 @@
 <template>
-  <div class="map-wrapper-add">
-    <div id="map" class="map-instance">
+  <div class="map-wrapper-edit">
+    <div id="editMap" class="map-instance-edit">
       <!-- The map will be injected here -->
     </div>
-    <!-- Centered marker overlay -->
     <div class="map-center-marker">
-
       <div class="marker-circle"></div>
     </div>
+    <!-- Additional tools or overlays for editing can be added here -->
   </div>
 </template>
 
@@ -16,71 +15,64 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 export default {
-  name: "MapBlogStation",
+  name: "MapEdit",
   props: {
-  latitude: {
-    type: Number,
-    default: 19.91048, // Default latitude if not provided
+    latitude: Number,
+    longitude: Number,
   },
-  longitude: {
-    type: Number,
-    default: 99.840576, // Default longitude if not provided
+  mounted() {
+    this.initMap(this.latitude, this.longitude);
   },
-},
-
-mounted() {
-  this.initMap(this.latitude, this.longitude);
-},
-methods: {
-  initMap(lat, lng ) {
-    const mapCoords = [lat, lng]; // Default coordinates if none are provided
-    this.map = L.map("map").setView(mapCoords, 13);
+  methods: {
+    initMap() {
+      const mapCoords = [this.latitude, this.longitude];
+      this.map = L.map("editMap").setView(mapCoords, 13);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution:
           '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
         maxZoom: 18,
       }).addTo(this.map);
+
       this.map.on("moveend", () => {
         const center = this.map.getCenter();
         this.$emit("update-coordinates", center.lat, center.lng);
       });
     },
+    updateMapCenter(lat, lng) {
+      const newCoords = [lat, lng];
+      if (this.map) {
+        this.map.setView(newCoords, this.map.getZoom());
+        if (this.marker) {
+          this.marker.setLatLng(newCoords);
+        } else {
+          // If marker doesn't exist, create it
+          
+        }
+      }
+    },
   },
   watch: {
-  latitude(newVal) {
-    if (this.longitude && newVal !== undefined) {
-      this.updateMapCenter(newVal, this.longitude);
-    }
-  },
-  longitude(newVal) {
-    if (this.latitude && newVal !== undefined) {
-      this.updateMapCenter(this.latitude, newVal);
-    }
-  },
-},
-updateMapCenter(lat, lng) {
-    const newCoords = [lat, lng];
-    if (this.map) {
-      this.map.setView(newCoords, this.map.getZoom());
-      if (this.marker) {
-        this.marker.setLatLng(newCoords);
-      } else {
-        // If marker doesn't exist, create it
-        this.marker = L.marker(newCoords).addTo(this.map);
+    latitude(val) {
+      if (this.longitude !== undefined && val !== undefined) {
+        this.updateMapCenter(val, this.longitude);
       }
-    }
+    },
+    longitude(val) {
+      if (this.latitude !== undefined && val !== undefined) {
+        this.updateMapCenter(this.latitude, val);
+      }
+    },
   },
 };
 </script>
 
 <style scoped>
-.map-wrapper-add {
+.map-wrapper-edit {
   position: relative;
-  height: 100%; /* Adjust height as needed */
+  height: 100%; /* Adjust as needed */
   width: 100%;
 }
-
-.map-instance {
+.map-instance-edit {
   height: 100%;
   width: 100%;
 }
@@ -94,11 +86,6 @@ updateMapCenter(lat, lng) {
   z-index: 1000; /* Ensure it's above the map */
 }
 
-.marker-icon {
-  width: 40px;
-  height: 40px;
-}
-
 .marker-circle {
   width: 20px;
   height: 20px;
@@ -107,9 +94,9 @@ updateMapCenter(lat, lng) {
   border: 3px solid #fff;
   animation: pulseAnimation 2s infinite;
   /* Adjust the box-shadow to create a marker pin effect */
- 
 }
 
+/* Keyframes for pulsing animation */
 @keyframes pulseAnimation {
   0% {
     box-shadow: 0 0 0 0 rgba(35, 187, 241, 0.4);

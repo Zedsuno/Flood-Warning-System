@@ -49,6 +49,17 @@
           </div>
         </div>
         <div class="botton-Save-All">
+          
+          <div class="Botton-Save">
+            <button
+              @click="
+                isEditMode ? showUpdateConfirmation() : showSaveConfirmation()
+              "
+              class="Botton-Save-Text"
+            >
+              {{ isEditMode ? "อัพเดทสถานี" : "สร้างสถานี" }}
+            </button>
+          </div>
           <button
             v-if="isEditMode"
             @click="showDeleteConfirmation"
@@ -72,16 +83,6 @@
               </g>
             </svg>
           </button>
-          <div class="Botton-Save">
-            <button
-              @click="
-                isEditMode ? showUpdateConfirmation() : showSaveConfirmation()
-              "
-              class="Botton-Save-Text"
-            >
-              {{ isEditMode ? "อัพเดทสถานี" : "สร้างสถานี" }}
-            </button>
-          </div>
         </div>
       </div>
 
@@ -137,20 +138,10 @@ export default {
     };
   },
   created() {
-    if (this.isEditMode && this.stationId) {
-      this.fetchStation(this.stationId)
-        .then((response) => {
-          this.stationData = response.data;
-          // Ensure `location` is defined even if it's not present in the response
-          if (!this.stationData.location) {
-            this.stationData.location = this.defaultStationData().location;
-          }
-        })
-        .catch((error) => {
-          console.error("Failed to fetch station data", error);
-        });
-    }
-  },
+  if (this.isEditMode && this.stationId) {
+    this.fetchStationData();
+  }
+},
   computed: {
     ...mapState({
       currentStation: (state) => state.stations.currentStation,
@@ -175,28 +166,30 @@ export default {
       "updateStationData",
     ]),
     defaultStationData() {
-      return {
-        _id: null,
-        stationId: "",
-        hardware: [],
-        software: "",
-        active: false, // Assuming new stations are active by default
-        waterLevel: "100  ", // Starting water level, adjust as needed
-        referenceArea: "500", // The area the station is monitoring
-        waterLevelThreshold: "", // The threshold for alerts
-        status: "active",
-        location: {
-          address: "",
-          river: "",
-          state: "",
-          postalCode: "",
-          latitude: null,
-          longitude: null,
-          elevation: null,
-          precision: "",
-        },
-      };
+  return {
+    _id: null,  // Not needed when creating a new record, provided by MongoDB
+    stationId: "",  // Unique identifier for the station, to be entered by the user
+    hardware: [],  // Array of hardware device IDs, initially empty
+    software: "",  // Software version or description
+    active: true,  // New stations start as active by default
+    waterLevel: 100,  // Default starting water level, might need adjustment based on actual setup
+    sensorDistance: 500,  // Default sensor distance to water surface
+    riverbedDistance: 600,  // Default total depth from sensor to riverbed
+    thresholds: [],  // No thresholds set initially
+    status: "active",  // New stations start as 'active'
+    location: {  // Default location details
+      address: "",
+      river: "",
+      state: "",
+      postalCode: "",
+      latitude: null,
+      longitude: null,
+      elevation: null,
+      precision: "",
     },
+    apiKey: ""  // API key for integration or security purposes
+  };
+},
     updateStationProfile(profileData) {
       this.stationData = { ...this.stationData, ...profileData };
     },
@@ -211,19 +204,29 @@ export default {
       }
     },
     async fetchStationData() {
-      this.loading = true;
-      try {
-        const response = await axios.get(
-          `http://localhost:3001/api/stations/${this.stationId}`
-        );
+  this.loading = true;
+  console.log(`Fetching data for station ID: ${this.stationId}`);  // Log the station ID being requested
+  axios.get(`http://localhost:3001/api/stations/${this.stationId}`)
+    .then(response => {
+      console.log('API Response:', response);  // Log the whole response object
+
+      if (response && response.data) {
         this.stationData = response.data;
-      } catch (error) {
-        console.error("Error fetching station data:", error);
-        // Handle error appropriately
-      } finally {
-        this.loading = false;
+        if (!this.stationData.location) {
+          this.stationData.location = this.defaultStationData().location;
+        }
+      } else {
+        console.warn('No data returned from API:', response);
       }
-    },
+    })
+    .catch(error => {
+      console.error("Failed to fetch station data", error);
+      console.log('Error details:', error.response || error.message || error);  // Log more detailed error info
+    })
+    .finally(() => {
+      this.loading = false;
+    });
+},
     showSaveConfirmation() {
       this.showSavePopup = true; // Set the flag to true to show the popup
     },
@@ -335,7 +338,7 @@ export default {
 }
 .Div-Add-Station-All {
   overflow-y: auto;
-  background-color: rgb(219, 226, 226);
+  background-color: var(--color-background);
   -webkit-box-flex: 1;
   flex-grow: 1;
   z-index: 1;
@@ -383,8 +386,7 @@ export default {
   font-size: 0.75rem;
   line-height: 1;
   font-weight: 700;
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: 'Prompt', sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 8px;
@@ -404,8 +406,7 @@ export default {
   font-size: 2.25rem;
   line-height: 1;
   font-weight: 700;
-  font-family: Calibre, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: 'Prompt', sans-serif;
 }
 
 .Botton-Save {
@@ -413,6 +414,12 @@ export default {
   flex-direction: row;
   -webkit-box-align: center;
   align-items: center;
+}
+
+.Botton-Save-Text:hover{
+  background-color: #0f9cb7;
+  transform: translateY(-2px); /* Slightly raise the button on hover */
+  box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
 }
 .Botton-Save-Text {
   border-radius: 9999px;
@@ -435,11 +442,10 @@ export default {
   font-size: 0.875rem;
   padding-left: 32px;
   padding-right: 32px;
-  background-color: rgb(35, 187, 241);
+  background-image: linear-gradient(to right, #11abcd, #25adfc); 
   border: 2px solid transparent;
   color: rgb(250, 251, 253);
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: 'Prompt', sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   cursor: pointer;
@@ -496,17 +502,18 @@ export default {
   background-color: rgb(40, 43, 46);
   border: 2px solid transparent;
   color: rgb(250, 251, 253);
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: 'Prompt', sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   cursor: pointer;
-  margin-right: 16px;
+  margin-left: 16px;
 }
 
 .css-1r8mp7n:hover {
   background-color: #ff4d4d; /* red background */
   color: white; /* white text */
+  transform: translateY(-2px); /* Slightly raise the button on hover */
+  box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
 }
 
 .css-19a9efo:not(:root) {
@@ -537,8 +544,7 @@ export default {
   font-size: 0.75rem;
   line-height: 1;
   font-weight: 700;
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: 'Prompt', sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 8px;
@@ -557,8 +563,7 @@ export default {
   font-size: 2.25rem;
   line-height: 1;
   font-weight: 700;
-  font-family: Calibre, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: 'Prompt', sans-serif;
 }
 
 .station-details {
@@ -589,8 +594,7 @@ export default {
 }
 
 .station-id-text {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: 'Prompt', sans-serif;
   margin: 0px;
   font-weight: 700;
   text-transform: uppercase;

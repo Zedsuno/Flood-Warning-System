@@ -91,14 +91,14 @@
   }
   
   h2 {
-    font-family: Calibre, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-family: 'Prompt', sans-serif;
     font-weight: 700;
     font-size: 2rem;
     margin-bottom: 16px;
   }
   
   p {
-    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-family: 'Prompt', sans-serif;
     font-weight: 400;
     font-size: 1rem;
     margin-bottom: 32px;

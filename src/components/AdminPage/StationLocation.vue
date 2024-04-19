@@ -3,7 +3,7 @@
     <div class="Div_Location_Form">
       <div class="Header_Location_Form">
         <h2 class="H2_Header_Location">สถานที่ตั้ง</h2>
-        <div role="radiogroup" class="Radio_Group_Ad_Co">
+        <!-- <div role="radiogroup" class="Radio_Group_Ad_Co">
           <button
             @click="setCurrentView('Address')"
             type="button"
@@ -25,9 +25,175 @@
           >
             พิกัด
           </button>
-        </div>
+        </div> -->
       </div>
       <div class="Div-All-Form">
+        <div class="Div-Form-Input-Location">
+          <div class="Div-Input-info-form">
+            <div class="css-uyzs9k">
+              <div class="Div_Map_location">
+                <MapEdit
+                  v-if="
+                    isEditMode &&
+                    existingData &&
+                    existingData.latitude != null &&
+                    existingData.longitude != null
+                  "
+                  :key="'map-edit'"
+                  :latitude="existingData.latitude"
+                  :longitude="existingData.longitude"
+                  @update-coordinates="updateMapCenter"
+                />
+                <MapBlog
+                  v-else
+                  :key="'map-blog'"
+                  @update-coordinates="updateMapCenter"
+                />
+              </div>
+            </div>
+            <p class="text-p-mapblog">
+              แพนและ/หรือซูมเพื่อตั้งศูนย์กลางแผนที่ใหม่ พิกัดสถานีของคุณ
+              จะได้รับการอัปเดตโดยใช้พิกัดกึ่งกลางปัจจุบันของแผนที่ ข้างบน.
+
+              <template v-if="isEditMode">
+                การเปลี่ยนตำแหน่งจะรีเซ็ตสถานะสถานีของคุณ
+                ซึ่งหมายความว่าอาจใช้เวลาถึงห้าวันจึงจะพร้อมให้บริการอีกครั้งบน
+                หลังจากส่งข้อมูลที่เชื่อถือได้ที่เกี่ยวข้องกับตำแหน่งใหม่นี้
+                สถานีของคุณจะแสดงอีกครั้ง
+              </template>
+            </p>
+            <div class="Div-coordinates-blog">
+              <div class="Div-coordinates-latitude" disabled="">
+                <label class="Label-Text-name">ละติจูด</label>
+                <div class="Div-input-info-blog">
+                  <input
+                    v-model="latitude"
+                    class="input-information"
+                    type="number"
+                    @blur="updateData"
+                  />
+                </div>
+              </div>
+              <div class="Div-coordinates-longtitude" disabled="">
+                <label class="Label-Text-name">ลองติจูด</label>
+                <div class="Div-input-info-blog">
+                  <input
+                    v-model="longitude"
+                    class="input-information"
+                    type="number"
+                    @blur="updateData"
+                  />
+                </div>
+              </div>
+            </div>
+            <!-- <div class="sl-precision-container">
+              <div class="css-0">
+                <label class="Label-Text-name">Precision</label>
+                <div role="radiogroup" class="sl-precision-radiogroup">
+                  <div class="sl-radio-option">
+                    <label class="sl-radio-label"
+                      ><input
+                        type="radio"
+                        name="location.precision"
+                        class="sl-radio-input"
+                        value="6"
+                        checked=""
+                      />
+                      <div
+                        type="radio"
+                        aria-hidden="true"
+                        class="sl-radio-custom"
+                      >
+                        <span class="sl-radio-inner"></span>
+                      </div>
+                      <div class="sl-radio-text">Precise</div></label
+                    >
+                  </div>
+                  <div class="sl-radio-option">
+                    <label class="sl-radio-label"
+                      ><input
+                        type="radio"
+                        name="location.precision"
+                        class="sl-radio-input"
+                        value="3"
+                      />
+                      <div
+                        type="radio"
+                        aria-hidden="true"
+                        class="sl-radio-custom"
+                      >
+                        <span class="sl-radio-inner"></span>
+                      </div>
+                      <div class="sl-radio-text">
+                        Block <span class="Text-P">(40.043, -96.327)</span>
+                      </div></label
+                    >
+                  </div>
+                  <div class="sl-radio-option">
+                    <label class="sl-radio-label"
+                      ><input
+                        type="radio"
+                        name="location.precision"
+                        class="sl-radio-input"
+                        value="2"
+                      />
+                      <div
+                        type="radio"
+                        aria-hidden="true"
+                        class="sl-radio-custom"
+                      >
+                        <span class="sl-radio-inner"></span>
+                      </div>
+                      <div class="sl-radio-text">
+                        Neighborhood
+                        <span class="Text-P">(40.04, -96.33)</span>
+                      </div></label
+                    >
+                  </div>
+                </div>
+                <p class="sl-description">
+                  ปรับความแม่นยำของพิกัดของสถานีเมื่อใด
+                  แสดงต่อสาธารณะบนแผนที่หรือภายในผลลัพธ์ API แม่นยำน้อยลง
+                  ความแม่นยำจะส่งผลให้สถานีของคุณปรากฏมากขึ้น
+                  ตำแหน่งทั่วไปในระดับบล็อกเมืองหรือพื้นที่ใกล้เคียง
+                </p>
+              </div>
+            </div> -->
+            <!-- <div class="elevation-section">
+              <div class="elevation-control">
+                <div class="elevation-input-wrapper">
+                  <label class="Label-Text-name">ระดับความสูง</label>
+                  <div class="elevation-input-container">
+                    <input
+                      required=""
+                      type="number"
+                      step="any"
+                      min="0"
+                      class="elevation-input"
+                      v-model="elevation"
+                      @blur="updateData"
+                    />
+                  </div>
+                </div>
+                <p class="elevation-units">feet</p>
+                <button
+                  @click="lookupElevation"
+                  aria-disabled="false"
+                  type="button"
+                  class="elevation-button"
+                >
+                  Lookup
+                </button>
+              </div>
+              <p class="elevation-description">
+                ระบุระดับความสูงของสถานีหรือดำเนินการค้นหา
+                กำหนดระดับความสูงโดยอัตโนมัติ พิกัดด้านบน.
+                พิกัดละติจูด/ลองจิจูดที่ถูกต้อง
+                จำเป็นข้างต้นเพื่อกำหนดระดับความสูง
+              </p>
+            </div> -->
+          </div>
+        </div>
         <div v-show="currentView === 'Address'" class="Div-Form-Input-Location">
           <div class="Div-Text">
             <p class="Text-P">
@@ -35,6 +201,11 @@
               สามารถกำหนดพิกัดละติจูด/ลองจิจูดได้โดยอัตโนมัติ
               ตามที่อยู่ที่คุณให้ไว้โดยใช้ "Geocode Address"
             </p>
+          </div>
+          <div class="Div-Botton-Geo">
+            <button @click="reverseGeocode" type="button" class="Botton-Geo">
+              Geocode Address
+            </button>
           </div>
           <div class="Div-Input-info-all">
             <div class="Div-Input-info-form">
@@ -139,163 +310,9 @@
                 </div>
               </div>
             </div>
-            <div class="Div-Botton-Geo">
-              <button aria-disabled="false" type="button" class="Botton-Geo">
-                Geocode Address
-              </button>
-            </div>
           </div>
         </div>
-        <div class="Div-Form-Input-Location">
-          <div class="Div-Input-info-form">
-            <div class="css-uyzs9k">
-              <div class="Div_Map_location">
-                <MapBlog @update-coordinates="updateCoordinates" />
-              </div>
-            </div>
-            <p class="text-p-mapblog">
-              แพนและ/หรือซูมเพื่อตั้งศูนย์กลางแผนที่ใหม่ พิกัดสถานีของคุณ
-              จะได้รับการอัปเดตโดยใช้พิกัดกึ่งกลางปัจจุบันของแผนที่ ข้างบน.
 
-              <template v-if="isEditMode">
-                การเปลี่ยนตำแหน่งจะรีเซ็ตสถานะสถานีของคุณ
-                ซึ่งหมายความว่าอาจใช้เวลาถึงห้าวันจึงจะพร้อมให้บริการอีกครั้งบน
-                หลังจากส่งข้อมูลที่เชื่อถือได้ที่เกี่ยวข้องกับตำแหน่งใหม่นี้
-                สถานีของคุณจะแสดงอีกครั้ง
-              </template>
-            </p>
-            <div class="Div-coordinates-blog">
-              <div class="Div-coordinates-latitude" disabled="">
-                <label class="Label-Text-name">ละติจูด</label>
-                <div class="Div-input-info-blog">
-                  <input
-                    v-model="latitude"
-                    class="input-information"
-                    type="number"
-                    @blur="updateData"
-                  />
-                </div>
-              </div>
-              <div class="Div-coordinates-longtitude" disabled="">
-                <label class="Label-Text-name">ลองติจูด</label>
-                <div class="Div-input-info-blog">
-                  <input
-                    v-model="longitude"
-                    class="input-information"
-                    type="number"
-                    @blur="updateData"
-                  />
-                </div>
-              </div>
-            </div>
-            <div class="sl-precision-container">
-              <div class="css-0">
-                <label class="Label-Text-name">Precision</label>
-                <div role="radiogroup" class="sl-precision-radiogroup">
-                  <div class="sl-radio-option">
-                    <label class="sl-radio-label"
-                      ><input
-                        type="radio"
-                        name="location.precision"
-                        class="sl-radio-input"
-                        value="6"
-                        checked=""
-                      />
-                      <div
-                        type="radio"
-                        aria-hidden="true"
-                        class="sl-radio-custom"
-                      >
-                        <span class="sl-radio-inner"></span>
-                      </div>
-                      <div class="sl-radio-text">Precise</div></label
-                    >
-                  </div>
-                  <div class="sl-radio-option">
-                    <label class="sl-radio-label"
-                      ><input
-                        type="radio"
-                        name="location.precision"
-                        class="sl-radio-input"
-                        value="3"
-                      />
-                      <div
-                        type="radio"
-                        aria-hidden="true"
-                        class="sl-radio-custom"
-                      >
-                        <span class="sl-radio-inner"></span>
-                      </div>
-                      <div class="sl-radio-text">
-                        Block <span class="Text-P">(40.043, -96.327)</span>
-                      </div></label
-                    >
-                  </div>
-                  <div class="sl-radio-option">
-                    <label class="sl-radio-label"
-                      ><input
-                        type="radio"
-                        name="location.precision"
-                        class="sl-radio-input"
-                        value="2"
-                      />
-                      <div
-                        type="radio"
-                        aria-hidden="true"
-                        class="sl-radio-custom"
-                      >
-                        <span class="sl-radio-inner"></span>
-                      </div>
-                      <div class="sl-radio-text">
-                        Neighborhood
-                        <span class="Text-P">(40.04, -96.33)</span>
-                      </div></label
-                    >
-                  </div>
-                </div>
-                <p class="sl-description">
-                  ปรับความแม่นยำของพิกัดของสถานีเมื่อใด
-                  แสดงต่อสาธารณะบนแผนที่หรือภายในผลลัพธ์ API แม่นยำน้อยลง
-                  ความแม่นยำจะส่งผลให้สถานีของคุณปรากฏมากขึ้น
-                  ตำแหน่งทั่วไปในระดับบล็อกเมืองหรือพื้นที่ใกล้เคียง
-                </p>
-              </div>
-            </div>
-            <div class="elevation-section">
-              <div class="elevation-control">
-                <div class="elevation-input-wrapper">
-                  <label class="Label-Text-name">ระดับความสูง</label>
-                  <div class="elevation-input-container">
-                    <input
-                      required=""
-                      type="number"
-                      step="any"
-                      min="0"
-                      class="elevation-input"
-                      v-model="elevation"
-                      @blur="updateData"
-                    />
-                  </div>
-                </div>
-                <p class="elevation-units">feet</p>
-                <button
-                  @click="lookupElevation"
-                  aria-disabled="false"
-                  type="button"
-                  class="elevation-button"
-                >
-                  Lookup
-                </button>
-              </div>
-              <p class="elevation-description">
-                ระบุระดับความสูงของสถานีหรือดำเนินการค้นหา
-                กำหนดระดับความสูงโดยอัตโนมัติ พิกัดด้านบน.
-                พิกัดละติจูด/ลองจิจูดที่ถูกต้อง
-                จำเป็นข้างต้นเพื่อกำหนดระดับความสูง
-              </p>
-            </div>
-          </div>
-        </div>
         <div
           v-show="currentView === 'Coordinate'"
           class="Div-Form-Input-Location"
@@ -309,12 +326,14 @@
 
 <script>
 import MapBlog from "../AdminPage/MapBlogStation";
+import MapEdit from "../AdminPage/MapEdit";
 import axios from "axios";
 
 export default {
   // Register the child component(s) used within this component
   components: {
     MapBlog,
+    MapEdit,
   },
   // Define the props that are expected to be passed to this component from its parent
   props: {
@@ -322,16 +341,17 @@ export default {
       type: Object,
       default: () => ({
         // Default object structure if the prop is not provided
+        latitude: "",
+        longitude: "",
         address: "",
         river: "",
         state: "",
         postalCode: "",
-        latitude: "",
-        longitude: "",
         precision: "",
         elevation: "",
       }),
     },
+
     isEditMode: {
       type: Boolean,
       default: false, // Default mode is not edit mode
@@ -349,6 +369,7 @@ export default {
       longitude: this.existingData ? this.existingData.longitude : "",
       elevation: this.existingData ? this.existingData.elevation : "",
       currentView: "Address", // Default to 'Address' view
+
       // Other properties are initialized in a similar fashion...
     };
   },
@@ -368,16 +389,22 @@ export default {
 
         // Other properties are updated in a similar fashion...
       },
-      deep: true, // Watch for nested property changes within the object
+      deep: true,
+      immediate: true, // Watch for nested property changes within the object
+    },
+    isEditMode(newVal) {
+      console.log("Edit mode changed to:", newVal);
     },
   },
   methods: {
     // Method called to update latitude and longitude after the map has been moved
-    updateCoordinates(lat, lng) {
+    updateMapCenter(lat, lng) {
+      console.log(`updateCoordinates called with lat: ${lat}, lng: ${lng}`);
       this.latitude = lat.toFixed(6); // Set precision to 6 decimal places for latitude
       this.longitude = lng.toFixed(6); // Set precision to 6 decimal places for longitude
       this.updateData(); // Cal l updateData to emit an event with the updated data
     },
+
     // Method called to emit updated location data to the parent component
     updateData() {
       this.$emit("update-location", {
@@ -413,6 +440,45 @@ export default {
     setCurrentView(view) {
       this.currentView = view; // Update the currentView data property with the new view
     },
+    mounted() {
+      console.log(this.existingData); // Check the entire structure
+      console.log(this.isEditMode); // Confirm mode
+    },
+
+    async reverseGeocode() {
+  // Ensure that latitude and longitude are numbers and not empty strings
+  const lat = parseFloat(this.latitude);
+  const lon = parseFloat(this.longitude);
+
+  if (!lat || !lon) {
+    console.error("Invalid latitude or longitude for reverse geocoding.");
+    return;
+  }
+
+  try {
+    const response = await axios.get(`https://nominatim.openstreetmap.org/reverse`, {
+      params: {
+        lat: lat,
+        lon: lon,
+        format: "json"
+      }
+    });
+
+    // Check if response has address details and update the relevant fields
+    if (response.data.address) {
+      this.address = `${response.data.address.amenity || ''},${response.data.address.road || ''}, `;
+      this.state = `${response.data.address.town || ''}`;
+      this.postalCode = response.data.address.postcode || '';
+      
+      
+      
+      // Emit an event or call a method to update the parent data
+      // this.$emit('update-address-data', { address: this.address, state: this.state, postalCode: this.postalCode });
+    }
+  } catch (error) {
+    console.error("Error during reverse geocoding:", error);
+  }
+},
     // ... (other methods)
   },
 };
@@ -434,13 +500,17 @@ export default {
   }
 }
 .Div_Location_Form {
-  background-color: #fff;
-  box-shadow: rgba(0, 0, 0, 0.04) 0px 0px 2px 0px,
-    rgba(0, 0, 0, 0.16) 0px 1px 4px 0px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 2px solid #e7eaf3; /* Subtle border like login card */
+  box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08); /* Shadow like login card */
+  border-radius: 10px; /* Rounded corners like login card */
   margin-bottom: 16px;
-  border-radius: 0.5rem;
   padding: 16px;
-  width: 100%;
+  transition: transform 0.1s ease-in-out;
+  position: relative;
+  display: flex; /* Flex layout */
+  flex-direction: column;
+  
 }
 
 .Header_Location_Form {
@@ -460,8 +530,7 @@ export default {
   font-size: 1.875rem;
   line-height: 1;
   font-weight: 700;
-  font-family: Calibre, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: "Prompt", sans-serif;
   margin-bottom: 0px;
   margin-top: 8px;
   margin-right: 32px;
@@ -500,8 +569,7 @@ export default {
   background-color: transparent;
   border: 2px solid transparent;
   color: rgb(255, 255, 255);
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: "Prompt", sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   cursor: pointer;
@@ -539,8 +607,7 @@ export default {
 }
 
 .Text-P {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: "Prompt", sans-serif;
   margin: 0px;
   font-weight: 400;
   font-size: 0.875rem;
@@ -666,8 +733,7 @@ arrow-selection-svg:not(:root) {
 }
 
 .text-p-mapblog {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: "Prompt", sans-serif;
   margin: 0px 0px 8px;
   font-weight: 400;
   font-size: 0.75rem;
@@ -742,11 +808,10 @@ arrow-selection-svg:not(:root) {
   padding-left: 0; /* Remove any padding on the left */
 }
 .Label-Text-name {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: "Prompt", sans-serif;
   margin: 0px;
   font-weight: 700;
-  font-size: 0.875rem;
+  font-size: 1rem;
 }
 .sl-precision-radiogroup {
   padding-top: 8px;
@@ -791,8 +856,7 @@ input[type="radio"][aria-checked="mixed"] + .sl-radio-custom > * {
 }
 
 .Text-P {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: "Prompt", sans-serif;
   margin: 0px;
   font-weight: 400;
   font-size: 0.875rem;
@@ -832,8 +896,7 @@ input[type="radio"][aria-checked="mixed"] + .sl-radio-custom > * {
 }
 
 .Text-P {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: "Prompt", sans-serif;
   margin: 0px;
   font-weight: 400;
   font-size: 0.875rem;
@@ -841,8 +904,7 @@ input[type="radio"][aria-checked="mixed"] + .sl-radio-custom > * {
 }
 
 .sl-description {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: "Prompt", sans-serif;
   margin: 4px 0px;
   font-weight: 400;
   font-size: 0.75rem;
@@ -872,13 +934,16 @@ input[type="radio"][aria-checked="mixed"] + .sl-radio-custom > * {
   }
 }
 .elevation-units {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: "Prompt", sans-serif;
   margin: 0px 16px 0px 0px;
   font-weight: 400;
   font-size: 1rem;
 }
-
+.Botton-Geo:hover{
+  background-color: #0f9cb7;
+  transform: translateY(-2px); /* Slightly raise the button on hover */
+  box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+}
 .Botton-Geo {
   border-radius: 9999px;
   font-weight: bold; /* Make the font bolder */
@@ -896,11 +961,10 @@ input[type="radio"][aria-checked="mixed"] + .sl-radio-custom > * {
   min-width: 3rem; /* Increased minimum width */
   font-size: 0.75rem; /* Increased font size for readability */
   padding: 0.75rem 1rem; /* Increased padding for a larger button */
-  background-color: rgb(40, 43, 46);
+  background-image: linear-gradient(to right, #11abcd, #25adfc); 
   border: 2px solid transparent;
   color: rgb(250, 251, 253);
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: "Prompt", sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   cursor: pointer;
@@ -908,7 +972,7 @@ input[type="radio"][aria-checked="mixed"] + .sl-radio-custom > * {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Optional: add text shadow for better contrast */
 }
 
-.elevation-button{
+.elevation-button {
   border-radius: 9999px;
   font-weight: bold; /* Make the font bolder */
   display: inline-flex;
@@ -925,11 +989,10 @@ input[type="radio"][aria-checked="mixed"] + .sl-radio-custom > * {
   min-width: 3rem; /* Increased minimum width */
   font-size: 0.75rem; /* Increased font size for readability */
   padding: 0.75rem 1rem; /* Increased padding for a larger button */
-  background-color: rgb(40, 43, 46);
+  background-image: linear-gradient(to right, #11abcd, #25adfc); 
   border: 2px solid transparent;
   color: rgb(250, 251, 253);
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: "Prompt", sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   cursor: pointer;
@@ -938,8 +1001,7 @@ input[type="radio"][aria-checked="mixed"] + .sl-radio-custom > * {
 }
 
 .elevation-description {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: "Prompt", sans-serif;
   margin: 8px 0px 0px;
   font-weight: 400;
   font-size: 0.75rem;

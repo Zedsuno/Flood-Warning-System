@@ -44,6 +44,7 @@ exports.getAllStation = async (req, res) => {
   };
   
   exports.updateStation = async (req, res) => {
+    console.log(req.body);
     if (mongoose.connection.readyState !== 1) {
       return res.status(503).json({ error: 'Database not available' });
     }
@@ -93,3 +94,5 @@ exports.getAllStation = async (req, res) => {
       res.status(500).json({ message: "Error deleting station", error: error.toString() });
     }
   };
+
+  

@@ -74,9 +74,10 @@
           <!-- ThresholdFormModal Component -->
           <ThresholdFormModal
             v-if="isThresholdModalVisible"
-            :initialThresholds="waterLevelThresholds"
-            @save="saveThresholds"
+            :initialThresholds="thresholds"
+            @save="SaveThresholds"
             @close="closeThresholdModal"
+            @blur="updateData"
           />
         </div>
         <div class="Div-From-input"></div>
@@ -113,16 +114,9 @@ export default {
       active: this.existingData.active || false,
       waterLevel: this.existingData.waterLevel || 0,
       referenceArea: this.existingData.referenceArea || "",
-      waterLevelThreshold: this.existingData.waterLevelThreshold,
+      thresholds: this.existingData.thresholds || [],
       showApiPopup: false,
       isThresholdModalVisible: false, // Data property to control the visibility of the modal
-      waterLevelThresholds: {
-        // Example structure of threshold data
-        low: { value: 20, color: "#3498db" },
-        moderate: { value: 50, color: "#f1c40f" },
-        high: { value: 80, color: "#e74c3c" },
-        critical: { value: 100, color: "#c0392b" },
-      },
     };
   },
   watch: {
@@ -134,7 +128,7 @@ export default {
         this.active = newData.active;
         this.waterLevel = newData.waterLevel;
         this.referenceArea = newData.referenceArea;
-        this.waterLevelThreshold = newData.waterLevelThreshold;
+        this.thresholds= newData.thresholds;
       },
       deep: true,
     },
@@ -145,24 +139,27 @@ export default {
     },
     updateData() {
       this.$emit("update-profile", {
+        ...this.existingData,
         stationId: this.stationId,
         hardware: this.hardware,
         software: this.software,
         active: this.active,
         waterLevel: this.waterLevel,
         referenceArea: this.referenceArea,
-        waterLevelThreshold: this.waterLevelThreshold,
+        thresholds: this.thresholds,
       });
     },
     showThresholdModal() {
       this.isThresholdModalVisible = true; // Method to open the modal
     },
+    SaveThresholds(thresholds) {
+    // Store thresholds in StationProfile's data
+    this.thresholds = thresholds;
+    this.updateData();
+    this.closeThresholdModal();
+  },
     closeThresholdModal() {
       this.isThresholdModalVisible = false; // Method to close the modal
-    },
-    saveThresholds(newThresholds) {
-      this.waterLevelThresholds = newThresholds; // Method to update thresholds
-      this.isThresholdModalVisible = false; // Close the modal after saving
     },
     handleContinue() {
       // Set showApiPopup to true to show the ApiToggle component
@@ -190,12 +187,17 @@ export default {
 }
 
 .DivStationProfile {
-  background-color: #fff;
-  box-shadow: rgba(0, 0, 0, 0.04) 0px 0px 2px 0px,
-    rgba(0, 0, 0, 0.16) 0px 1px 4px 0px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 2px solid #e7eaf3; /* Subtle border like login card */
+  box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08); /* Shadow like login card */
+  border-radius: 10px; /* Rounded corners like login card */
   margin-bottom: 16px;
-  border-radius: 0.5rem;
   padding: 16px;
+  transition: transform 0.1s ease-in-out;
+  position: relative;
+  display: flex; /* Flex layout */
+  flex-direction: column;
+  
 }
 
 @media screen and (min-width: 62em) {
@@ -208,8 +210,7 @@ export default {
   font-size: 1.875rem;
   line-height: 1;
   font-weight: 700;
-  font-family: Calibre, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: 'Prompt', sans-serif;
   margin-bottom: 16px;
   margin-top: 8px;
   text-align: left;
@@ -224,12 +225,11 @@ export default {
 }
 
 .Labelname {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: 'Prompt', sans-serif;
   text-align: left;
   margin: 0px;
   font-weight: 700;
-  font-size: 0.875rem;
+  font-size: 1rem;
 }
 .DivInput {
   display: flex;
@@ -258,8 +258,7 @@ export default {
 }
 
 .TextP {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: 'Prompt', sans-serif;
   margin: 4px 0px;
   font-weight: 400;
   font-size: 0.75rem;
@@ -280,6 +279,11 @@ export default {
   flex-grow: 1;
   text-align: left;
 }
+.ButtonClassThreshold:hover{
+  background-color: #0f9cb7;
+  transform: translateY(-2px); /* Slightly raise the button on hover */
+  box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+}
 .ButtonClassThreshold {
   border-radius: 9999px;
   font-weight: bold; /* Make the font bolder */
@@ -297,17 +301,23 @@ export default {
   min-width: 3rem; /* Increased minimum width */
   font-size: 0.75rem; /* Increased font size for readability */
   padding: 0.75rem 1rem; /* Increased padding for a larger button */
-  background-color: rgb(40, 43, 46);
+  background-image: linear-gradient(to right, #11abcd, #25adfc); 
   border: 2px solid transparent;
   color: rgb(250, 251, 253);
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: 'Prompt', sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   cursor: pointer;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Optional: add shadow for depth */
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Optional: add text shadow for better contrast */
 }
+
+.Botton-link-hardware:hover{
+  background-color: #0f9cb7;
+  transform: translateY(-2px); /* Slightly raise the button on hover */
+  box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+}
+
 .Botton-link-hardware {
   border-radius: 9999px;
   font-weight: bold; /* Make the font bolder */
@@ -325,11 +335,10 @@ export default {
   min-width: 3rem; /* Increased minimum width */
   font-size: 0.75rem; /* Increased font size for readability */
   padding: 0.75rem 1rem; /* Increased padding for a larger button */
-  background-color: rgb(40, 43, 46);
+  background-image: linear-gradient(to right, #11abcd, #25adfc); 
   border: 2px solid transparent;
   color: rgb(250, 251, 253);
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: 'Prompt', sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   cursor: pointer;
