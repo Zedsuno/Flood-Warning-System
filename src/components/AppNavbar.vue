@@ -36,7 +36,7 @@
             </router-link> 
           </li>
           <li class="nav-item">
-            <router-link to="/Riverview" class="nav-link" active-class="active">
+            <router-link to="/WaterResource" class="nav-link" active-class="active">
               <i class="fa fa-water"></i> แหล่งน้ำ</router-link>
             </li>
           <li class="nav-item dropdown">
