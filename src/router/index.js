@@ -9,6 +9,7 @@ import RegisterPage from '../view/RegisterPage.vue';
 import AdminPage from '../view/AdminPage.vue';
 import AddStationPage from '../view/AddStationPage.vue';
 import StationPage from '../view/StationPage.vue';
+import WaterResource from '../view/WaterResource.vue';
 import MapPage from "../view/MapPage.vue";
 import AccountPage from '../view/AccoutPage.vue';
 import authGuard from '@/router/auth-guard';
@@ -21,13 +22,19 @@ const routes = [
   {
     path: '/DefendFlood',
     name: 'DefendFlood',
-    component: DefendFlood ,},
+    component: DefendFlood,
+  },
   {
     path: '/FloodBook',
     name: 'FloodBook',
     component: FloodBook
   }
-,
+  ,
+  {
+    path: '/WaterResource',
+    name: 'WaterResource',
+    component: WaterResource,
+  },
   {
     path: '/HisTory',
     name: 'HisTory',
@@ -59,14 +66,14 @@ const routes = [
     path: '/admin/AddStation',
     name: 'AddStation',
     component: AddStationPage,
-    props: false 
+    props: false
   },
   {
     path: '/Station',
     name: 'Station',
     component: StationPage,
   },
-  
+
   {
     path: '/admin/edit-station/:stationId',
     name: 'EditStation',
@@ -84,6 +91,7 @@ const routes = [
   component: AccountPage,
 }
   
+
   // ...more routes here
 ];
 
