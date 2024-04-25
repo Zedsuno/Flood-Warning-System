@@ -40,7 +40,7 @@ export default {
     return {
       // Use require to ensure the image is processed by webpack
       backgroundStyle: {
-        backgroundImage: `url(${require("@/assets/Picture/Flood.png")})`,
+        backgroundImage: `url(${require("@/assets/Picture/Flood.avif")})`,
         backgroundSize: "cover",
         backgroundRepeat: "no-repeat",
         backgroundPosition: "center center",
@@ -67,7 +67,7 @@ ensure that CSS only applies to this component */
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.4);
   z-index: 2;
 }
 

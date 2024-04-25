@@ -285,14 +285,14 @@
     font-size: 1.5rem;
     line-height: 1;
     font-weight: 700;
-    font-family: Calibre, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    color: rgb(51, 51, 51);
+    font-family: 'Prompt', sans-serif;
+     color: rgb(51, 51, 51);
     margin-right: 8px;
 }
 
 .css-q4tf6v {
-    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    margin: 8px 0px 0px 8px;
+  font-family: 'Prompt', sans-serif;
+   margin: 8px 0px 0px 8px;
     font-weight: 400;
     font-size: 0.75rem;
     color: rgb(87, 91, 96);
@@ -357,8 +357,8 @@
 }
 
 .css-ig04zd {
-    font-family: Calibre, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    margin: 0px;
+  font-family: 'Prompt', sans-serif;
+   margin: 0px;
     font-weight: 600;
     font-size: 40px;
     letter-spacing: 0.025em;
@@ -376,8 +376,8 @@
 }
 
 .css-10imrpe {
-    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    margin: 0px;
+  font-family: 'Prompt', sans-serif;
+  margin: 0px;
     font-weight: 400;
     font-size: 14px;
     color: rgb(87, 91, 96);
@@ -386,8 +386,8 @@
 }
 
 .css-1cr4kj8 {
-    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    margin: -8px 0px 0px;
+  font-family: 'Prompt', sans-serif;
+  margin: -8px 0px 0px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.1em;
@@ -439,24 +439,24 @@
 }
 
 .css-1v8hoxr {
-    font-family: Calibre, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    margin: 0px 3px 0px 0px;
+  font-family: 'Prompt', sans-serif;
+   margin: 0px 3px 0px 0px;
     font-weight: 500;
     font-size: 1.5rem;
     color: rgb(51, 51, 51);
 }
 
 .css-1plaodm {
-    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    margin: 0px;
+  font-family: 'Prompt', sans-serif;
+   margin: 0px;
     font-weight: 400;
     font-size: 0.875rem;
     color: rgb(87, 91, 96);
 }
 
 .css-13rn9mf {
-    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    margin: 0px;
+  font-family: 'Prompt', sans-serif;
+  margin: 0px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.1em;

@@ -114,7 +114,7 @@
     background-color: transparent;
     border: 2px solid transparent;
     color: #2c3e50; /* Dark slate gray text */
-    font-family: Calibre, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-family: 'Prompt', sans-serif;
     cursor: pointer;
     margin-right: 4px;
     text-decoration: none; /* Removes underline from links */

@@ -9,9 +9,10 @@ import RegisterPage from '../view/RegisterPage.vue';
 import AdminPage from '../view/AdminPage.vue';
 import AddStationPage from '../view/AddStationPage.vue';
 import StationPage from '../view/StationPage.vue';
-import FormAddStation from '@/components/AdminPage/FormAddStation.vue';
-import MapPage from '../components/MapPage.vue';
 import WaterResource from '../view/WaterResource.vue';
+import MapPage from "../view/MapPage.vue";
+import AccountPage from '../view/AccoutPage.vue';
+import authGuard from '@/router/auth-guard';
 const routes = [
   {
     path: '/',
@@ -56,9 +57,10 @@ const routes = [
     component: RegisterPage,
   },
   {
-    path: '/admin',
+    path: '/Admin',
     name: 'admin',
     component: AdminPage,
+    beforeEnter: authGuard
   },
   {
     path: '/admin/AddStation',
@@ -75,14 +77,20 @@ const routes = [
   {
     path: '/admin/edit-station/:stationId',
     name: 'EditStation',
-    component: FormAddStation, // If you are using the same component for add and edit
+    component: AddStationPage , // If you are using the same component for add and edit
     props: (route) => ({ isEditMode: true, stationId: route.params.stationId })
   },
-  {
-    path: '/Map',
-    name: 'MapPage',
-    component: MapPage,
-  }
+{
+  path: '/Map',
+  name: 'MapPage',
+  component: MapPage,
+},
+{
+  path: '/Account',
+  name: 'Account',
+  component: AccountPage,
+}
+  
 
   // ...more routes here
 ];

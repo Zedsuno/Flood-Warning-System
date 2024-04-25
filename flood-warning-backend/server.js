@@ -4,7 +4,8 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
 const stationRoutes = require('./routes/stationRoutes');
-
+const hardwareRoutes = require('./routes/hardwareRoutes');
+const sensorRoutes = require('./routes/sensorRoutes');
 const app = express();
 
 // CORS configuration
@@ -27,6 +28,9 @@ app.use(express.json());
 // Use authRoutes with a prefix of '/api'
 app.use('/api', authRoutes);
 app.use('/api', stationRoutes);
+app.use('/api', hardwareRoutes);
+app.use('/api/sensors', sensorRoutes);
+
 // Start the server
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

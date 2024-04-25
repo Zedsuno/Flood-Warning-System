@@ -1,358 +1,345 @@
+
+
 <template>
-  <div class="site ">
-    <div class="header-nave">
-      <div class="header-logo">
-        <a href="#" class="logo-link">
-          <img
-            src="@/assets/Logo/Logo (Replace).png"
-            width="30"
-            height="24"
-            class="logo-img d-inline-block align-text-top"
-            alt="Logo"
-          />
-          เตือนภัยน้ำท่วม
-        </a>
-      </div>
-      <div class="space"></div>
-
-      <div class="navigation-admin">
-        <!-- Placeholder for a decorative or functional block, adjust as needed -->
-        <div class="textStation">
-          <div class="bar-nave">
-            <div style="width: 100%; height: 100%">
-              <div class="green-nave"></div>
-            </div>
-          </div>
-
-          <!-- Navigation items -->
-          <div class="text-nave-station">
-            <router-link
-              to="/Admin"
-              aria-current="page"
-              class="text-router-station"
-              previewlistener="true"
-            >
-              <p class="font-station">สถานี</p>
+  <section>
+    <nav>
+      <header>
+        <div class="imgBx">
+          <img src="@/assets/Logo/Logo (Replace).png" alt="logo" />
+          <h3>เตือนภัยน้ำท่วม<br /><span>เชียงราย</span></h3>
+        </div>
+        
+      </header>
+      <menu>
+        <ul>
+          <li v-for="(item, index) in menuItems" :key="index">
+            <router-link :to="item.path" class="text-router-station" active-class="active">
+              <i :class="item.icon"></i>
+              <span>{{ item.label }}</span>
+            </router-link>
+          </li>
+        </ul>
+        <div class="mode">
+          <div class="icon">
+            <router-link to="/">
+              <i class="fa-solid fa-home"></i>
+              <span>หน้าแรก</span>
             </router-link>
           </div>
-        </div>
-
-        <div class="textAccount">
-          <div class="bar-nave">
-            <div style="width: 100%; height: 100%">
-              <div class="green-nave"></div>
-            </div>
-          </div>
-
-          <div class="text-nave-Account">
-            <router-link
-              to="/account"
-              class="text-router-Account"
-              previewlistener="true"
-            >
-              <p class="font-account">Account</p>
-            </router-link>
+          <div class="icon" @click="logout">
+            <a href="#">
+              <i class="fa-solid fa-right-from-bracket"></i>
+              <span>ออกจากระบบ</span>
+            </a>
           </div>
         </div>
-
-        <!-- Add additional navigation items here -->
-      </div>
-    </div>
-
-    <!-- Footer -->
-    <div class="footer-admin">
-      <div class="footer-router"></div>
-      <router-link to="/"><a
-        class="footerHome"
-        previewlistener="true"
-        ><p class="text-home">Home</p></a
-      >
-    </router-link>
-      <router-link class="footer-logout" to="/login"
-        ><p class="text-logout">Logout</p></router-link
-      >
-    </div>
-  </div>
+      </menu>
+    </nav>
+  </section>
 </template>
 
 <script>
 export default {
   name: "Sidebar-AdminPage",
+  data() {
+    return {
+      menuItems: [
+        { label: "สถานี", path: "/Admin", icon: "fa-solid fa-tower-cell" },
+        { label: "โปรไฟล์", path: "/Account", icon: "fa-solid fa-user" },
+       
+      ],
+      activeIndex: null,
+    };
+  },
+  methods: {
+    setActive(index) {
+      this.activeIndex = index;
+    },
+    logout() {
+      localStorage.removeItem("token");
+      this.$router.push("/login");
+    },
+    toggleNav() {
+      // Toggle logic here
+    },
+  },
 };
 </script>
 
 <style scoped>
-
-.header-logo{
-  transition: all 0.15s ease-out 0s;
-    cursor: pointer;
-    text-decoration: none;
-    outline: none;
-    display: block;
+body {
+  min-height: 100vh;
+  background: #e4e9f7;
+  transition: all 0.5s ease;
 }
 
-.site {
-  width: 300px;
-  position: fixed;
-  height: 100%;
-  background-color: whitesmoke;
-  color: var(--jet); /* White text color */
-  padding: 32px;
+section {
   display: flex;
+  height: 100%;
+  position: fixed;
+  width: 300px;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  -webkit-box-pack: justify;
-  top: 0; /* Align to the top */
-  left: 0; /* Align to the left */
-  bottom: 0; /* Stretch to the bottom */
-  z-index: 100; /* Adjust as needed, should be above the base content */
-  /* Other styles */
 }
 
-.space {
-  margin-top: 80px;
-}
-
-.header-nave {
-  margin-bottom: 8px;
-}
-
-.logo-link {
-  display: flex;
-  align-items: center;
-  color: var(--jet); /* Adjust as needed */
-  text-decoration: none; /* Remove underline from link */
-  font-weight: bold; /* Bold text for the header */
-  font-size: 18px; /* Adjust the font size as needed */
-}
-
-.logo-link:hover {
-  color: var(--pacific-cyan); /* Hover color */
-}
-
-.bar-nave {
-  position: absolute;
-  top: 0px;
-  bottom: 0px;
-  overflow: hidden;
-}
-.green-nave {
-  width: 6px;
+nav {
+  background: #fff;
+  box-shadow: 0 2px 150px rgba(0, 0, 0, 0.2);
   height: 100%;
-  background-color: rgb(58, 186, 80);
-}
-
-.textStation {
+  padding: 25px;
   position: relative;
-  margin-bottom: 16px;
+  transition: all 0.5s ease;
+  width: 250px;
 }
 
-.text-nave-station {
-  margin-left: 12px;
+nav.active {
+  width: 100px;
 }
 
-.text-router-station {
-  transition: all 0.15s ease-out 0s;
-  cursor: pointer;
-  text-decoration: none;
-  outline: none;
-  display: block;
-  padding-top: 8px;
-  color: var(--jet);
-  font-size: 1.875rem;
-  font-weight: 700;
-  padding-left: 4px;
-  margin-top: 0px;
-  margin-bottom: 0px;
-}
-
-.text-router-station:hover {
-  color: var(--pacific-cyan);; /* Hover color */
-}
-
-.font-station {
-  font-size: 1.875rem;
-  margin: 0px;
-}
-
-.textAccount {
+header {
+  align-items: center;
+  display: flex;
+  height: 80px;
+  justify-content: center;
   position: relative;
-  margin-bottom: 16px;
+  width: 100%;
 }
 
-.text-nave-Account {
-  margin-left: 12px;
+.imgBx {
+  align-items: center;
+  display: flex;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
 }
 
-.text-router-Account {
-  transition: all 0.15s ease-out 0s;
+.imgBx img {
+  border-radius: 10px;
   cursor: pointer;
-  text-decoration: none;
-  outline: none;
-  display: block;
-  padding-top: 8px;
-  color: var(--jet);
-  font-size: 1.875rem;
-  font-weight: 700;
-  padding-left: 4px;
-  margin-top: 0px;
-  margin-bottom: 0px;
+  height: 50px;
+  margin-right: 10px;
+  object-fit: cover;
+  position: relative;
+  width: 50px;
 }
 
-.text-router-Account:hover {
-  color: var(--pacific-cyan);; /* Hover color */
-}
-.font-account {
-  font-size: 1.875rem;
-}
-.logo-img {
-  margin-right: 10px; /* Spacing between logo and text */
+h3 {
+  color: #707070;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 20px;
+  text-transform: uppercase;
+  transition: all 0.5s ease;
 }
 
-.navigation-admin {
+h3 span {
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.toggle {
+  align-items: center;
+  background: #11abcd;
+  border-radius: 50%;
+  box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
+  cursor: pointer;
+  display: flex;
+  height: 30px;
+  justify-content: center;
+  position: absolute;
+  right: -40px;
+  width: 30px;
+}
+
+.toggle i {
+  animation: animToggle 0.5s ease;
+  color: #f6f5ff;
+  filter: drop-shadow(0px 1px 3px 1px rgba(60, 64, 67, 0.15));
+}
+
+@keyframes animToggle {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+menu {
   display: flex;
   flex-direction: column;
-  margin-top: 16px;
+  height: calc(100% - 70px);
+  justify-content: space-between;
+  overflow: hidden;
   position: relative;
-  margin-bottom: 16px;
-}
-.navigation-admin ul {
-  list-style: none;
-  padding: 0;
+  width: 100%;
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
 }
 
-.navigation-admin ul li {
-  margin-bottom: 15px;
+ul {
+  margin-top: 50px;
+  position: relative;
+  width: 100%;
 }
 
-.navigation-admin ul li a {
-  color: white;
-  text-decoration: none;
-  font-size: 16px;
-  transition: color 0.3s ease;
-}
-
-.navigation-admin ul li a:hover {
-  color: #11abcd; /* Hover color */
-}
-
-.footer-admin {
-  margin-left: 16px;
-}
-
-.footer-router {
+li {
+  align-items: center;
+  border-radius: 10px;
   display: flex;
-  flex-direction: column;
-}
-
-.footerHome {
-  transition: all 0.15s ease-out 0s;
+  height: 50px;
+  margin-bottom: 5px;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
   cursor: pointer;
-  text-decoration: none;
-  outline: none;
-  display: inline-block;
-  margin-bottom: 16px;
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  color: var(--jet);
+  transition: background-color .3s;
 }
 
-.footerHome:hover{
-  color: var(--pacific-cyan);
-}
-.text-home {
-  font-family: Calibre, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-  margin: 0px;
-  font-weight: 700;
-  font-size: 1.125rem;
+
+li .active {
+  background: #e4f6f7; /* This will apply to <router-link> elements */
 }
 
-.text-home::after {
-  display: block;
-  content: "";
-  border-bottom: 3px solid rgb(23, 25, 28);
-  transform: scaleX(0);
-  transition: transform 250ms cubic-bezier(0.785, 0.135, 0.15, 0.86) 0s;
-  transform-origin: 0% 50%;
-  width: inherit;
-}
-.text-support {
-  font-family: Calibre, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-  margin: 0px;
-  font-weight: 700;
-  font-size: 1.125rem;
+/* Ensure the style is applied directly to the router-link within li */
+li .text-router-station.active {
+  background: #e4f6f7; /* Active state styling */
+  display: flex; /* To ensure the style covers the entire li space */
+  width: 100%; /* Cover the full width of the li */
 }
 
-.text-support::after {
-  display: block;
-  content: "";
-  border-bottom: 3px solid rgb(23, 25, 28);
-  transform: scaleX(0);
-  transition: transform 250ms cubic-bezier(0.785, 0.135, 0.15, 0.86) 0s;
-  transform-origin: 0% 50%;
-  width: inherit;
-}
-
-.footer-support {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-}
-
-.support-nave {
-  transition: all 0.15s ease-out 0s;
+.fa-magnifying-glass {
+  align-items: center;
   cursor: pointer;
+  display: flex;
+  height: 50px;
+  justify-content: center;
+  margin-right: 10px;
+  min-width: 50px;
+  position: relative;
+  width: 50px;
+}
+
+input {
+  background: transparent;
+  border: none;
+  color: #707070;
+  font-size: 18px;
+  outline: none;
+  padding-right: 15px;
+  position: relative;
+  transition: all 0.3s ease;
+  width: calc(100% - 50px);
+}
+
+a {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
   text-decoration: none;
-  outline: none;
-  display: inline-block;
-  margin-right: 8px;
-  color: var(--jet);
+  transition: all 0.5s ease;
+  width: 100%;
 }
 
-.support-nave :hover{
-  color: var(--pacific-cyan);
-}
-
-.footer-logout {
-  color: inherit;
-  text-decoration: inherit;
-  transition: all 0.15s ease-out 0s;
-  cursor: pointer;
-  outline: none;
-  display: inline-block;
-  margin-top: 16px;
+a i.fa-solid {
+  align-items: center;
+  color: #707070;
   display: flex;
-  flex-direction: row;
-  align-items: flex-start;
+  font-size: 20px;
+  height: 50px;
+  justify-content: center;
+  margin-right: 10px;
+  min-width: 50px;
+  position: relative;
+  transition: all 0.3s ease;
+  width: 50px;
+}
+
+a:hover {
+  background: #11abcd;
+  color: #f6f5ff;
+}
+
+a span {
+  color: #707070;
+  font-size: 20px;
+  font-weight: 500;
+  text-transform: capitalize;
+  transition: all 0.3s ease;
+}
+
+.mode {
+  position: relative;
+  width: 100%;
+}
+
+.icon {
+  border-radius: 10px;
+  height: 50px;
+  margin-bottom: 5px;
+  overflow: hidden;
+  position: relative;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.icon:hover {
+  background: #11abcd;
+  
+}
+
+.icon a {
+  align-items: center;
   display: flex;
-  color: var(--jet);
+  height: 100%;
+  position: relative;
+  text-decoration: none;
+  width: 100%;
 }
 
-.footer-logout:hover{
-  color: var(--pacific-cyan);
+.icon a i.fa-solid {
+  align-items: center;
+  color: #707070;
+  display: flex;
+  font-size: 20px;
+  height: 50px;
+  justify-content: center;
+  margin-right: 10px;
+  min-width: 50px;
+  position: relative;
+  transition: all 0.3s ease;
+  width: 50px;
 }
 
-.text-logout {
-  font-family: Calibre, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-  margin: 0px;
-  font-weight: 700;
-  font-size: 1.125rem;
+.icon a span {
+  color: #707070;
+  font-size: 20px;
+  font-weight: 500;
+  text-transform: capitalize;
+  transition: all 0.3s ease;
+}
+
+.icon:hover  i.fa-solid,
+.icon:hover  span
+{
+  color: #f6f5ff;
 }
 
 
-.footer-admin a {
-  color: var(--jet); 
-    text-decoration: none;
-  transition: color 0.3s ease;
+.text-router-station:hover  i.fa-solid,
+.text-router-station:hover  span
+{
+  color: #f6f5ff;
 }
 
-.footer-admin a:hover {
-  color: #11abcd; /* Hover color */
+.active:hover  i.fa-solid,
+.active:hover  span
+{
+  color: #707070;
 }
 </style>

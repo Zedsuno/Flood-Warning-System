@@ -1,5 +1,17 @@
 <template>
   <div class="Div-Add-Station-All">
+    <DeletePopup
+      v-if="showDeletePopup"
+      @confirmDelete="confirmDelete"
+      @cancelDelete="cancelDelete"
+    />
+    <UpdatePopup
+      v-if="showUpdatePopup"
+      @confirmUpdate="confirmUpdate"
+      @cancelUpdate="cancelUpdate"
+    />
+
+  
     <div class="Div-Add-Station">
       <div class="Div-Header-Text">
         <div class="Blog-Text-Add-Header">
@@ -15,14 +27,12 @@
               <div class="station-details">
                 <div class="station-status-container">
                   <div class="station-status-badge">
-                    <div
-                      aria-haspopup="dialog"
-                      aria-expanded="false"
-                      aria-controls="popover-154"
-                      class="station-status-text"
+                    <span
+                      class="status-badge"
+                      :class="{ inactive: stationData.active === false }"
                     >
-                      ไม่ได้ใช้งาน
-                    </div>
+                      {{ stationData.active ? "ใช้งานอยู่" : "ไม่ได้ใช้งาน" }}
+                    </span>
                   </div>
                 </div>
                 <p class="station-id-text">
@@ -33,9 +43,18 @@
           </div>
         </div>
         <div class="botton-Save-All">
+          <div class="Botton-Save">
+            <button
+              type="button"
+              @click="triggerFormSubmission"
+              class="Botton-Save-Text"
+            >
+              {{ isEditMode ? "อัพเดทสถานี" : "สร้างสถานี" }}
+            </button>
+          </div>
           <button
             v-if="isEditMode"
-            @click="deleteStation"
+            @click="showDeleteConfirmation"
             type="button"
             aria-label="Delete Station"
             class="css-1r8mp7n"
@@ -56,27 +75,27 @@
               </g>
             </svg>
           </button>
-          <div class="Botton-Save">
-            <button
-              @click="isEditMode ? updateStation() : saveStation()"
-              class="Botton-Save-Text"
-            >
-              {{ isEditMode ? "อัพเดทสถานี" : "สร้างสถานี" }}
-            </button>
-          </div>
         </div>
       </div>
 
       <div class="Space-Btw"></div>
-      <form @submit.prevent="isEditMode ? updateStation() : saveStation()">
+      <form
+      
+        class="formStationInput"
+        @submit.prevent="submitForm"
+      >
         <StationProfile
           :existingData="stationData"
           @update-profile="updateStationProfile"
+          :errors="errors"
         />
         <StationLocation
           :existingData="stationData.location"
           @update-location="updateStationLocation"
+          :isEditMode="isEditMode"
+          :errors="errors"
         />
+        
       </form>
     </div>
   </div>
@@ -87,11 +106,16 @@ import axios from "axios";
 import StationProfile from "./StationProfile.vue";
 import StationLocation from "./StationLocation.vue";
 import { mapActions, mapState } from "vuex";
-
+import DeletePopup from "../AdminPage/DeletePopup.vue";
+import UpdatePopup from "../AdminPage/UpdatePopup.vue";
+import { EventBus } from "../../event-bus";
 export default {
   components: {
     StationProfile,
     StationLocation,
+    DeletePopup,
+    UpdatePopup,
+    
   },
   props: {
     isEditMode: {
@@ -106,21 +130,15 @@ export default {
   data() {
     return {
       stationData: this.defaultStationData(),
+      showDeletePopup: false,
+      showUpdatePopup: false,
+      showSavePopup: false,
+      errors: {},
     };
   },
   created() {
     if (this.isEditMode && this.stationId) {
-      this.fetchStation(this.stationId)
-        .then((response) => {
-          this.stationData = response.data;
-          // Ensure `location` is defined even if it's not present in the response
-          if (!this.stationData.location) {
-            this.stationData.location = this.defaultStationData().location;
-          }
-        })
-        .catch((error) => {
-          console.error("Failed to fetch station data", error);
-        });
+      this.fetchStationData();
     }
   },
   computed: {
@@ -146,29 +164,31 @@ export default {
       "saveStation",
       "updateStationData",
     ]),
-    defaultStationData() {
+    defaultStationData () {
       return {
-        _id: null,
-        stationId: "",
-        hardware: [],
-        software: "",
-        active: false, // Assuming new stations are active by default
-        waterLevel: "100  ", // Starting water level, adjust as needed
-        referenceArea: "500", // The area the station is monitoring
-        waterLevelThreshold: "", // The threshold for alerts
-        status: "active",
+        _id: null, // Not needed when creating a new record, provided by MongoDB
+        stationId: "", // Unique identifier for the station, to be entered by the user
+        hardware: [], // Array of hardware device IDs, initially empty
+        software: "", // Software version or description
+        active: true, // New stations start as active by default
+        sensorDistance: "", // The fixed distance from the sensor to a reference point
+        waterline: "", // Default total depth from sensor to riverbed
+        thresholds: [], // No thresholds set initially
+        status: "active", // New stations start as 'active'
         location: {
+          // Default location details
           address: "",
           river: "",
           state: "",
           postalCode: "",
           latitude: null,
           longitude: null,
-          elevation: null,
-          precision: "",
+          
         },
+        apiKey: "", // API key for integration or security purposes
       };
     },
+    
     updateStationProfile(profileData) {
       this.stationData = { ...this.stationData, ...profileData };
     },
@@ -184,18 +204,33 @@ export default {
     },
     async fetchStationData() {
       this.loading = true;
-      try {
-        const response = await axios.get(
-          `http://localhost:3001/api/stations/${this.stationId}`
-        );
-        this.stationData = response.data;
-      } catch (error) {
-        console.error("Error fetching station data:", error);
-        // Handle error appropriately
-      } finally {
-        this.loading = false;
-      }
+      console.log(`Fetching data for station ID: ${this.stationId}`); // Log the station ID being requested
+      axios
+        .get(`http://localhost:3001/api/stations/${this.stationId}`)
+        .then((response) => {
+          console.log("API Response:", response); // Log the whole response object
+
+          if (response && response.data) {
+            this.stationData = response.data;
+            if (!this.stationData.location) {
+              this.stationData.location = this.defaultStationData().location;
+            }
+          } else {
+            console.warn("No data returned from API:", response);
+          }
+        })
+        .catch((error) => {
+          console.error("Failed to fetch station data", error);
+          console.log(
+            "Error details:",
+            error.response || error.message || error
+          ); // Log more detailed error info
+        })
+        .finally(() => {
+          this.loading = false;
+        });
     },
+
     // Call this method when the save button is clicked
     async saveStation() {
       if (!this.isEditMode) {
@@ -203,60 +238,136 @@ export default {
         const postData = { ...this.stationData };
         delete postData._id; // Remove _id when creating a new document
         try {
-          const response = await axios.post(
-            "http://localhost:3001/api/stations",
-            postData
-          );
-          this.$emit("station-saved", response.data);
+          await axios.post("http://localhost:3001/api/stations", postData);
+          // Notify success
+          EventBus.emit("notify", {
+            message: "Station saved successfully",
+            type: "success",
+          });
           this.$router.push("/Admin");
         } catch (error) {
-          console.error("Error saving the station:", error.response.data);
+          // Notify error
+          EventBus.emit("notify", {
+            message: "Error saving station: " + error.message,
+            type: "error",
+          });
         }
       } else {
-        // Updating an existing station
+        // If in edit mode, call the update method instead
         await this.updateStation();
       }
     },
-    async updateStation() {
+
+    showUpdateConfirmation() {
+      this.showUpdatePopup = true;
+    },
+    async confirmUpdate() {
       try {
         const updateData = { ...this.stationData };
         // Don't delete _id here since it's required for identifying the document to update
-        const response = await axios.put(
+        await axios.put(
           `http://localhost:3001/api/stations/${updateData._id}`,
           updateData
         );
-        console.log("Station updated:", response.data);
+        EventBus.emit("notify", {
+          message: "Station updated successfully",
+          type: "success",
+        });
         this.$router.push("/Admin");
       } catch (error) {
         console.error("Error updating the station:", error.response.data);
       }
+
+      this.showUpdatePopup = false;
     },
-    async deleteStation() {
-      if (confirm("คุณแน่ใจใช่มั้ยว่าจะลบสถานีแห่งนี้")) {
-        axios
-          .delete(`http://localhost:3001/api/stations/${this.stationData._id}`)
-          .then(() => {
-            console.log("Station deleted successfully");
-            this.$router.push("/Admin");
-          })
-          .catch((error) => {
-            console.error("Error deleting the station:", error);
-          });
+    cancelUpdate() {
+      this.showUpdatePopup = false;
+    },
+    showDeleteConfirmation() {
+      this.showDeletePopup = true;
+    },
+    async confirmDelete() {
+      try {
+        await axios.delete(
+          `http://localhost:3001/api/stations/${this.stationData._id}`
+        );
+        EventBus.emit("notify", {
+          message: "Station deleted successfully",
+          type: "success",
+        });
+        this.$router.push("/Admin");
+      } catch (error) {
+        console.error("Error deleting the station:", error);
       }
+      this.showDeletePopup = false; // Hide the popup regardless of the outcome
+    },
+
+    // Called when the deletion is cancelled from the DeletePopup component
+    cancelDelete() {
+      this.showDeletePopup = false;
+    },
+    triggerFormSubmission() {
+      if (this.validateForm()) {
+        this.submitForm();
+      } else {
+        console.error('Validation failed:', this.errors);
+      }
+    },
+    submitForm() {
+      this.isEditMode ? this.showUpdateConfirmation() : this.saveStation();
+    },
+    validateForm() {
+      this.errors = {}; // Reset errors
+      let isValid = true;
+
+      if (!this.stationData.stationId) {
+        this.errors.stationId = "กรุณาระบุชื่อสถานี";
+        isValid = false;
+      }
+      if (!this.stationData.location.latitude) {
+        this.errors.latitude = "กรุณาระบุละติจูด";
+        isValid = false;
+      }
+      if (!this.stationData.location.longitude) {
+        this.errors.longitude = "กรุณาระบุลองติจูด.";
+        isValid = false;
+      }
+
+      return isValid;
     },
   },
 };
 </script>
 
 <style scoped>
-@media screen and (min-width: 62em) {
+.formStationInput {
+  display: flex; /* Enables flexbox layout */
+  justify-content: space-between; /* Spacing between the child elements */
+  align-items: flex-start; /* Align items to the start of the flex container */
+}
+@media screen and (max-width: 1024px) {
   .Div-Add-Station-All {
-    overflow-y: scroll;
+    flex-direction: column; /* Stack children on top of each other */
+    align-items: center; /* Center the children */
+    /* Stack children in a column on smaller screens */
   }
+
+  .DivStationProfileAll,
+  .Div_Location_Form_All {
+    width: 100%; /* Children take full width */
+    max-width: none; /* Remove max-width restriction */
+  }
+}
+.DivStationProfileAll,
+.Div_Location_Form_All {
+  width: 50%; /* Children take up half the width */
+  max-width: 600px; /* Or adjust to your design preference */
+  /* Background color for each child */
+  /* Internal spacing */
 }
 .Div-Add-Station-All {
   overflow-y: auto;
-  background-color: rgb(219, 226, 226);
+  background-color: var(--color-background);
   -webkit-box-flex: 1;
   flex-grow: 1;
   z-index: 1;
@@ -304,8 +415,7 @@ export default {
   font-size: 0.75rem;
   line-height: 1;
   font-weight: 700;
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: "Prompt", sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 8px;
@@ -325,8 +435,7 @@ export default {
   font-size: 2.25rem;
   line-height: 1;
   font-weight: 700;
-  font-family: Calibre, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: "Prompt", sans-serif;
 }
 
 .Botton-Save {
@@ -334,6 +443,12 @@ export default {
   flex-direction: row;
   -webkit-box-align: center;
   align-items: center;
+}
+
+.Botton-Save-Text:hover {
+  background-color: #0f9cb7;
+  transform: translateY(-2px); /* Slightly raise the button on hover */
+  box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
 }
 .Botton-Save-Text {
   border-radius: 9999px;
@@ -356,11 +471,10 @@ export default {
   font-size: 0.875rem;
   padding-left: 32px;
   padding-right: 32px;
-  background-color: rgb(35, 187, 241);
+  background-image: linear-gradient(to right, #11abcd, #25adfc);
   border: 2px solid transparent;
   color: rgb(250, 251, 253);
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: "Prompt", sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   cursor: pointer;
@@ -417,17 +531,18 @@ export default {
   background-color: rgb(40, 43, 46);
   border: 2px solid transparent;
   color: rgb(250, 251, 253);
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: "Prompt", sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   cursor: pointer;
-  margin-right: 16px;
+  margin-left: 16px;
 }
 
 .css-1r8mp7n:hover {
   background-color: #ff4d4d; /* red background */
   color: white; /* white text */
+  transform: translateY(-2px); /* Slightly raise the button on hover */
+  box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
 }
 
 .css-19a9efo:not(:root) {
@@ -458,8 +573,7 @@ export default {
   font-size: 0.75rem;
   line-height: 1;
   font-weight: 700;
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: "Prompt", sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 8px;
@@ -478,8 +592,7 @@ export default {
   font-size: 2.25rem;
   line-height: 1;
   font-weight: 700;
-  font-family: Calibre, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: "Prompt", sans-serif;
 }
 
 .station-details {
@@ -492,7 +605,10 @@ export default {
 }
 
 .station-status-badge {
-  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem; /* Adjusted space */
 }
 
 .station-status-text {
@@ -510,8 +626,7 @@ export default {
 }
 
 .station-id-text {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-family: "Prompt", sans-serif;
   margin: 0px;
   font-weight: 700;
   text-transform: uppercase;
@@ -520,4 +635,5 @@ export default {
   font-size: 0.75rem;
   color: rgb(153, 153, 153);
 }
+
 </style>

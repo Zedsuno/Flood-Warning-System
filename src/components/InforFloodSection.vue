@@ -421,7 +421,7 @@ strong {
 
 .fema-link {
   padding: 0.7rem;
-  font-family: "SourceSansPro-Regular", "Source Sans Pro", sans-serif;
+  font-family: 'Prompt', sans-serif;
   font-size: 15px;
   color: white;
   background: #11abcd;
