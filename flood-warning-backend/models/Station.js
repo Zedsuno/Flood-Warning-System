@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Hardware = require('./Hardware');
 // Define ThresholdSchema next
 const ThresholdSchema = new mongoose.Schema({
   name: String,
@@ -9,36 +10,42 @@ const ThresholdSchema = new mongoose.Schema({
 // Now define StationSchema
 const StationSchema = new mongoose.Schema({
   stationId: String,
-  hardware: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Hardware' }],
-  software: String,
-  location: {
+  hardware: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Hardware'
+  }],  location: {
     address: String,
     river: String,
     state: String,
     postalCode: String,
     latitude: Number,
     longitude: Number,
-    elevation: Number,
-    precision: String,
   },
   active: Boolean,
   thresholds: [ThresholdSchema],
   status: String,
   apiKey: String,
-  sensorDistance: Number, // The fixed distance from the sensor to a reference point
-  riverbedDistance: Number, // The distance from the reference point to the riverbed
+  sensorDistance: Number,
+  waterline: Number, // The
+  // The depth
 });
 
-StationSchema.virtual('waterSurfaceToSensor').get(function() {
-  // Assuming 'sensorDistance' is the height of the sensor from the riverbed
-  // and the latest sensor value is the distance to the water surface
-  const latestReading = this.hardware.map(h => h.readings[h.readings.length - 1]).reduce((a, b) => a.timestamp > b.timestamp ? a : b, {value: 0});
-  return this.sensorDistance - latestReading.value;
+StationSchema.virtual('Water Level').get(function() {
+  if (!this.hardware.length) return null; // No hardware linked
+  const latestReading = this.hardware.map(h => h.readings[h.readings.length - 1]).reduce((a, b) => a.timestamp > b.timestamp ? a : b, {value: null});
+  return latestReading.value !== null ? this.sensorDistance - latestReading.value : null;
 });
 
-StationSchema.virtual('totalWaterDepth').get(function() {
+StationSchema.virtual('WaterDepth').get(function() {
   // 'riverbedDistance' is the total depth from riverbed to water surface
-  return this.riverbedDistance - this.waterSurfaceToSensor;
+  return this.waterline - this.WaterLevel;
 });
+
+StationSchema.methods.linkSensor = function(sensorId) {
+  if (!this.hardware.includes(sensorId)) {
+    this.hardware.push(sensorId);
+    return this.save();
+  }
+};
 
 module.exports = mongoose.model('Station', StationSchema);

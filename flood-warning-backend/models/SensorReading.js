@@ -1,8 +1,11 @@
 const mongoose = require('mongoose');
 
 const SensorReadingSchema = new mongoose.Schema({
-  timestamp: Date,
-  value: Number, // The distance from the sensor to the water surface
-});
+  waterLine: Number,
+  distanceSensor: Number,
+  measurement: Number,
+  sensorId: String
+}, { timestamps: true });
+
 
 module.exports = mongoose.model('SensorReading', SensorReadingSchema);

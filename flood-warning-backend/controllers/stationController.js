@@ -32,7 +32,10 @@ exports.getAllStation = async (req, res) => {
       if (!mongoose.Types.ObjectId.isValid(stationId)) {
         return res.status(400).json({ message: "Invalid station ID format" });
       }
-      const station = await Station.findById(stationId);
+      const station = await Station.findById(stationId)
+        .populate('hardware') // Assuming 'hardware' is the name of the field in Station schema
+        .exec(); // Execute the query to get the data
+  
       if (!station) {
         return res.status(404).json({ message: "Station not found" });
       }

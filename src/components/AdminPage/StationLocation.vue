@@ -73,6 +73,7 @@
                     @blur="updateData"
                   />
                 </div>
+                <p v-if="errors.latitude" class="error-message">{{ errors.latitude }}</p>
               </div>
               <div class="Div-coordinates-longtitude" disabled="">
                 <label class="Label-Text-name">ลองติจูด</label>
@@ -84,6 +85,7 @@
                     @blur="updateData"
                   />
                 </div>
+                <p v-if="errors.longitude" class="error-message">{{ errors.longitude }}</p>
               </div>
             </div>
             <!-- <div class="sl-precision-container">
@@ -217,7 +219,7 @@
                     class="selection-info"
                     @change="updateData"
                   >
-                    <option value="">เลือกแหล่งน้ำ</option>
+                    <option disabled value="" selected>เลือกแหล่งน้ำ</option>
                     <option value="แม่น้ำโขง">แม่น้ำโขง</option>
                     <option value="แม่น้ำกก">แม่น้ำกก</option>
                     <option value="แม่น้ำอิง">แม่น้ำอิง</option>
@@ -261,7 +263,7 @@
                     class="selection-info"
                     @change="updateData"
                   >
-                    <option value="">เลือกอำเภอ</option>
+                    <option disabled value="" selected>เลือกอำเภอ</option>
                     <option value="อำเภอเมือง">อำเภอเมือง</option>
                     <option value="อำเภอเชียงของ">อำเภอเชียงของ</option>
                     <option value="อำเภอเทิง">อำเภอเทิง</option>
@@ -351,7 +353,10 @@ export default {
         elevation: "",
       }),
     },
-
+    errors: {
+      type: Object,
+      default: () => ({}),
+    },
     isEditMode: {
       type: Boolean,
       default: false, // Default mode is not edit mode
@@ -1006,5 +1011,8 @@ input[type="radio"][aria-checked="mixed"] + .sl-radio-custom > * {
   font-weight: 400;
   font-size: 0.75rem;
   color: rgb(153, 153, 153);
+}
+.error-message {
+  color: red;
 }
 </style>

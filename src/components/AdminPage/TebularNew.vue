@@ -70,7 +70,23 @@
                       style="width: 9.65361%"
                     >
                       <a href="#" class="dataTable-sorter"
-                        >ระยะจากเซ็นเซอร์ถึงน้ำ</a
+                        >ระยะห่างเซนเซอร์</a
+                      >
+                    </th>
+                    <th
+                      class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                      style="width: 9.65361%"
+                    >
+                      <a href="#" class="dataTable-sorter"
+                        >ระดับตลิ่ง</a
+                      >
+                    </th>
+                    <th
+                      class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                      style="width: 9.65361%"
+                    >
+                      <a href="#" class="dataTable-sorter"
+                        >ระดับความลึก</a
                       >
                     </th>
                     <th
@@ -106,6 +122,12 @@
                     </td>
                     <td class="text-sm font-weight-normal">
                       {{ station.sensorDistance }} cm
+                    </td>
+                    <td class="text-sm font-weight-normal">
+                      {{ station.waterline }} cm
+                    </td>
+                    <td class="text-sm font-weight-normal">
+                      {{ station.WaterDepth }} cm
                     </td>
                     <td class="text-sm font-weight-normal">
                       <ul class="threshold-list">
@@ -364,10 +386,7 @@ p {
   font-size: 1rem;
 }
 
-.table-responsive {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
+
 
 .dataTable-wrapper .dataTable-top {
   padding: 1.5rem;
@@ -408,9 +427,7 @@ p {
   padding: 6px;
 }
 
-.dataTable-wrapper.no-footer .dataTable-container {
-  border-bottom: 0;
-}
+
 
 .dataTable-table {
   max-width: 100%;
@@ -420,7 +437,7 @@ p {
   
 }
 .table {
-  --bs-table-color: #7b809a;
+  --bs-table-color: #222222;
   --bs-table-bg: transparent;
   --bs-table-border-color: #f0f2f5;
   --bs-table-accent-bg: transparent;
@@ -470,6 +487,34 @@ tr {
   border-width: 0;
 }
 
+.dataTable-container{
+  overflow-x: scroll; /* Enable horizontal scrolling */
+  width: 100px; /* Full width of parent container */
+  min-width: 100%; /* Minimum width is full width of parent container */
+}
+.dataTable-bottom:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Add styles for the scrollbar for visibility */
+.dataTable-container::-webkit-scrollbar {
+  height: 10px;
+}
+
+.dataTable-container::-webkit-scrollbar-thumb {
+  background: #cccccc;
+  border-radius: 5px;
+}
+
+.dataTable-container {
+  scrollbar-width: thin;
+  scrollbar-color: #cccccc transparent;
+}
+.dataTable-wrapper.no-footer .dataTable-container {
+  border-bottom: 0;
+}
 .dataTable-wrapper .dataTable-container .table thead tr th {
   padding: 0.75rem 1.5rem;
   font-weight: bolder;
@@ -667,6 +712,6 @@ a {
 }
 
 .threshold-text {
-  color: #000; /* Keeps text color black */
+  color: #222225; /* Keeps text color black */
 }
 </style>

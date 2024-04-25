@@ -11,11 +11,7 @@
       @cancelUpdate="cancelUpdate"
     />
 
-    <SavePopup
-      v-if="showSavePopup"
-      @confirmSave="confirmSave"
-      @cancelSave="cancelSave"
-    />
+  
     <div class="Div-Add-Station">
       <div class="Div-Header-Text">
         <div class="Blog-Text-Add-Header">
@@ -31,14 +27,12 @@
               <div class="station-details">
                 <div class="station-status-container">
                   <div class="station-status-badge">
-                    <div
-                      aria-haspopup="dialog"
-                      aria-expanded="false"
-                      aria-controls="popover-154"
-                      class="station-status-text"
+                    <span
+                      class="status-badge"
+                      :class="{ inactive: stationData.active === false }"
                     >
-                      ไม่ได้ใช้งาน
-                    </div>
+                      {{ stationData.active ? "ใช้งานอยู่" : "ไม่ได้ใช้งาน" }}
+                    </span>
                   </div>
                 </div>
                 <p class="station-id-text">
@@ -49,12 +43,10 @@
           </div>
         </div>
         <div class="botton-Save-All">
-          
           <div class="Botton-Save">
             <button
-              @click="
-                isEditMode ? showUpdateConfirmation() : showSaveConfirmation()
-              "
+              type="button"
+              @click="triggerFormSubmission"
               class="Botton-Save-Text"
             >
               {{ isEditMode ? "อัพเดทสถานี" : "สร้างสถานี" }}
@@ -87,17 +79,24 @@
       </div>
 
       <div class="Space-Btw"></div>
-        <form  class="formStationInput " @submit.prevent="isEditMode ? updateStation() : saveStation()">
-          <StationProfile
-            :existingData="stationData"
-            @update-profile="updateStationProfile"
-          />
-          <StationLocation
-            :existingData="stationData.location"
-            @update-location="updateStationLocation"
-            :isEditMode="isEditMode"
-          />
-        </form>
+      <form
+      
+        class="formStationInput"
+        @submit.prevent="submitForm"
+      >
+        <StationProfile
+          :existingData="stationData"
+          @update-profile="updateStationProfile"
+          :errors="errors"
+        />
+        <StationLocation
+          :existingData="stationData.location"
+          @update-location="updateStationLocation"
+          :isEditMode="isEditMode"
+          :errors="errors"
+        />
+        
+      </form>
     </div>
   </div>
 </template>
@@ -109,15 +108,14 @@ import StationLocation from "./StationLocation.vue";
 import { mapActions, mapState } from "vuex";
 import DeletePopup from "../AdminPage/DeletePopup.vue";
 import UpdatePopup from "../AdminPage/UpdatePopup.vue";
-import SavePopup from "../AdminPage/SavePopup.vue";
-import { EventBus } from "../../event-bus"
+import { EventBus } from "../../event-bus";
 export default {
   components: {
     StationProfile,
     StationLocation,
     DeletePopup,
     UpdatePopup,
-    SavePopup,
+    
   },
   props: {
     isEditMode: {
@@ -135,13 +133,14 @@ export default {
       showDeletePopup: false,
       showUpdatePopup: false,
       showSavePopup: false,
+      errors: {},
     };
   },
   created() {
-  if (this.isEditMode && this.stationId) {
-    this.fetchStationData();
-  }
-},
+    if (this.isEditMode && this.stationId) {
+      this.fetchStationData();
+    }
+  },
   computed: {
     ...mapState({
       currentStation: (state) => state.stations.currentStation,
@@ -165,31 +164,31 @@ export default {
       "saveStation",
       "updateStationData",
     ]),
-    defaultStationData() {
-  return {
-    _id: null,  // Not needed when creating a new record, provided by MongoDB
-    stationId: "",  // Unique identifier for the station, to be entered by the user
-    hardware: [],  // Array of hardware device IDs, initially empty
-    software: "",  // Software version or description
-    active: true,  // New stations start as active by default
-    waterLevel: 100,  // Default starting water level, might need adjustment based on actual setup
-    sensorDistance: 500,  // Default sensor distance to water surface
-    riverbedDistance: 600,  // Default total depth from sensor to riverbed
-    thresholds: [],  // No thresholds set initially
-    status: "active",  // New stations start as 'active'
-    location: {  // Default location details
-      address: "",
-      river: "",
-      state: "",
-      postalCode: "",
-      latitude: null,
-      longitude: null,
-      elevation: null,
-      precision: "",
+    defaultStationData () {
+      return {
+        _id: null, // Not needed when creating a new record, provided by MongoDB
+        stationId: "", // Unique identifier for the station, to be entered by the user
+        hardware: [], // Array of hardware device IDs, initially empty
+        software: "", // Software version or description
+        active: true, // New stations start as active by default
+        sensorDistance: "", // The fixed distance from the sensor to a reference point
+        waterline: "", // Default total depth from sensor to riverbed
+        thresholds: [], // No thresholds set initially
+        status: "active", // New stations start as 'active'
+        location: {
+          // Default location details
+          address: "",
+          river: "",
+          state: "",
+          postalCode: "",
+          latitude: null,
+          longitude: null,
+          
+        },
+        apiKey: "", // API key for integration or security purposes
+      };
     },
-    apiKey: ""  // API key for integration or security purposes
-  };
-},
+    
     updateStationProfile(profileData) {
       this.stationData = { ...this.stationData, ...profileData };
     },
@@ -204,43 +203,42 @@ export default {
       }
     },
     async fetchStationData() {
-  this.loading = true;
-  console.log(`Fetching data for station ID: ${this.stationId}`);  // Log the station ID being requested
-  axios.get(`http://localhost:3001/api/stations/${this.stationId}`)
-    .then(response => {
-      console.log('API Response:', response);  // Log the whole response object
+      this.loading = true;
+      console.log(`Fetching data for station ID: ${this.stationId}`); // Log the station ID being requested
+      axios
+        .get(`http://localhost:3001/api/stations/${this.stationId}`)
+        .then((response) => {
+          console.log("API Response:", response); // Log the whole response object
 
-      if (response && response.data) {
-        this.stationData = response.data;
-        if (!this.stationData.location) {
-          this.stationData.location = this.defaultStationData().location;
-        }
-      } else {
-        console.warn('No data returned from API:', response);
-      }
-    })
-    .catch(error => {
-      console.error("Failed to fetch station data", error);
-      console.log('Error details:', error.response || error.message || error);  // Log more detailed error info
-    })
-    .finally(() => {
-      this.loading = false;
-    });
-},
-    showSaveConfirmation() {
-      this.showSavePopup = true; // Set the flag to true to show the popup
+          if (response && response.data) {
+            this.stationData = response.data;
+            if (!this.stationData.location) {
+              this.stationData.location = this.defaultStationData().location;
+            }
+          } else {
+            console.warn("No data returned from API:", response);
+          }
+        })
+        .catch((error) => {
+          console.error("Failed to fetch station data", error);
+          console.log(
+            "Error details:",
+            error.response || error.message || error
+          ); // Log more detailed error info
+        })
+        .finally(() => {
+          this.loading = false;
+        });
     },
+
     // Call this method when the save button is clicked
-    async confirmSave() {
+    async saveStation() {
       if (!this.isEditMode) {
         // Creating a new station
         const postData = { ...this.stationData };
         delete postData._id; // Remove _id when creating a new document
         try {
-           await axios.post(
-            "http://localhost:3001/api/stations",
-            postData
-          );
+          await axios.post("http://localhost:3001/api/stations", postData);
           // Notify success
           EventBus.emit("notify", {
             message: "Station saved successfully",
@@ -251,18 +249,15 @@ export default {
           // Notify error
           EventBus.emit("notify", {
             message: "Error saving station: " + error.message,
-            type: "error",   
+            type: "error",
           });
         }
       } else {
         // If in edit mode, call the update method instead
         await this.updateStation();
       }
-      this.showSavePopup = false;
     },
-    cancelSave() {
-      this.showSavePopup = false; // Hide the popup
-    },
+
     showUpdateConfirmation() {
       this.showUpdatePopup = true;
     },
@@ -274,7 +269,10 @@ export default {
           `http://localhost:3001/api/stations/${updateData._id}`,
           updateData
         );
-        EventBus.emit('notify', { message: 'Station updated successfully', type: 'success' });
+        EventBus.emit("notify", {
+          message: "Station updated successfully",
+          type: "success",
+        });
         this.$router.push("/Admin");
       } catch (error) {
         console.error("Error updating the station:", error.response.data);
@@ -293,7 +291,10 @@ export default {
         await axios.delete(
           `http://localhost:3001/api/stations/${this.stationData._id}`
         );
-        EventBus.emit('notify', { message: 'Station deleted successfully', type: 'success' });
+        EventBus.emit("notify", {
+          message: "Station deleted successfully",
+          type: "success",
+        });
         this.$router.push("/Admin");
       } catch (error) {
         console.error("Error deleting the station:", error);
@@ -305,13 +306,40 @@ export default {
     cancelDelete() {
       this.showDeletePopup = false;
     },
+    triggerFormSubmission() {
+      if (this.validateForm()) {
+        this.submitForm();
+      } else {
+        console.error('Validation failed:', this.errors);
+      }
+    },
+    submitForm() {
+      this.isEditMode ? this.showUpdateConfirmation() : this.saveStation();
+    },
+    validateForm() {
+      this.errors = {}; // Reset errors
+      let isValid = true;
+
+      if (!this.stationData.stationId) {
+        this.errors.stationId = "กรุณาระบุชื่อสถานี";
+        isValid = false;
+      }
+      if (!this.stationData.location.latitude) {
+        this.errors.latitude = "กรุณาระบุละติจูด";
+        isValid = false;
+      }
+      if (!this.stationData.location.longitude) {
+        this.errors.longitude = "กรุณาระบุลองติจูด.";
+        isValid = false;
+      }
+
+      return isValid;
+    },
   },
 };
 </script>
 
 <style scoped>
-
-
 .formStationInput {
   display: flex; /* Enables flexbox layout */
   justify-content: space-between; /* Spacing between the child elements */
@@ -321,20 +349,21 @@ export default {
   .Div-Add-Station-All {
     flex-direction: column; /* Stack children on top of each other */
     align-items: center; /* Center the children */
-     /* Stack children in a column on smaller screens */
+    /* Stack children in a column on smaller screens */
   }
 
-  .DivStationProfileAll, .Div_Location_Form_All {
+  .DivStationProfileAll,
+  .Div_Location_Form_All {
     width: 100%; /* Children take full width */
     max-width: none; /* Remove max-width restriction */
   }
 }
-.DivStationProfileAll, .Div_Location_Form_All {
+.DivStationProfileAll,
+.Div_Location_Form_All {
   width: 50%; /* Children take up half the width */
   max-width: 600px; /* Or adjust to your design preference */
-   /* Background color for each child */
-   /* Internal spacing */
-  
+  /* Background color for each child */
+  /* Internal spacing */
 }
 .Div-Add-Station-All {
   overflow-y: auto;
@@ -386,7 +415,7 @@ export default {
   font-size: 0.75rem;
   line-height: 1;
   font-weight: 700;
-  font-family: 'Prompt', sans-serif;
+  font-family: "Prompt", sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 8px;
@@ -406,7 +435,7 @@ export default {
   font-size: 2.25rem;
   line-height: 1;
   font-weight: 700;
-  font-family: 'Prompt', sans-serif;
+  font-family: "Prompt", sans-serif;
 }
 
 .Botton-Save {
@@ -416,7 +445,7 @@ export default {
   align-items: center;
 }
 
-.Botton-Save-Text:hover{
+.Botton-Save-Text:hover {
   background-color: #0f9cb7;
   transform: translateY(-2px); /* Slightly raise the button on hover */
   box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
@@ -442,10 +471,10 @@ export default {
   font-size: 0.875rem;
   padding-left: 32px;
   padding-right: 32px;
-  background-image: linear-gradient(to right, #11abcd, #25adfc); 
+  background-image: linear-gradient(to right, #11abcd, #25adfc);
   border: 2px solid transparent;
   color: rgb(250, 251, 253);
-  font-family: 'Prompt', sans-serif;
+  font-family: "Prompt", sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   cursor: pointer;
@@ -502,7 +531,7 @@ export default {
   background-color: rgb(40, 43, 46);
   border: 2px solid transparent;
   color: rgb(250, 251, 253);
-  font-family: 'Prompt', sans-serif;
+  font-family: "Prompt", sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   cursor: pointer;
@@ -544,7 +573,7 @@ export default {
   font-size: 0.75rem;
   line-height: 1;
   font-weight: 700;
-  font-family: 'Prompt', sans-serif;
+  font-family: "Prompt", sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 8px;
@@ -563,7 +592,7 @@ export default {
   font-size: 2.25rem;
   line-height: 1;
   font-weight: 700;
-  font-family: 'Prompt', sans-serif;
+  font-family: "Prompt", sans-serif;
 }
 
 .station-details {
@@ -576,7 +605,10 @@ export default {
 }
 
 .station-status-badge {
-  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem; /* Adjusted space */
 }
 
 .station-status-text {
@@ -594,7 +626,7 @@ export default {
 }
 
 .station-id-text {
-  font-family: 'Prompt', sans-serif;
+  font-family: "Prompt", sans-serif;
   margin: 0px;
   font-weight: 700;
   text-transform: uppercase;
@@ -603,4 +635,5 @@ export default {
   font-size: 0.75rem;
   color: rgb(153, 153, 153);
 }
+
 </style>

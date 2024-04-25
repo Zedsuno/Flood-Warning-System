@@ -19,6 +19,7 @@
         
         // ... other components ...
       },
+      
       methods: {
   editStation(stationId) {
     // Assume `stationDataToEdit` is the data object of the station you want to edit.
