@@ -6,9 +6,7 @@
           <p class="popup-title">{{ stationData.stationId }}</p>
           <button type="button" aria-label="Close Panel" class="popup-close-btn " @click="closePopup">
             <svg viewBox="0 0 24 24" focusable="false" role="presentation" aria-hidden="true" class="popup-close-icon">
-              <path fill="currentColor"
-                d="M.439,21.44a1.5,1.5,0,0,0,2.122,2.121L11.823,14.3a.25.25,0,0,1,.354,0l9.262,9.263a1.5,1.5,0,1,0,2.122-2.121L14.3,12.177a.25.25,0,0,1,0-.354l9.263-9.262A1.5,1.5,0,0,0,21.439.44L12.177,9.7a.25.25,0,0,1-.354,0L2.561.44A1.5,1.5,0,0,0,.439,2.561L9.7,11.823a.25.25,0,0,1,0,.354Z">
-              </path>
+              <circle cx="12" cy="12" r="11" fill="currentColor"></circle>
             </svg>
           </button>
         </div>
@@ -17,7 +15,7 @@
           <div class="css-0">
             <div class="popup-section">
               <div class="popup-weather-icon">
-                <canvas ref="waterLevelCanvas" width="60" height="60"></canvas>
+                <canvas ref="waterLevelCanvas" width="60" height="45"></canvas>
               </div>
               <div class="popup-weather-info">
                 <div class="popup-temperature">
@@ -72,8 +70,18 @@
               <p class="css-5ka3wh">Winds</p>
             </div>
           </div>
-
         </div>
+
+        <div style="margin-top: 30px;">
+          <row>
+            <v-row>
+              <v-col cols="4">ระดับน้ำ 100 ม.รทก.</v-col>
+              <v-col cols="4">ระดับตลิ่ง 200 ม.รทก.</v-col>
+              <v-col cols="4">ระดับท้องน้ำ 350 ม.รทก.</v-col>
+            </v-row>
+          </row>
+        </div>
+
         <div class="css-1pzn42j">
           <div class="css-1ja7mm4">
           </div>
@@ -516,6 +524,14 @@ export default {
   .css-1ja7mm4 {
     margin-top: 32px;
   }
+}
+
+.css-1pzn42j .popup-weather-condition {
+  font-size: smaller;
+}
+
+.popup-time-update {
+  text-align: left;
 }
 
 .css-1ja7mm4 {
