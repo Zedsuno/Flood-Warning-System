@@ -75,9 +75,9 @@
         <div style="margin-top: 30px;">
           <row>
             <v-row>
-              <v-col cols="4">ระดับน้ำ 100 ม.รทก.</v-col>
-              <v-col cols="4">ระดับตลิ่ง 200 ม.รทก.</v-col>
-              <v-col cols="4">ระดับท้องน้ำ 350 ม.รทก.</v-col>
+              <v-col cols="4">ระดับน้ำ 100 ม.รทก. </v-col>
+              <v-col cols="4">ระดับตลิ่ง 200 ม.รทก. </v-col>
+              <v-col cols="4">ระดับท้องน้ำ 350 ม.รทก. </v-col>
             </v-row>
           </row>
         </div>
