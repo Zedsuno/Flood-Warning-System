@@ -9,13 +9,13 @@
             <div class="DivInput">
               <input
                 required
-                v-model="stationId"
+                v-model="stationName"
                 class="Inputclass"
                 @blur="updateData"
               />
             </div>
-            <p v-if="errors.stationId" class="error-message">
-              {{ errors.stationId }}
+            <p v-if="errors.stationName" class="error-message">
+              {{ errors.stationName }}
             </p>
           </div>
           <p class="TextP">
@@ -26,11 +26,15 @@
         <div class="Div-From-input-blog-all">
           <div class="Div-From-input-blog">
             <div class="Div-Text">
-  <label class="Labelname">Hardware</label>
-  <div class="DivInput">
-    <input v-model="hardwareIDInput" class="Inputclass" placeholder="กรอกรหัสฮาร์ดแวร์ไอดี" />
-  </div>
-</div>
+              <label class="Labelname">Hardware</label>
+              <div class="DivInput">
+                <input
+                  v-model="hardwareIDInput"
+                  class="Inputclass"
+                  placeholder="กรอกรหัสฮาร์ดแวร์ไอดี"
+                />
+              </div>
+            </div>
           </div>
           <button
             type="button"
@@ -48,6 +52,32 @@
             @close-api-popup="showApiPopup = false"
           />
         </div>
+        <div class="Div-riverprofile-blog">
+              <div class="Div-riverprofile-waterline" disabled="">
+                <label class="Label-Text-name">ระดับตลิ่ง</label>
+                <div class="Div-input-info-blog">
+                  <input
+                    v-model="waterline"
+                    class="input-information"
+                    type="number"
+                    @blur="updateData"
+                  />
+                </div>
+                <p v-if="errors.waterline" class="error-message">{{ errors.waterline}}</p>
+              </div>
+              <div class="Div-riverprofile-Distancesensor" disabled="">
+                <label class="Label-Text-name">ระยะห่างเซนเซอร์</label>
+                <div class="Div-input-info-blog">
+                  <input
+                    v-model="sensorDistance"
+                    class="input-information"
+                    type="number"
+                    @blur="updateData"
+                  />
+                </div>
+                <p v-if="errors.sensorDistance" class="error-message">{{ errors.sensorDistance }}</p>
+              </div>
+            </div>
         <!-- <div class="Div-From-input-Station">
           <div class="Div-From-input-blog">
             <div class="css-0">
@@ -78,6 +108,8 @@
             </div>
           </div>
           <!-- ThresholdFormModal Component -->
+
+          <!-- Existing markup -->
           <ThresholdFormModal
             v-if="isThresholdModalVisible"
             :initialThresholds="thresholds"
@@ -94,24 +126,24 @@
 
 <script>
 import TogglePopup from "../AdminPage/togglePopup.vue";
-import ThresholdFormModal from "./ThresholdFormModal.vue";
 import ApiToggle from "../AdminPage/ApiPopup.vue";
 import axios from "axios";
 import Swal from "sweetalert2";
+import ThresholdFormModal from "./ThresholdFormModal.vue"; // Import the new modal
 
 export default {
   components: {
     TogglePopup,
-    ThresholdFormModal,
-    ApiToggle,
+    ApiToggle, ThresholdFormModal,
   },
   props: {
     existingData: {
       type: Object,
       default: () => ({
-        stationId: "",
+        stationName: "",
         hardwareIDInput: "",
-        software: "",
+        waterline: "",
+        sensorDistance : "",
       }),
     },
     errors: {
@@ -121,38 +153,43 @@ export default {
   },
   data() {
     return {
-      stationId: this.existingData.stationId,
-      software: this.existingData.software,
+      stationName: this.existingData.stationName || "",
       active: this.existingData.active || false,
       waterLevel: this.existingData.waterLevel || 0,
+      sensorDistance:this.existingData.sensorDistance || "",
+      waterline:this.existingData.waterline ||"",
       referenceArea: this.existingData.referenceArea || "",
       thresholds: this.existingData.thresholds || [],
       showApiPopup: false,
       isSensorLinked: false,
       isThresholdModalVisible: false,
       hardwareIDInput: this.existingData.hardwareIDInput || "",
-      
+
       // Data property to control the visibility of the modal
     };
   },
   watch: {
-    
     existingData: {
       handler(newData) {
         console.log("Watcher - New existing data:", newData);
-        this.stationId = newData.stationId;
+        this.stationName = newData.stationName;
         this.hardwareIDInput = newData.hardwareIDInput;
         this.software = newData.software;
         this.active = newData.active;
         this.waterLevel = newData.waterLevel;
         this.referenceArea = newData.referenceArea;
         this.thresholds = newData.thresholds;
-        this.sensorData = newData; 
+        this.sensorData = newData;
+        this.sensorDistance = newData.sensorDistance ;
+        this.waterline = newData.waterline;
       },
       deep: true,
     },
   },
-
+  mounted() {
+    // Assuming you have a route parameter named `stationId`
+    this.stationId = this.$route.params.stationId;
+  },
   methods: {
     toggleSensorLink() {
       if (this.isSensorLinked) {
@@ -166,18 +203,19 @@ export default {
         Swal.fire({
           icon: "error",
           title: "อุ๊ปส์...",
-          text: "กรุณาเลือกฮาร์ดแวร์เพื่อเชื่อมต่อ!",
+          text: "กรุณากรอกคีย์ฮาร์ดแวร์เพื่อเชื่อมต่อ!",
           confirmButtonText: "ตกลง",
           confirmButtonColor: "#25adfc",
         });
         return;
       }
       this.connectHardware(this.hardwareIDInput);
-      
     },
-   
-    connectHardware(hardwareID) {
-      console.log(`Attempting to link hardware with ID: ${hardwareID}`);
+
+    connectHardware(hardwareIDInput) {
+      console.log(
+        `Attempting to link hardware with ID: ${hardwareIDInput} to station with ID: ${this.stationId}`
+      );
       Swal.fire({
         title: "กำลังเชื่อมกับเซนเซอร์...",
         html: "โปรดรอสักครู่...",
@@ -188,7 +226,11 @@ export default {
         allowOutsideClick: () => !Swal.isLoading(),
         showConfirmButton: false,
       });
-      axios.post("http://localhost:3001/api/hardware/link-and-fetch", { hardwareID: this.hardwareIDInput, stationId: this.stationId })
+      axios
+        .post("http://localhost:3001/api/hardware/link-and-fetch", {
+          hardwareID: hardwareIDInput,
+          stationId: this.stationId,
+        })
         .then((response) => {
           // Stop the loading SweetAlert and show a success message
           Swal.fire({
@@ -203,14 +245,19 @@ export default {
             response.data
           );
           this.isSensorLinked = true;
-         
         })
         .catch((error) => {
+          console.error("API Error Response:", error.response);
+          // Now display the message from the backend if it's available
+          const errorMessage =
+            error.response && error.response.data && error.response.data.message
+              ? error.response.data.message
+              : "An unknown error occurred.";
           // If there is an error, stop the loading SweetAlert and show an error message
           Swal.fire({
             icon: "error",
-            title: "Failed to Link Sensor",
-            text: "There was a problem linking the sensor.",
+            title: "ล้มเหลวในการเชื่อมโยงเซ็นเซอร์",
+            text: errorMessage,
             confirmButtonText: "ตกลง",
             confirmButtonColor: "#25adfc",
           });
@@ -229,7 +276,11 @@ export default {
         allowOutsideClick: () => !Swal.isLoading(),
         showConfirmButton: false,
       });
-      axios.post("http://localhost:3001/api/hardware/unlink", { hardwareId: this.hardwareIDInput })
+      axios
+        .post("http://localhost:3001/api/hardware/unlink", {
+          hardwareId: this.hardwareIDInput,
+          stationId: this.stationId,
+        })
         .then((response) => {
           Swal.fire({
             icon: "success",
@@ -259,18 +310,23 @@ export default {
     updateData() {
       this.$emit("update-profile", {
         ...this.existingData,
-        stationId: this.stationId,
-        
+        stationName: this.stationName,
         hardware: this.hardware,
         software: this.software,
         active: this.active,
         waterLevel: this.waterLevel,
         referenceArea: this.referenceArea,
         thresholds: this.thresholds,
+        sensorDistance: this.sensorDistance,
+        waterline: this.waterline,
       });
     },
     showThresholdModal() {
-      this.isThresholdModalVisible = true; // Method to open the modal
+      this.isThresholdModalVisible = true; // Trigger to show modal
+    },
+
+    removeThreshold(index) {
+      this.thresholds.splice(index, 1);
     },
     SaveThresholds(thresholds) {
       // Store thresholds in StationProfile's data
@@ -286,7 +342,6 @@ export default {
       this.showApiPopup = true;
       this.$refs.togglePopup.close();
     },
-   
   },
 };
 </script>
@@ -528,5 +583,64 @@ arrow-selection-svg:not(:root) {
 }
 .error-message {
   color: red;
+}
+
+.remove-button {
+  margin-right: 10px;
+  background: none;
+  border: none;
+  color: #ff4136;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.Div-riverprofile-blog {
+  display: flex;
+  flex-direction: row;
+  margin-top: 16px;
+  margin-bottom: 8px;
+}
+
+.Div-riverprofile-waterline {
+  min-width: 100px;
+  margin-right: 32px;
+}
+
+.Div-riverprofile-Distancesensor {
+  min-width: 100px;
+}
+
+.Label-Text-name {
+  font-family: "Prompt", sans-serif;
+  margin: 0px;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.Div-input-info-blog {
+  display: flex;
+  position: relative;
+}
+
+.input-information {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  position: relative;
+  transition: all 0.2s ease 0s;
+  outline: none;
+  appearance: none;
+  font-size: 1rem;
+  height: 2.5rem;
+  background-color: transparent;
+  border-radius: 0px;
+  border: none; /* Removes the border */
+  border-bottom: 2px solid #aaa; /* Default color for the bottom border */
+}
+.input-information:focus {
+  border-bottom: 2px solid #11abcd; /* Change #00f to the color you want */
+}
+.Div-riverprofile-Distancesensor {
+  min-width: 100px;
 }
 </style>

@@ -28,8 +28,7 @@ export default {
       const mapCoords = [this.latitude, this.longitude];
       this.map = L.map("editMap").setView(mapCoords, 13);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution:
-          '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
+        
         maxZoom: 18,
       }).addTo(this.map);
 

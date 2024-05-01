@@ -36,7 +36,7 @@
                   </div>
                 </div>
                 <p class="station-id-text">
-                  ชื่อสถานี: {{ stationData.stationId }}
+                  ชื่อสถานี: {{ stationData.stationName }}
                 </p>
               </div>
             </div>
@@ -167,7 +167,7 @@ export default {
     defaultStationData () {
       return {
         _id: null, // Not needed when creating a new record, provided by MongoDB
-        stationId: "", // Unique identifier for the station, to be entered by the user
+        stationName: "", // Unique identifier for the station, to be entered by the user
         hardware: [], // Array of hardware device IDs, initially empty
         software: "", // Software version or description
         active: true, // New stations start as active by default
@@ -320,8 +320,8 @@ export default {
       this.errors = {}; // Reset errors
       let isValid = true;
 
-      if (!this.stationData.stationId) {
-        this.errors.stationId = "กรุณาระบุชื่อสถานี";
+      if (!this.stationData.stationName) {
+        this.errors.stationName = "กรุณาระบุชื่อสถานี";
         isValid = false;
       }
       if (!this.stationData.location.latitude) {
@@ -330,6 +330,14 @@ export default {
       }
       if (!this.stationData.location.longitude) {
         this.errors.longitude = "กรุณาระบุลองติจูด.";
+        isValid = false;
+      }
+      if (!this.stationData.waterline) {
+        this.errors.waterline = "กรุณาระบุระดับตลิ่ง.";
+        isValid = false;
+      }
+      if (!this.stationData.sensorDistance) {
+        this.errors.sensorDistance = "กรุณาระบุระยะห่างเซนเซอร์.";
         isValid = false;
       }
 

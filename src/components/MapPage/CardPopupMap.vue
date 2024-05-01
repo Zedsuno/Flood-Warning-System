@@ -96,7 +96,7 @@
         <div class="css-1pzn42j">
           <div class="css-1ja7mm4">
           </div>
-          <button type="button" class="popup-action-btn">แดชบอร์ดสถานี</button>
+          <router-link to="/Station" class="popup-action-btn">แดชบอร์ดสถานี</router-link>
         </div>
       </div>
     </div>

@@ -19,7 +19,7 @@
         >
           {{ stationData.active ? "ใช้งานอยู่" : "ไม่ได้ใช้งาน" }}
         </span>
-        <p class="station-name">{{ stationData.stationId }}</p>
+        <p class="station-name">{{ stationData.stationName }}</p>
       </div>
       <p class="station-location">
         {{ stationData.location.address }},{{ stationData.location.state }},{{
@@ -33,7 +33,7 @@
         </p>
       </div>
       <div class="station-actions">
-        <button type="button" class="action-btn dashboard">Dashboard</button>
+        <router-link to="/Station"  type="button" class="action-btn dashboard">แดชบอร์ดสถานี</router-link>
         <button
           type="button"
           class="action-btn edit"

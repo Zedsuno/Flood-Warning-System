@@ -31,9 +31,7 @@
           </router-link>
         </li>
           <li class="nav-item">
-            <router-link to="/Station" class="nav-link" active-class="active">
-              <i class="fa fa-tower-cell"></i> สถานี
-            </router-link> 
+             
           </li>
           <li class="nav-item">
             <router-link to="/WaterResource" class="nav-link" active-class="active">

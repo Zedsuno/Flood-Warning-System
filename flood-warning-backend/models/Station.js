@@ -9,7 +9,7 @@ const ThresholdSchema = new mongoose.Schema({
 
 // Now define StationSchema
 const StationSchema = new mongoose.Schema({
-  stationId: String,
+  stationName: String,
   hardware: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Hardware'
@@ -27,13 +27,14 @@ const StationSchema = new mongoose.Schema({
   apiKey: String,
   sensorDistance: Number,
   waterline: Number, // The
+  WaterLevel: Number,
   // The depth
 });
 
 StationSchema.virtual('Water Level').get(function() {
   if (!this.hardware.length) return null; // No hardware linked
   const latestReading = this.hardware.map(h => h.readings[h.readings.length - 1]).reduce((a, b) => a.timestamp > b.timestamp ? a : b, {value: null});
-  return latestReading.value !== null ? this.sensorDistance - latestReading.value : null;
+  return latestReading.value !== null ? this.distanceSensor - latestReading.measurement : null;
 });
 
 StationSchema.virtual('WaterDepth').get(function() {

@@ -1,10 +1,11 @@
 const mongoose = require('mongoose');
 const SensorReading = require('./SensorReading');
-
+const Station = require('./Station');
 
 const HardwareSchema = new mongoose.Schema({
-  equipment_id: { type: String, unique: true },
-  station: { type: mongoose.Schema.Types.ObjectId, ref: 'Station' },  // Link to only one Station
+  HardwareID: String,
+  equipment_id: { type: String, required: true,unique: true },
+  Station: { type: mongoose.Schema.Types.ObjectId, ref: 'Station' },
   name: String,
   apiKey: String,
   sensorType: String,

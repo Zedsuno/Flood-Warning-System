@@ -21,16 +21,15 @@ exports.updateHardwareSettings = async (req, res) => {
   }
 };
 exports.linkHardwareToStationAndFetchData = async (req, res) => {
-  const { hardwareID, stationId } = req.body;
+  const { hardwareID, stationId } = req.body; 
   if (!mongoose.Types.ObjectId.isValid(stationId)) {
     return res.status(400).json({ message: "Invalid station ID" });
-  }
-
+} // Make sure both are being received
   try {
-    const hardware = await Hardware.findOne({ equipment_id: hardwareID });
-    if (!hardware) {
-      return res.status(404).json({ message: "Hardware not found" });
-    }
+      const hardware = await Hardware.findOne({ equipment_id: hardwareID });
+      if (!hardware) {
+          return res.status(404).json({ message: "ไม่พบฮาร์ดแวร์" });
+      }
 
     // Check if the equipment_id entered by the user matches the hardwareID
     if (hardware.equipment_id !== hardwareID) {
@@ -39,7 +38,7 @@ exports.linkHardwareToStationAndFetchData = async (req, res) => {
 
     const linkedStation = await Station.findOne({ hardware: hardware._id });
     if (linkedStation) {
-      return res.status(400).json({ message: "Hardware already linked" });
+      return res.status(400).json({ message: "ฮาร์ดแวร์มีการเชื่อมต่อยู่แล้ว" });
     }
 
     const apiResponse = await axios.get('https://run.mocky.io/v3/ee7c7476-b7f2-4db6-a446-e31d265338a8');
@@ -58,8 +57,6 @@ exports.linkHardwareToStationAndFetchData = async (req, res) => {
         hardware.readings.push(existingReading._id);
       } else {
         const newReading = new SensorReading({
-          waterLine: data.water_line,
-          distanceSensor: data.distance_sensor,
           measurement: data.measurement,
           sensorId: data.id,
         });
@@ -81,7 +78,7 @@ exports.linkHardwareToStationAndFetchData = async (req, res) => {
     res.status(200).json({ message: "Hardware linked and data fetched successfully", station });
   } catch (error) {
     console.error('Error linking hardware to station or fetching data:', error);
-    res.status(500).json({ message: 'Failed to link hardware to station or fetch data', error });
+    res.status(500).json({ message: 'ไม่สามารถเชื่อมโยงฮาร์ดแวร์กับสถานีหรือดึงข้อมูลได้', error });
   }
 };
 

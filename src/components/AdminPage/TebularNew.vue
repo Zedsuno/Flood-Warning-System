@@ -69,25 +69,19 @@
                       class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
                       style="width: 9.65361%"
                     >
-                      <a href="#" class="dataTable-sorter"
-                        >ระยะห่างเซนเซอร์</a
-                      >
+                      <a href="#" class="dataTable-sorter">ระยะห่างเซนเซอร์</a>
                     </th>
                     <th
                       class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
                       style="width: 9.65361%"
                     >
-                      <a href="#" class="dataTable-sorter"
-                        >ระดับตลิ่ง</a
-                      >
+                      <a href="#" class="dataTable-sorter">ระดับตลิ่ง</a>
                     </th>
                     <th
                       class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
                       style="width: 9.65361%"
                     >
-                      <a href="#" class="dataTable-sorter"
-                        >ระดับความลึก</a
-                      >
+                      <a href="#" class="dataTable-sorter">ระดับความลึก</a>
                     </th>
                     <th
                       class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
@@ -105,13 +99,12 @@
                       class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
                       style="width: 15.0483%"
                     ></th>
-                   
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="station in paginatedStations" :key="station._id">
+                  <tr v-for="station in paginatedStations" :key="station._id" >
                     <td class="text-sm font-weight-normal">
-                      {{ station.stationId }}
+                      {{ station.stationName }}
                     </td>
                     <td class="text-sm font-weight-normal">
                       {{ station.location.address }},
@@ -155,7 +148,7 @@
                       </span>
                     </td>
                     <td class="text-sm font-weight-normal">
-                      <button class="dashboard-button">แดชบอร์ด</button>
+                      <router-link to="/Station" class="dashboard-button">แดชบอร์ดสถานี</router-link>
                       <router-link
                         :to="{
                           name: 'EditStation',
@@ -165,7 +158,6 @@
                         >แก้ไข</router-link
                       >
                     </td>
-                    
                   </tr>
                 </tbody>
               </table>
@@ -200,16 +192,21 @@
 </template>
 
 <script>
+import axios from "axios";
 export default {
   data() {
     return {
       currentPage: 1,
       itemsPerPage: 5,
       searchQuery: "", // Used for the v-model on the search input
+      sensorReadings: {},
     };
   },
   props: {
     allStations: Array,
+  },
+  mounted() {
+    this.fetchSensorReadingsForAllStations(); // Fetch sensor data when component mounts
   },
   computed: {
     filteredStations() {
@@ -260,6 +257,25 @@ export default {
     },
   },
   methods: {
+    fetchSensorReadingsForAllStations() {
+      this.allStations.forEach((station) => {
+        axios
+          .get(`http://localhost:3001/api/sensors/${station.hardwareID}`)
+          .then((response) => {
+            // Direct assignment for Vue 3 reactivity
+            this.sensorReadings[station._id] = response.data;
+          })
+          .catch((error) => {
+            console.error(
+              "Error fetching sensor readings for station:",
+              station._id,
+              error
+            );
+            this.sensorReadings[station._id] = []; // Assign empty array on error
+          });
+      });
+    },
+
     changePage(newPage) {
       this.currentPage = newPage;
     },
@@ -353,7 +369,7 @@ export default {
 }
 
 .mb-0-teb {
-  margin-bottom: 0 ;
+  margin-bottom: 0;
 }
 .h4-teb,
 .h5-teb,
@@ -385,8 +401,6 @@ p {
 p {
   font-size: 1rem;
 }
-
-
 
 .dataTable-wrapper .dataTable-top {
   padding: 1.5rem;
@@ -427,14 +441,11 @@ p {
   padding: 6px;
 }
 
-
-
 .dataTable-table {
   max-width: 100%;
   width: 100%;
   border-spacing: 0;
   border-collapse: separate;
-  
 }
 .table {
   --bs-table-color: #222222;
@@ -487,7 +498,7 @@ tr {
   border-width: 0;
 }
 
-.dataTable-container{
+.dataTable-container {
   overflow-x: scroll; /* Enable horizontal scrolling */
   width: 100px; /* Full width of parent container */
   min-width: 100%; /* Minimum width is full width of parent container */
@@ -612,13 +623,9 @@ tr {
   font-weight: 700;
 }
 
-
-
 .dataTable-table th a {
   text-decoration: none;
   color: inherit;
-  
-  
 }
 
 .dataTable-sorter {
@@ -633,29 +640,29 @@ a {
   color: #344767;
 }
 .status-badge {
-    display: inline-block;
-    padding: 0.25rem 0.75rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    line-height: 1;
-    text-align: center;
-    white-space: nowrap;
-    vertical-align: baseline;
-    border-radius: 0.375rem;
-    transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
-  }
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 0.375rem;
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+}
 
-  /* Style for active status */
-  .status-badge:not(.inactive) {
-    background-color: #28a745; /* Green background for active status */
-    color: #ffffff; /* White text for active status */
-  }
+/* Style for active status */
+.status-badge:not(.inactive) {
+  background-color: #28a745; /* Green background for active status */
+  color: #ffffff; /* White text for active status */
+}
 
-  /* Style for inactive status */
-  .status-badge.inactive {
-    background-color: #dc3545; /* Red background for inactive status */
-    color: #ffffff; /* White text for inactive status */
-  }
+/* Style for inactive status */
+.status-badge.inactive {
+  background-color: #dc3545; /* Red background for inactive status */
+  color: #ffffff; /* White text for inactive status */
+}
 .dashboard-button {
   border-radius: 30px;
   /* Background color for buttons */
@@ -669,7 +676,6 @@ a {
   border-radius: 9999px; /* Fully rounded corners for buttons */
   background-color: #4a90e2;
   display: inline-block; /* Inline-block allows for margin auto to work */
-  
 }
 
 .edit-button {
@@ -685,21 +691,18 @@ a {
   border-radius: 9999px; /* Fully rounded corners for buttons */
   background-color: #f5a623;
   display: inline-block; /* Inline-block allows for margin auto to work */
- 
 }
 
 .threshold-list {
   list-style: none;
   padding: 0;
   margin: 0;
-  
 }
 
 .threshold-list li {
   display: flex;
   align-items: center;
   margin-bottom: 4px; /* Adjust as needed */
-  
 }
 
 .threshold-indicator {
@@ -708,7 +711,6 @@ a {
   display: inline-block;
   margin-right: 5px; /* Adjust as needed */
   border-radius: 50%; /* Makes the color indicator circular */
-  
 }
 
 .threshold-text {

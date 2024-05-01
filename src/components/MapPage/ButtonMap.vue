@@ -20,7 +20,7 @@
             <div class="name-display-container">
               <svg viewBox="0 0 200 22" class="name-display-svg">
                 <text x="100" y="17" class="station-name-text">
-                  {{ stationId }}
+                  {{ stationName }}
                 </text>
               </svg>
             </div>
@@ -35,7 +35,7 @@
 export default {
   name: "ButtonMap",
   props: {
-    stationId: String,
+    stationName: String,
     waterLevel: Number,
   },
   methods: {

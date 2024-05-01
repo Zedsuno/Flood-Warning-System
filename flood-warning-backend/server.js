@@ -29,7 +29,7 @@ app.use(express.json());
 app.use('/api', authRoutes);
 app.use('/api', stationRoutes);
 app.use('/api', hardwareRoutes);
-app.use('/api/sensors', sensorRoutes);
+app.use('/api', sensorRoutes);
 
 // Start the server
 const PORT = process.env.PORT || 3001;

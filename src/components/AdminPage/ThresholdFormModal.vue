@@ -2,34 +2,25 @@
   <div class="threshold-modal">
     <div class="modal-content">
       <h3>ตั้งค่าเกณฑ์ระดับน้ำ</h3>
-      <form @submit.prevent="saveThresholds" >
-        <div
-          v-for="(threshold, index) in thresholds"
-          :key="index"
-          class="form-group"
-        >
-          <span class="remove-icon" @click="removeThreshold(index)"
-            >&#10005;</span
-          >
-          <!-- Changed button to span for X -->
+      <form @submit.prevent="saveThreshold">
+        <div class="form-group" v-for="(threshold, index) in thresholds" :key="index">
           <div class="threshold-details">
             <input
               type="text"
-              placeholder="ชื่อเกณฑ์"
+              :placeholder="threshold.name"
               v-model="threshold.name"
+              readonly
+              
             />
             <input
               type="number"
-              placeholder="Value (cm)"
+              placeholder="Value (%)"
               v-model.number="threshold.value"
+              @blur="updateData"
             />
-            <input type="color" v-model="threshold.color" class="color-input" />
-            <!-- Added class for styling -->
+            <input type="color" v-model="threshold.color" class="color-input" readonly />
           </div>
         </div>
-        <button type="button" @click="addThreshold" class="add-button">
-          เพิ่มการตั้งค่าเกณฑ์
-        </button>
         <div class="form-actions">
           <button type="submit" class="save-button">
             บันทึกการตั้งค่าเกณฑ์
@@ -44,56 +35,38 @@
 </template>
 
 <script>
-
 export default {
-  props: {
-    initialThresholds: {
-      type: Array,
-      default: () => [],
-    },
-  },
-
   data() {
     return {
-      thresholds: this.initialThresholds.length
-        ? [...this.initialThresholds]
-        : [
-            {
-              name: "Low",
-              value: 0,
-              color: "#00FF00",
-            },
-          ],
+      thresholds: [
+        { name: "น้อยวิกฤต", value: "", color: "#A52A2A" }, 
+        { name: "น้อย", value: "", color: "#FFFF00" }, 
+        { name: "ปกติ", value: "", color: "#008000" }, 
+        { name: "มาก", value: "", color: "#800080" }, 
+        { name: "ล้นตลิ่ง", value: "", color: "#FF0000" } 
+      ]
     };
   },
-  watch: {
-    initialThresholds(newVal) {
-      this.thresholds = [...newVal];
-    }
-  },
   methods: {
-    addThreshold() {
-      this.thresholds.push({
-        name: "",
-        value: 0,
-        color: "#0000FF",
-      });
+    async saveThreshold() {
+      this.$emit('save', this.thresholds);
     },
-    removeThreshold(index) {
-      this.thresholds.splice(index, 1);
-    },
-    async saveThresholds() {
-    // Emit the thresholds to the parent instead of making an API call
-    this.$emit('save', this.thresholds);
-     // Close the modal after saving
-  },
   },
 };
 </script>
 
 <style scoped>
 .threshold-modal {
-  /* Same styles as toggle-popup__container */
+  display: flex; /* Enables flexbox */
+  align-items: center; /* Vertical alignment */
+  justify-content: center; /* Horizontal alignment */
+  position: fixed; /* Fixed position */
+  top: 0; /* Top edge */
+  left: 0; /* Left edge */
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  z-index: 9999; /* High z-index to ensure it's on top */
 }
 
 .modal-content {
@@ -104,7 +77,7 @@ export default {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   width: auto;
   max-width: 600px; /* Ensure the modal doesn't exceed the max width */
-  margin: auto; /* Center the modal in the available space */
+  z-index: 1001; /* Ensures modal content is above the overlay */
 }
 
 .form-group {
@@ -125,11 +98,18 @@ export default {
   /* Additional styles to align the button to the left of the threshold */
 }
 .remove-icon {
+  display: inline-block;
+  width: 24px; /* Fixed width for consistency */
+  height: 24px; /* Fixed height for consistency */
+  line-height: 24px; /* Center the icon vertically */
+  text-align: center; /* Center the icon horizontally */
+  background-color: #ff4136; /* Red background for attention */
+  color: white; /* White text for contrast */
+  border-radius: 50%; /* Circular button */
   cursor: pointer;
-  color: #ff4136; /* Red color for deletion */
-  font-size: 1.5rem; /* Adjust the size of the X */
-  margin-right: 0.5rem; /* Space between the X and the input */
+  margin-right: 15px; /* Spacing to the next element */
 }
+
 
 .label-color {
   display: block;
@@ -143,6 +123,17 @@ export default {
   align-items: center;
   gap: 10px; /* Spacing between inputs */
 }
+
+input, button {
+  transition: all 0.3s ease; /* Smooth transition for all interactable elements */
+}
+
+button:hover {
+  transform: scale(1.05); /* Slightly enlarge buttons on hover */
+  box-shadow: 0px 2px 5px rgba(0,0,0,0.2); /* Subtle shadow for depth */
+}
+
+
 
 .form-actions {
   display: flex;
@@ -176,15 +167,12 @@ input[type="text"],input[type="color"] {
   border-bottom: 2px solid #aaa; /* Default color for the bottom border */
 }
 .color-input {
-  border: 1px solid #ddd; /* Border for the color input */
-  height: 30px; /* Height for the color input */
-  width: 3px; /* Width for the color input */
-  padding: 0;
-  cursor: pointer; /* Hand cursor on hover */
-  margin-left: 0px; /* Spacing to the left of the color picker */
-  display: inline-block; /* Align with other input fields */
-  vertical-align: middle; /* Center with respect to the adjacent text input */
-  flex-grow: 2;
+  border: 2px solid #ddd; /* Solid border for better visibility */
+  width: 50px; /* Wider than default for easier interaction */
+  height: 30px; /* Taller input for better accessibility */
+  cursor: pointer;
+  border-radius: 5px; /* Rounded corners for modern look */
+  margin-left: 10px; /* Ensure spacing from previous input */
 }
 
 .add-button,
