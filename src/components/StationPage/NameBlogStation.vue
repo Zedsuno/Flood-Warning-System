@@ -7,7 +7,7 @@
                   <div class="css-0">
                     <div class="css-1xhj18k">
                       <h2 class="css-obye91">นางแล</h2>
-                      <div class="css-csyjyt">ไม่ดำเนินการ</div>
+                      <div class="css-csyjyt">กำลังใช้งาน</div>
                     </div>
                     <p class="css-1qtpv3j">เมืองเชียงราย</p>
                     <div class="css-1xhj18k">
@@ -134,6 +134,7 @@ export default {
 }
 
 .css-obye91 {
+  padding-bottom: 10px;
   font-size: 2.25rem;
   line-height: 1;
   font-weight: 700;
@@ -166,6 +167,7 @@ export default {
   }
 }
 .css-1qtpv3j {
+  
   font-family: 'Prompt', sans-serif;
   margin: 0px 0px 4px;
   font-weight: 500;
@@ -210,7 +212,7 @@ export default {
   font-family: 'Prompt', sans-serif;
   margin: 0px;
   font-weight: 400;
-  font-size: 0.875rem;
+  font-size: 1rem;
   color: rgb(87, 91, 96);
 }
 
