@@ -9,7 +9,9 @@
                       <h2 class="css-obye91">นางแล</h2>
                       <div class="css-csyjyt">กำลังใช้งาน</div>
                     </div>
-                    <p class="css-1qtpv3j">เมืองเชียงราย</p>
+                    <div class="css-1xhj18k">
+                      <p class="css-1qtpv3j">เมืองเชียงราย</p>
+                    </div>   
                     <div class="css-1xhj18k">
                       <p class="css-klhis3">13.72, 100.59</p>
                       <div class="css-1xhj18k">
@@ -17,7 +19,9 @@
                         <p class="css-1m046fs">2:14 pm</p>
                       </div>
                     </div>
-                    <p class="css-1knou7x">Elev: 20 m</p>
+                    <div class="css-1xhj18k">
+                      <p class="css-1knou7x">Elev: 20 m</p>
+                    </div>  
                   </div>
                 </div>
               </div>
