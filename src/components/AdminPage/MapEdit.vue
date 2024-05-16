@@ -4,7 +4,7 @@
       <!-- The map will be injected here -->
     </div>
     <div class="map-center-marker">
-      <div class="marker-circle"></div>
+      <div class="marker-circle" :style="{ 'background-color': markerColor }"></div>
     </div>
     <!-- Additional tools or overlays for editing can be added here -->
   </div>
@@ -17,18 +17,23 @@ import "leaflet/dist/leaflet.css";
 export default {
   name: "MapEdit",
   props: {
+    status: String,
     latitude: Number,
     longitude: Number,
+    waterLevel: Number,
+    waterline: Number,
   },
   mounted() {
     this.initMap(this.latitude, this.longitude);
+    if (this.status) {
+      this.updateMarkerColor(this.status);
+    }
   },
   methods: {
     initMap() {
       const mapCoords = [this.latitude, this.longitude];
       this.map = L.map("editMap").setView(mapCoords, 13);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        
         maxZoom: 18,
       }).addTo(this.map);
 
@@ -36,6 +41,31 @@ export default {
         const center = this.map.getCenter();
         this.$emit("update-coordinates", center.lat, center.lng);
       });
+    },
+    updateMarkerColor(status) {
+      console.log(`Updating color for status: ${status}`);
+      switch (status) {
+        case "น้อยวิกฤต":
+          this.markerColor = "#FF0000"; // Red
+          break;
+        case "น้อย":
+          this.markerColor = "#FFA500"; // Orange
+          break;
+        case "ปกติ":
+          this.markerColor = "#008000"; // Green
+          break;
+        case "มาก":
+          this.markerColor = "#0000FF"; // Blue
+          break;
+        case "ล้นตลิ่ง":
+          this.markerColor = "#4B0082"; // Indigo
+          break;
+        default:
+          this.markerColor = "#23BBF1"; // Default blue
+      }
+      console.log(
+        `Marker color updated to: ${this.markerColor} for status: ${status}`
+      );
     },
     updateMapCenter(lat, lng) {
       const newCoords = [lat, lng];
@@ -45,12 +75,14 @@ export default {
           this.marker.setLatLng(newCoords);
         } else {
           // If marker doesn't exist, create it
-          
         }
       }
     },
   },
   watch: {
+    status(newVal) {
+      this.updateMarkerColor(newVal);
+    },
     latitude(val) {
       if (this.longitude !== undefined && val !== undefined) {
         this.updateMapCenter(val, this.longitude);

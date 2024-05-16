@@ -7,6 +7,9 @@
             v-if="stationData && stationData.location"
             :latitude="stationData.location.latitude"
             :longitude="stationData.location.longitude"
+            :status="selectedStationData?.status || 'unknown'"
+            :waterLevel="stationData.waterLevel"
+            :waterline="stationData.waterline"
           />
         </div>
       </div>
@@ -28,12 +31,14 @@
       </p>
       <div class="separator"></div>
       <div class="station-info">
-        <p class="data-status">
-          {{ stationData.dataStatus || "ไม่ได้ส่ง Data เข้ามา" }}
+        <p class="data-status">ระดับน้ำปัจจุบัน
+          {{   selectedStation?.status || "ไม่ได้ส่ง Data เข้ามา" }}
         </p>
       </div>
       <div class="station-actions">
-        <router-link to="/Station"  type="button" class="action-btn dashboard">แดชบอร์ดสถานี</router-link>
+        <router-link to="/Station" type="button" class="action-btn dashboard"
+          >แดชบอร์ดสถานี</router-link
+        >
         <button
           type="button"
           class="action-btn edit"
@@ -49,15 +54,18 @@
 <script>
 import axios from "axios";
 import MapDash from "../AdminPage/MapDash";
+import { mapActions, mapState } from 'vuex';
 
 export default {
   components: { MapDash },
   emits: ["stationSaved"],
   props: {
+    status: String,
     stationId: {
       type: String,
-      default: null,
-    },
+      required: true,  // Ensure this prop must be passed
+      default: null    // Consider how to handle defaults
+    }
   },
   data() {
     return {
@@ -66,16 +74,28 @@ export default {
       error: null,
     };
   },
+
   watch: {
     stationId(newVal, oldVal) {
+      console.log(`Station ID changed from ${oldVal} to ${newVal}`);
       if (newVal !== oldVal) {
         this.fetchStationData(newVal);
       }
     },
   },
+  computed: {
+    ...mapState('waterLevels', ['stations']),
+    selectedStationData() {
+      const data = this.stations.find(station => station._id === this.stationId);
+      console.log(`Computed station data for ID ${this.stationId}:`, data);
+      return data;
+    }
+  },
   methods: {
+    ...mapActions("waterLevels", ["fetchStation", "applyThresholds"]),
+
     navigateToEditStation(stationId) {
-      // Optionally, you can include additional logic here before navigating.
+      console.log(`Navigating to edit station with ID ${stationId}`);
       this.$router.push({ name: "EditStation", params: { stationId } });
     },
     async fetchStationData(stationId) {
@@ -83,23 +103,25 @@ export default {
         console.error("fetchStationData was called without a stationId.");
         return;
       }
+      console.log(`Fetching data for station ID ${stationId}`);
       this.loading = true;
       try {
-        const response = await axios.get(
-          `http://localhost:3001/api/stations/${stationId}`
-        );
+        const response = await axios.get(`http://localhost:3001/api/stations/${stationId}`);
         this.stationData = response.data;
+        console.log(`Data fetched for station ID ${stationId}:`, response.data);
         this.error = null;
         this.$emit("stationSaved", this.stationData);
       } catch (error) {
-        console.error("Error fetching station data:", error);
+        console.error(`Error fetching station data for ID ${stationId}:`, error);
         this.error = error;
       } finally {
         this.loading = false;
+        console.log(`Fetching station data completed for ID ${stationId}`);
       }
     },
   },
   mounted() {
+    console.log(`AddStationDash component mounted with stationId: ${this.stationId}`);
     if (this.stationId) {
       this.fetchStationData(this.stationId);
     } else {
@@ -196,10 +218,14 @@ export default {
   margin-bottom: 0.75rem; /* Adjusted space */
 }
 
-
 .station-name {
   font-weight: 600; /* Bold font */
   font-size: 1.5rem; /* Larger font size */
+  color: #212529; /* Text color consistent with LoginPage.vue */
+}
+.data-status {
+  font-weight: 600; /* Bold font */
+  font-size: 1rem; /* Larger font size */
   color: #212529; /* Text color consistent with LoginPage.vue */
 }
 

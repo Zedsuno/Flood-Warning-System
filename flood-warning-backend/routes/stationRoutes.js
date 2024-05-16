@@ -8,6 +8,7 @@ router.get('/stations/:id', stationController.getStationById);
 router.get('/stations', stationController.getAllStation);
 router.put('/stations/:id', stationController.updateStation);
 router.delete('/stations/:id', stationController.deleteStation);
+router.post('/updateWaterLevel', stationController.updateWaterLevel);
 
 
 module.exports = router;

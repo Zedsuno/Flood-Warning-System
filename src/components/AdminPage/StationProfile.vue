@@ -29,9 +29,10 @@
               <label class="Labelname">Hardware</label>
               <div class="DivInput">
                 <input
-                  v-model="hardwareIDInput"
+                  v-model="hardwareID"
                   class="Inputclass"
-                  placeholder="กรอกรหัสฮาร์ดแวร์ไอดี"
+                  :placeholder="isHardwareLinked ? '' : 'กรอกรหัสฮาร์ดแวร์ไอดี'"
+                  :disabled="isHardwareLinked"
                 />
               </div>
             </div>
@@ -39,12 +40,12 @@
           <button
             type="button"
             :class="{
-              'linked-style': isSensorLinked,
-              'unlinked-style': !isSensorLinked,
+              'linked-style': isHardwareLinked,
+              'unlinked-style': !isHardwareLinked,
             }"
-            @click="toggleSensorLink"
+            @click="toggleHardwareLink"
           >
-            {{ isSensorLinked ? "ยกเลิกการเชื่อมต่อ" : "เชื่อมโยงเซนเซอร์" }}
+            {{ isHardwareLinked ? "ยกเลิกการเชื่อมต่อ" : "เชื่อมโยงเซนเซอร์" }}
           </button>
           <TogglePopup ref="togglePopup" @continue="handleContinue" />
           <ApiToggle
@@ -53,31 +54,35 @@
           />
         </div>
         <div class="Div-riverprofile-blog">
-              <div class="Div-riverprofile-waterline" disabled="">
-                <label class="Label-Text-name">ระดับตลิ่ง</label>
-                <div class="Div-input-info-blog">
-                  <input
-                    v-model="waterline"
-                    class="input-information"
-                    type="number"
-                    @blur="updateData"
-                  />
-                </div>
-                <p v-if="errors.waterline" class="error-message">{{ errors.waterline}}</p>
-              </div>
-              <div class="Div-riverprofile-Distancesensor" disabled="">
-                <label class="Label-Text-name">ระยะห่างเซนเซอร์</label>
-                <div class="Div-input-info-blog">
-                  <input
-                    v-model="sensorDistance"
-                    class="input-information"
-                    type="number"
-                    @blur="updateData"
-                  />
-                </div>
-                <p v-if="errors.sensorDistance" class="error-message">{{ errors.sensorDistance }}</p>
-              </div>
+          <div class="Div-riverprofile-waterline" disabled="">
+            <label class="Label-Text-name">ระดับตลิ่ง</label>
+            <div class="Div-input-info-blog">
+              <input
+                v-model="waterline"
+                class="input-information"
+                type="number"
+                @blur="updateData"
+              />
             </div>
+            <p v-if="errors.waterline" class="error-message">
+              {{ errors.waterline }}
+            </p>
+          </div>
+          <div class="Div-riverprofile-Distancesensor" disabled="">
+            <label class="Label-Text-name">ระยะห่างเซนเซอร์</label>
+            <div class="Div-input-info-blog">
+              <input
+                v-model="sensorDistance"
+                class="input-information"
+                type="number"
+                @blur="updateData"
+              />
+            </div>
+            <p v-if="errors.sensorDistance" class="error-message">
+              {{ errors.sensorDistance }}
+            </p>
+          </div>
+        </div>
         <!-- <div class="Div-From-input-Station">
           <div class="Div-From-input-blog">
             <div class="css-0">
@@ -134,16 +139,17 @@ import ThresholdFormModal from "./ThresholdFormModal.vue"; // Import the new mod
 export default {
   components: {
     TogglePopup,
-    ApiToggle, ThresholdFormModal,
+    ApiToggle,
+    ThresholdFormModal,
   },
   props: {
     existingData: {
       type: Object,
       default: () => ({
         stationName: "",
-        hardwareIDInput: "",
+        hardwareID: "",
         waterline: "",
-        sensorDistance : "",
+        sensorDistance: "",
       }),
     },
     errors: {
@@ -156,14 +162,14 @@ export default {
       stationName: this.existingData.stationName || "",
       active: this.existingData.active || false,
       waterLevel: this.existingData.waterLevel || 0,
-      sensorDistance:this.existingData.sensorDistance || "",
-      waterline:this.existingData.waterline ||"",
+      sensorDistance: this.existingData.sensorDistance || "",
+      waterline: this.existingData.waterline || "",
       referenceArea: this.existingData.referenceArea || "",
       thresholds: this.existingData.thresholds || [],
       showApiPopup: false,
-      isSensorLinked: false,
+      isHardwareLinked: false,
       isThresholdModalVisible: false,
-      hardwareIDInput: this.existingData.hardwareIDInput || "",
+      hardwareID: this.existingData.hardwareID || "",
 
       // Data property to control the visibility of the modal
     };
@@ -173,14 +179,14 @@ export default {
       handler(newData) {
         console.log("Watcher - New existing data:", newData);
         this.stationName = newData.stationName;
-        this.hardwareIDInput = newData.hardwareIDInput;
+        this.hardwareID = newData.hardwareID;
         this.software = newData.software;
         this.active = newData.active;
         this.waterLevel = newData.waterLevel;
         this.referenceArea = newData.referenceArea;
         this.thresholds = newData.thresholds;
         this.sensorData = newData;
-        this.sensorDistance = newData.sensorDistance ;
+        this.sensorDistance = newData.sensorDistance;
         this.waterline = newData.waterline;
       },
       deep: true,
@@ -191,15 +197,15 @@ export default {
     this.stationId = this.$route.params.stationId;
   },
   methods: {
-    toggleSensorLink() {
-      if (this.isSensorLinked) {
-        this.unlinkSensor();
+    toggleHardwareLink() {
+      if (this.isHardwareLinked) {
+        this.unlinkHardware();
       } else {
         this.linkHardware();
       }
     },
     linkHardware() {
-      if (!this.hardwareIDInput) {
+      if (!this.hardwareID) {
         Swal.fire({
           icon: "error",
           title: "อุ๊ปส์...",
@@ -209,12 +215,13 @@ export default {
         });
         return;
       }
-      this.connectHardware(this.hardwareIDInput);
+      this.isHardwareLinked = true;
+      this.connectHardware(this.hardwareID);
     },
 
-    connectHardware(hardwareIDInput) {
+    connectHardware(hardwareID) {
       console.log(
-        `Attempting to link hardware with ID: ${hardwareIDInput} to station with ID: ${this.stationId}`
+        `Attempting to link hardware with ID: ${hardwareID} to station with ID: ${this.stationId}`
       );
       Swal.fire({
         title: "กำลังเชื่อมกับเซนเซอร์...",
@@ -228,7 +235,7 @@ export default {
       });
       axios
         .post("http://localhost:3001/api/hardware/link-and-fetch", {
-          hardwareID: hardwareIDInput,
+          hardwareID: hardwareID,
           stationId: this.stationId,
         })
         .then((response) => {
@@ -244,7 +251,7 @@ export default {
             "Hardware linked successfully, server response:",
             response.data
           );
-          this.isSensorLinked = true;
+          this.isHardwareLinked = true;
         })
         .catch((error) => {
           console.error("API Error Response:", error.response);
@@ -264,54 +271,49 @@ export default {
           console.error("Failed to link hardware:", error);
         });
     },
-    unlinkSensor() {
-      console.log("Unlinking Hardware ID: ", this.hardwareIDInput);
-      Swal.fire({
-        title: "Unlinking from sensor...",
-        html: "Please wait a moment...",
-        timerProgressBar: true,
-        onBeforeOpen: () => {
-          Swal.showLoading();
-        },
-        allowOutsideClick: () => !Swal.isLoading(),
-        showConfirmButton: false,
-      });
-      axios
-        .post("http://localhost:3001/api/hardware/unlink", {
-          hardwareId: this.hardwareIDInput,
-          stationId: this.stationId,
-        })
-        .then((response) => {
-          Swal.fire({
-            icon: "success",
-            title: "Unlinked Successfully!",
-            text: "The sensor has been successfully unlinked.",
-            confirmButtonText: "OK",
-            confirmButtonColor: "#25adfc",
-          });
-          console.log(
-            "Hardware unlinked successfully, server response:",
-            response.data
-          );
-          this.isSensorLinked = false;
-          // Emit an event or perform other logic as needed...
-        })
-        .catch((error) => {
-          Swal.fire({
-            icon: "error",
-            title: "Failed to Unlink Sensor",
-            text: "There was a problem unlinking the sensor.",
-            confirmButtonText: "OK",
-            confirmButtonColor: "#25adfc",
-          });
-          console.error("Failed to unlink hardware:", error);
-        });
+    unlinkHardware() {
+  console.log("Unlinking Hardware ID: ", this.hardwareIDInput);
+  Swal.fire({
+    title: "Unlinking from sensor...",
+    html: "Please wait a moment...",
+    timerProgressBar: true,
+    willOpen: () => {
+      Swal.showLoading();
     },
+    allowOutsideClick: () => !Swal.isLoading(),
+    showConfirmButton: false,
+  });
+  axios.post("http://localhost:3001/api/hardware/unlink", {
+    hardwareId: this.hardwareIDInput,
+  })
+  .then((response) => {
+    Swal.fire({
+      icon: "success",
+      title: "Unlinked Successfully!",
+      text: "The sensor has been successfully unlinked.",
+      confirmButtonText: "OK",
+      confirmButtonColor: "#25adfc",
+    });
+    console.log("Hardware unlinked successfully, server response:", response.data);
+    this.isHardwareLinked = false;
+    this.hardwareIDInput = '';
+  })
+  .catch((error) => {
+    Swal.fire({
+      icon: "error",
+      title: "Failed to Unlink Sensor",
+      text: "There was a problem unlinking the sensor.",
+      confirmButtonText: "OK",
+      confirmButtonColor: "#25adfc",
+    });
+    console.error("Failed to unlink hardware:", error);
+  });
+},
     updateData() {
       this.$emit("update-profile", {
         ...this.existingData,
         stationName: this.stationName,
-        hardware: this.hardware,
+        hardwareID: this.hardwareID,
         software: this.software,
         active: this.active,
         waterLevel: this.waterLevel,

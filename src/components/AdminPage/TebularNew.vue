@@ -67,6 +67,18 @@
                     </th>
                     <th
                       class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                      style="width: 19.3072%"
+                    >
+                      <a href="#" class="dataTable-sorter">ระดับน้ำ %</a>
+                    </th>
+                    <th
+                      class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                      style="width: 19.3072%"
+                    >
+                      <a href="#" class="dataTable-sorter">banklevel</a>
+                    </th>
+                    <th
+                      class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
                       style="width: 9.65361%"
                     >
                       <a href="#" class="dataTable-sorter">ระยะห่างเซนเซอร์</a>
@@ -77,17 +89,17 @@
                     >
                       <a href="#" class="dataTable-sorter">ระดับตลิ่ง</a>
                     </th>
-                    <th
+                    <!-- <th
                       class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
                       style="width: 9.65361%"
                     >
                       <a href="#" class="dataTable-sorter">ระดับความลึก</a>
-                    </th>
+                    </th> -->
                     <th
                       class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
                       style="width: 17.3197%"
                     >
-                      <a href="#" class="dataTable-sorter">ค่าเกณฑ์ระดับน้ำ</a>
+                      <a href="#" class="dataTable-sorter">ค่าเกณฑ์สถานะ</a>
                     </th>
                     <th
                       class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
@@ -102,7 +114,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="station in paginatedStations" :key="station._id" >
+                  <tr v-for="station in paginatedStations" :key="station._id">
                     <td class="text-sm font-weight-normal">
                       {{ station.stationName }}
                     </td>
@@ -111,17 +123,24 @@
                       {{ station.location.river }}, {{ station.location.state }}
                     </td>
                     <td class="text-sm font-weight-normal">
-                      {{ station.waterLevel }} cm
+                      {{ station.waterLevel }} cm 
                     </td>
+                    <td class="text-sm font-weight-normal">
+                      {{ station.waterLevelPercentage }} % 
+                    </td>
+                    <td class="text-sm font-weight-normal">
+                      {{ station.bankLevel }} cm
+                    </td>
+                    
                     <td class="text-sm font-weight-normal">
                       {{ station.sensorDistance }} cm
                     </td>
                     <td class="text-sm font-weight-normal">
                       {{ station.waterline }} cm
                     </td>
-                    <td class="text-sm font-weight-normal">
+                    <!-- <td class="text-sm font-weight-normal">
                       {{ station.WaterDepth }} cm
-                    </td>
+                    </td> -->
                     <td class="text-sm font-weight-normal">
                       <ul class="threshold-list">
                         <li
@@ -134,7 +153,7 @@
                           ></span>
                           <span class="threshold-text"
                             >{{ threshold.name }}:
-                            {{ threshold.value }} cm</span
+                            {{ threshold.value }} %</span
                           >
                         </li>
                       </ul>
@@ -148,7 +167,9 @@
                       </span>
                     </td>
                     <td class="text-sm font-weight-normal">
-                      <router-link to="/Station" class="dashboard-button">แดชบอร์ดสถานี</router-link>
+                      <router-link to="/Station" class="dashboard-button"
+                        >แดชบอร์ดสถานี</router-link
+                      >
                       <router-link
                         :to="{
                           name: 'EditStation',
@@ -192,33 +213,23 @@
 </template>
 
 <script>
-import axios from "axios";
+import { mapState, mapActions } from 'vuex';
+
 export default {
   data() {
     return {
       currentPage: 1,
       itemsPerPage: 5,
-      searchQuery: "", // Used for the v-model on the search input
-      sensorReadings: {},
+      searchQuery: "",
     };
   },
-  props: {
-    allStations: Array,
-  },
-  mounted() {
-    this.fetchSensorReadingsForAllStations(); // Fetch sensor data when component mounts
-  },
   computed: {
+    ...mapState('stations', ['allStations']),  // Assuming the 'stations' module is still relevant
+
     filteredStations() {
-      // Filter the stations based on the searchQuery
       return this.searchQuery
-        ? this.allStations.filter(
-            (station) =>
-              station.stationId &&
-              station.stationId
-                .toLowerCase()
-                .includes(this.searchQuery.toLowerCase())
-          )
+        ? this.allStations.filter(station =>
+            station.stationId.toLowerCase().includes(this.searchQuery.toLowerCase()))
         : this.allStations;
     },
     totalPages() {
@@ -231,63 +242,51 @@ export default {
     paginationRange() {
       let rangeStart = this.currentPage - 2;
       let rangeEnd = this.currentPage + 2;
-
       if (rangeStart < 1) {
         rangeStart = 1;
         rangeEnd = Math.min(5, this.totalPages);
       }
-
       if (rangeEnd > this.totalPages) {
         rangeEnd = this.totalPages;
         rangeStart = Math.max(1, this.totalPages - 4);
       }
-
-      return Array.from(
-        { length: rangeEnd - rangeStart + 1 },
-        (_, i) => i + rangeStart
-      );
+      return Array.from({ length: rangeEnd - rangeStart + 1 }, (_, i) => i + rangeStart);
     },
     pageInfo() {
       const startItem = (this.currentPage - 1) * this.itemsPerPage + 1;
-      const endItem = Math.min(
-        startItem + this.itemsPerPage - 1,
-        this.filteredStations.length
-      );
+      const endItem = Math.min(startItem + this.itemsPerPage - 1, this.filteredStations.length);
       return `Showing ${startItem} to ${endItem} of ${this.filteredStations.length} items.`;
     },
   },
   methods: {
-    fetchSensorReadingsForAllStations() {
-      this.allStations.forEach((station) => {
-        axios
-          .get(`http://localhost:3001/api/sensors/${station.hardwareID}`)
-          .then((response) => {
-            // Direct assignment for Vue 3 reactivity
-            this.sensorReadings[station._id] = response.data;
-          })
-          .catch((error) => {
-            console.error(
-              "Error fetching sensor readings for station:",
-              station._id,
-              error
-            );
-            this.sensorReadings[station._id] = []; // Assign empty array on error
-          });
+    ...mapActions('stations', ['fetchAllStations']),
+    ...mapActions('waterLevels', ['fetchSensorData', 'calculateWaterLevels', 'applyThresholds']),
+
+    fetchStationsAndSensorReadings() {
+      this.fetchAllStations().then(() => {
+        this.allStations.forEach(station => {
+          if (station.hardware.length > 0) {
+            this.fetchSensorData(station);
+          }
+        });
+      }).catch(error => {
+        console.error("Failed to fetch stations:", error);
       });
     },
-
     changePage(newPage) {
       this.currentPage = newPage;
     },
     onItemsPerPageChange() {
-      this.currentPage = 1; // Reset to first page when items per page changes
-      this.itemsPerPage = parseInt(this.itemsPerPage); // Ensure itemsPerPage is a number
+      this.currentPage = 1;
+      this.itemsPerPage = parseInt(this.itemsPerPage, 10);
     },
+  },
+  mounted() {
+    this.fetchStationsAndSensorReadings();
   },
   watch: {
     itemsPerPage() {
-      // Watcher to make sure the stations are re-paginated when itemsPerPage changes
-      this.changePage(1); // Go back to the first page
+      this.changePage(1);  // Reset to the first page when items per page changes
     },
   },
 };

@@ -24,29 +24,14 @@ const StationSchema = new mongoose.Schema({
   active: Boolean,
   thresholds: [ThresholdSchema],
   status: String,
-  apiKey: String,
   sensorDistance: Number,
   waterline: Number, // The
-  WaterLevel: Number,
+  waterLevel: Number,
+  bankLevel: Number,
+  waterLevelPercentage : Number,
   // The depth
 });
 
-StationSchema.virtual('Water Level').get(function() {
-  if (!this.hardware.length) return null; // No hardware linked
-  const latestReading = this.hardware.map(h => h.readings[h.readings.length - 1]).reduce((a, b) => a.timestamp > b.timestamp ? a : b, {value: null});
-  return latestReading.value !== null ? this.distanceSensor - latestReading.measurement : null;
-});
 
-StationSchema.virtual('WaterDepth').get(function() {
-  // 'riverbedDistance' is the total depth from riverbed to water surface
-  return this.waterline - this.WaterLevel;
-});
-
-StationSchema.methods.linkSensor = function(sensorId) {
-  if (!this.hardware.includes(sensorId)) {
-    this.hardware.push(sensorId);
-    return this.save();
-  }
-};
 
 module.exports = mongoose.model('Station', StationSchema);

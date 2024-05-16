@@ -11,7 +11,6 @@
       @cancelUpdate="cancelUpdate"
     />
 
-  
     <div class="Div-Add-Station">
       <div class="Div-Header-Text">
         <div class="Blog-Text-Add-Header">
@@ -79,11 +78,7 @@
       </div>
 
       <div class="Space-Btw"></div>
-      <form
-      
-        class="formStationInput"
-        @submit.prevent="submitForm"
-      >
+      <form class="formStationInput" @submit.prevent="submitForm">
         <StationProfile
           :existingData="stationData"
           @update-profile="updateStationProfile"
@@ -95,7 +90,6 @@
           :isEditMode="isEditMode"
           :errors="errors"
         />
-        
       </form>
     </div>
   </div>
@@ -115,7 +109,6 @@ export default {
     StationLocation,
     DeletePopup,
     UpdatePopup,
-    
   },
   props: {
     isEditMode: {
@@ -134,6 +127,8 @@ export default {
       showUpdatePopup: false,
       showSavePopup: false,
       errors: {},
+      isSensorLinked: false,
+      linkedHardwareId: null,
     };
   },
   created() {
@@ -164,17 +159,15 @@ export default {
       "saveStation",
       "updateStationData",
     ]),
-    defaultStationData () {
+    defaultStationData() {
       return {
         _id: null, // Not needed when creating a new record, provided by MongoDB
         stationName: "", // Unique identifier for the station, to be entered by the user
         hardware: [], // Array of hardware device IDs, initially empty
-        software: "", // Software version or description
         active: true, // New stations start as active by default
         sensorDistance: "", // The fixed distance from the sensor to a reference point
         waterline: "", // Default total depth from sensor to riverbed
-        thresholds: [], // No thresholds set initially
-        status: "active", // New stations start as 'active'
+        thresholds: [], // No thresholds set initially // New stations start as 'active'
         location: {
           // Default location details
           address: "",
@@ -183,12 +176,11 @@ export default {
           postalCode: "",
           latitude: null,
           longitude: null,
-          
         },
         apiKey: "", // API key for integration or security purposes
       };
     },
-    
+
     updateStationProfile(profileData) {
       this.stationData = { ...this.stationData, ...profileData };
     },
@@ -212,6 +204,8 @@ export default {
 
           if (response && response.data) {
             this.stationData = response.data;
+            this.isSensorLinked = !!this.stationData.linkedHardwareId;
+            this.linkedHardwareId = this.stationData.linkedHardwareId || null;
             if (!this.stationData.location) {
               this.stationData.location = this.defaultStationData().location;
             }
@@ -310,7 +304,7 @@ export default {
       if (this.validateForm()) {
         this.submitForm();
       } else {
-        console.error('Validation failed:', this.errors);
+        console.error("Validation failed:", this.errors);
       }
     },
     submitForm() {
@@ -643,5 +637,4 @@ export default {
   font-size: 0.75rem;
   color: rgb(153, 153, 153);
 }
-
 </style>

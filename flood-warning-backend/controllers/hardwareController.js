@@ -21,48 +21,39 @@ exports.updateHardwareSettings = async (req, res) => {
   }
 };
 exports.linkHardwareToStationAndFetchData = async (req, res) => {
-  const { hardwareID, stationId } = req.body; 
+  const { hardwareID, stationId } = req.body;
+
   if (!mongoose.Types.ObjectId.isValid(stationId)) {
     return res.status(400).json({ message: "Invalid station ID" });
-} // Make sure both are being received
-  try {
-      const hardware = await Hardware.findOne({ equipment_id: hardwareID });
-      if (!hardware) {
-          return res.status(404).json({ message: "ไม่พบฮาร์ดแวร์" });
-      }
+  }
 
-    // Check if the equipment_id entered by the user matches the hardwareID
-    if (hardware.equipment_id !== hardwareID) {
-      return res.status(400).json({ message: "Equipment ID does not match" });
+  try {
+    const hardware = await Hardware.findOne({ equipment_id: hardwareID });
+    if (!hardware) {
+      return res.status(404).json({ message: "Hardware not found" });
     }
 
     const linkedStation = await Station.findOne({ hardware: hardware._id });
     if (linkedStation) {
-      return res.status(400).json({ message: "ฮาร์ดแวร์มีการเชื่อมต่อยู่แล้ว" });
+      return res.status(400).json({ message: "Hardware already linked" });
     }
 
-    const apiResponse = await axios.get('https://run.mocky.io/v3/ee7c7476-b7f2-4db6-a446-e31d265338a8');
+    // Fetch sensor data from an external API
+    const apiResponse = await axios.get('https://run.mocky.io/v3/fac87583-0904-4b86-b3da-bd4c2af4bede');
     const sensorData = apiResponse.data.filter(item => item.equipment_id === hardwareID);
-    
     if (!sensorData.length) {
       return res.status(404).json({ message: "No sensor data found for the given hardware ID" });
     }
 
-    // Save the fetched sensor data to the database
-    // Note: This assumes that you have a SensorReading model similar to Hardware and Station
-  
+    // Save sensor data to the database
     for (const data of sensorData) {
       const existingReading = await SensorReading.findOne({ sensorId: data.id });
-      if (existingReading) {
-        hardware.readings.push(existingReading._id);
-      } else {
-        const newReading = new SensorReading({
-          measurement: data.measurement,
-          sensorId: data.id,
-        });
-        const savedReading = await newReading.save();
-        hardware.readings.push(savedReading._id);
-      }
+      const readingId = existingReading ? existingReading._id : (await new SensorReading({
+        measurement: data.measurement,
+        sensorId: data.id
+      }).save())._id;
+
+      hardware.readings.push(readingId);
     }
     await hardware.save();
 
@@ -71,14 +62,14 @@ exports.linkHardwareToStationAndFetchData = async (req, res) => {
     if (!station) {
       return res.status(404).json({ message: "Station not found" });
     }
-    
+
     station.hardware.push(hardware._id);
     await station.save();
 
     res.status(200).json({ message: "Hardware linked and data fetched successfully", station });
   } catch (error) {
     console.error('Error linking hardware to station or fetching data:', error);
-    res.status(500).json({ message: 'ไม่สามารถเชื่อมโยงฮาร์ดแวร์กับสถานีหรือดึงข้อมูลได้', error });
+    res.status(500).json({ message: 'Error linking hardware to station or fetching data', error });
   }
 };
 
