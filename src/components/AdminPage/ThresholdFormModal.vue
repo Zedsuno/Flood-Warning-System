@@ -5,29 +5,14 @@
       <form @submit.prevent="saveThreshold">
         <div class="form-group" v-for="(threshold, index) in thresholds" :key="index">
           <div class="threshold-details">
-            <input
-              type="text"
-              :placeholder="threshold.name"
-              v-model="threshold.name"
-              readonly
-              
-            />
-            <input
-              type="number"
-              placeholder="Value (%)"
-              v-model.number="threshold.value"
-              @blur="updateData"
-            />
-            <input type="color" v-model="threshold.color" class="color-input" readonly />
+            <input type="text" v-model="threshold.name" readonly />
+            <input type="number" placeholder="ค่าตั้งเกณฑ์ (%)" v-model.number="threshold.value" @blur="validateInput" />
+            <input type="color" v-model="threshold.color" class="color-input" />
           </div>
         </div>
         <div class="form-actions">
-          <button type="submit" class="save-button">
-            บันทึกการตั้งค่าเกณฑ์
-          </button>
-          <button type="button" @click="$emit('close')" class="cancel-button">
-            ยกเลิก
-          </button>
+          <button type="submit" class="save-button">บันทึกการตั้งค่าเกณฑ์</button>
+          <button type="button" @click="$emit('close')" class="cancel-button">ยกเลิก</button>
         </div>
       </form>
     </div>
@@ -35,38 +20,59 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex';
+
 export default {
+  props: {
+    initialThresholds: {
+      type: Array,
+      default: () => []
+    }
+  },
   data() {
     return {
-      thresholds: [
-        { name: "น้อยวิกฤต", value: "", color: "#A52A2A" }, 
-        { name: "น้อย", value: "", color: "#FFFF00" }, 
-        { name: "ปกติ", value: "", color: "#008000" }, 
-        { name: "มาก", value: "", color: "#800080" }, 
-        { name: "ล้นตลิ่ง", value: "", color: "#FF0000" } 
-      ]
+      thresholds: this.setupThresholds(),
     };
   },
   methods: {
-    async saveThreshold() {
-      this.$emit('save', this.thresholds);
+    ...mapActions('waterLevels', ['saveThresholds']), // Ensure the action name matches what's in Vuex
+
+    setupThresholds() {
+      const defaultThresholds = [
+        { name: "น้อยวิกฤต", value: "", color: "#A52A2A" },
+        { name: "น้อย", value: "", color: "#FFFF00" },
+        { name: "ปกติ", value: "", color: "#008000" },
+        { name: "มาก", value: "", color: "#800080" },
+        { name: "ล้นตลิ่ง", value: "", color: "#FF0000" }
+      ];
+      return defaultThresholds.map(threshold => {
+        const initial = this.initialThresholds.find(t => t.name === threshold.name);
+        return { ...threshold, value: initial?.value || threshold.value, color: initial?.color || threshold.color };
+      });
     },
-  },
+    validateInput(event) {
+      let value = parseFloat(event.target.value);
+      if (value < 0 || value > 100) {
+        alert('Threshold percentage must be between 0 and 100.');
+        event.target.value = 50; // Reset to a neutral default value
+      }
+    },
+    saveThreshold() {
+      const thresholdsToSave = this.thresholds.map(threshold => ({
+        name: threshold.name,
+        value: parseFloat(threshold.value),
+        color: threshold.color
+      }));
+      this.saveThresholds(thresholdsToSave); // This should match the Vuex action name
+      this.$emit('save', thresholdsToSave);
+    }
+  }
 };
 </script>
 
 <style scoped>
 .threshold-modal {
-  display: flex; /* Enables flexbox */
-  align-items: center; /* Vertical alignment */
-  justify-content: center; /* Horizontal alignment */
-  position: fixed; /* Fixed position */
-  top: 0; /* Top edge */
-  left: 0; /* Left edge */
   width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
-  z-index: 9999; /* High z-index to ensure it's on top */
 }
 
 .modal-content {
@@ -77,7 +83,6 @@ export default {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   width: auto;
   max-width: 600px; /* Ensure the modal doesn't exceed the max width */
-  z-index: 1001; /* Ensures modal content is above the overlay */
 }
 
 .form-group {
@@ -110,7 +115,6 @@ export default {
   margin-right: 15px; /* Spacing to the next element */
 }
 
-
 .label-color {
   display: block;
   margin-bottom: 5px;
@@ -132,8 +136,6 @@ button:hover {
   transform: scale(1.05); /* Slightly enlarge buttons on hover */
   box-shadow: 0px 2px 5px rgba(0,0,0,0.2); /* Subtle shadow for depth */
 }
-
-
 
 .form-actions {
   display: flex;

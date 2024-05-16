@@ -71,7 +71,7 @@
               </li>
             </ul>
           </li>
-          <li class="nav-item dropdown">
+          <!-- <li class="nav-item dropdown">
             <a
               class="nav-link dropdown-toggle"
               href="#"
@@ -88,7 +88,7 @@
                 <a class="dropdown-item" href="#">ประวัติสถานการณ์โดยรวม</a>
               </li>
             </ul>
-          </li>
+          </li> -->
         </ul>
       </div>
     </div>

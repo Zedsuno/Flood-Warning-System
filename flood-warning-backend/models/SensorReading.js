@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const SensorReadingSchema = new mongoose.Schema({
   measurement: Number,
-  sensorId: String
+  sensorId: String,
 }, { timestamps: true });
 
 

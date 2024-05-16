@@ -30,6 +30,7 @@ app.use('/api', authRoutes);
 app.use('/api', stationRoutes);
 app.use('/api', hardwareRoutes);
 app.use('/api', sensorRoutes);
+app.use('/api/stations', stationRoutes);
 
 // Start the server
 const PORT = process.env.PORT || 3001;

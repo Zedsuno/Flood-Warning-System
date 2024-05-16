@@ -21,7 +21,7 @@
         <ul class="navbar-nav ms-auto">
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              <img class="rounded-circle" src="@/assets/Logo/avatar.png" alt="Guest avatar" width="30" height="30"> Guest
+              <img class="rounded-circle" src="@/assets/Logo/avatar.png" alt="Guest avatar" width="30" height="30"> ADMIN
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
               <li><a class="dropdown-item" href="#/help">ช่วยเหลือ</a></li>
