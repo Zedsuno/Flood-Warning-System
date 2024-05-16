@@ -31,8 +31,8 @@
       </p>
       <div class="separator"></div>
       <div class="station-info">
-        <p class="data-status">ระดับน้ำปัจจุบัน
-          {{   selectedStation?.status || "ไม่ได้ส่ง Data เข้ามา" }}
+        <p  class="data-status">ระดับน้ำปัจจุบัน
+          {{   selectedStationData?.status || "ไม่ได้ส่ง Data เข้ามา" }}
         </p>
       </div>
       <div class="station-actions">
@@ -86,10 +86,11 @@ export default {
   computed: {
     ...mapState('waterLevels', ['stations']),
     selectedStationData() {
-      const data = this.stations.find(station => station._id === this.stationId);
-      console.log(`Computed station data for ID ${this.stationId}:`, data);
-      return data;
-    }
+    console.log('Fetching station data for ID:', this.stationId);
+    const station = this.$store.getters['waterLevels/getStationById'](this.stationId);
+    console.log('Selected station data:', station);
+    return station;
+  }
   },
   methods: {
     ...mapActions("waterLevels", ["fetchStation", "applyThresholds"]),

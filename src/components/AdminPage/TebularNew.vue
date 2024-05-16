@@ -142,21 +142,7 @@
                       {{ station.WaterDepth }} cm
                     </td> -->
                     <td class="text-sm font-weight-normal">
-                      <ul class="threshold-list">
-                        <li
-                          v-for="threshold in station.thresholds"
-                          :key="threshold.name"
-                        >
-                          <span
-                            class="threshold-indicator"
-                            :style="{ backgroundColor: threshold.color }"
-                          ></span>
-                          <span class="threshold-text"
-                            >{{ threshold.name }}:
-                            {{ threshold.value }} %</span
-                          >
-                        </li>
-                      </ul>
+                      {{ selectedStationData?.status || 'ไม่ได้ส่ง Data เข้ามา' }}
                     </td>
                     <td class="text-sm font-weight-normal">
                       <span
@@ -224,8 +210,14 @@ export default {
     };
   },
   computed: {
-    ...mapState('stations', ['allStations']),  // Assuming the 'stations' module is still relevant
-
+    ...mapState('stations', ['allStations']),
+    ...mapState('waterLevels', ['stations']),  // Assuming the 'stations' module is still relevant
+    selectedStationData() {
+    console.log('Fetching station data for ID:', this.stationId);
+    const station = this.$store.getters['waterLevels/getStationById'](this.stationId);
+    console.log('Selected station data:', station);
+    return station;
+  },
     filteredStations() {
       return this.searchQuery
         ? this.allStations.filter(station =>
