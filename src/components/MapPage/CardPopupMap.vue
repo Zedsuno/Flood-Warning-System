@@ -36,8 +36,8 @@
                   <p class="css-1vdfwj5">ซม.</p>
                 </div>
                 <div class="css-1pzn42j">
-                  <p class="popup-weather-condition" v-if="stationData?.status">
-                    {{ stationData.status }}
+                  <p class="popup-weather-condition" >
+                    {{   selectedStationData?.status || "ไม่ได้ส่ง Data เข้ามา" }}
                   </p>
                 </div>
               </div>
@@ -104,17 +104,32 @@
   </div>
 </template>
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters,mapState } from "vuex";
 
 export default {
   name: "CardPopupMap",
   props: {
     stationData: Object,
+    status: String,
+    stationId: {
+    type: String,
+    required: true
+  }
   },
   computed: {
     ...mapGetters({
       thresholds: "waterLevel/getThresholds", // Use the correct namespace if configured
     }),
+    ...mapState('waterLevels', ['stations']),
+  
+    selectedStationData() {
+    const station = this.stations.find(station => station._id === this.stationId);
+    if (!station) {
+      console.error(`Station with ID ${this.stationId} not found.`);
+      return { status: 'ไม่ได้ส่ง Data เข้ามา' }; // Default object if station is not found
+    }
+    return station;
+  },
     waterLevelColor() {
       const thresholds = this.getThresholds;
       if (!this.stationData?.waterLevel || !thresholds) {
@@ -125,9 +140,7 @@ export default {
       );
       return threshold ? threshold.color : "#000";
     },
-    stationStatus() {
-      return this.stationData?.status || "Unknown"; // Provide a default if status is undefined
-    },
+    
   },
   methods: {
     closePopup() {
@@ -141,6 +154,11 @@ export default {
     }
   }
   },
+  mounted() {
+  if (this.stationId) {
+    this.fetchStationData(this.stationId); // Make sure such method exists or is implemented correctly
+  }
+},
   data() {
     return {
       lastUpdated: new Date().toLocaleTimeString(),
