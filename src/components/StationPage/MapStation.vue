@@ -4,10 +4,16 @@
       <div class="css-1o3fej">
         <div class="css-o5rbxo">
           <div class="css-uwwqev">
-            <div
+            <!-- <div
               id="map"
               style="width: 100%; height: 100%; position: relative"
               class="leaflet-container leaflet-touch leaflet-retina leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom awxjs__ia-map"
+              tabindex="0"
+            > -->
+            <div
+              id="map"
+              style="width: 100%; height: 100%; position: relative"
+              class="leaflet-touch leaflet-retina leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom awxjs__ia-map"
               tabindex="0"
             >
               <div
@@ -184,7 +190,7 @@ export default {
   position: relative;
   overflow: hidden;
   width: 100%; /* Make sure the container takes full width */
-  height: 500px; /* Define a fixed height or use a percentage based on the parent's height */
+  height: 280px; /* Define a fixed height or use a percentage based on the parent's height */
 }
 
 .css-1o3fej {
