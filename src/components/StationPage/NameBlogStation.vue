@@ -1,27 +1,22 @@
 <template>
-<div class="e1i1uj6o1 css-1eyq3j2">
+<div v-if="stationData" class="e1i1uj6o1 css-1eyq3j2">
           <div class="css-1x4rk3v e1i1uj6o2">
             <div class="e1i1uj6o1 css-l705fq">
               <div class="css-sb8k6g e1i1uj6o2">
                 <div class="css-1lekzkb">
                   <div class="css-0">
                     <div class="css-1xhj18k">
-                      <h2 class="css-obye91">นางแล</h2>
-                      <div class="css-csyjyt">กำลังใช้งาน</div>
+                      <h2 class="css-obye91">{{ stationData.stationName }}</h2>
+                      <div class="css-csyjyt">{{ stationData.active ? "ใช้งานอยู่" : "ไม่ได้ใช้งาน" }}</div>
                     </div>
                     <div class="css-1xhj18k">
-                      <p class="css-1qtpv3j">เมืองเชียงราย</p>
+                      <p class="css-1qtpv3j">{{ stationData.location.address}}{{ stationData.location.state}}</p>
                     </div>   
                     <div class="css-1xhj18k">
-                      <p class="css-klhis3">13.72, 100.59</p>
-                      <div class="css-1xhj18k">
-                        <p class="css-1plaodm">Local Time:</p>
-                        <p class="css-1m046fs">2:14 pm</p>
-                      </div>
+                      <p class="css-klhis3">{{stationData.location.latitude}}, {{stationData.location.longtitude}}</p>
+                     
                     </div>
-                    <div class="css-1xhj18k">
-                      <p class="css-1knou7x">Elev: 20 m</p>
-                    </div>  
+                      
                   </div>
                 </div>
               </div>
@@ -35,6 +30,9 @@ import axios from "axios";
 
 export default {
   name: 'NameBlogStation',
+  props: {
+    stationId: String,
+  },
   data() {
     return {
       stationData: null,
@@ -45,15 +43,17 @@ export default {
     async fetchStationData() {
       try {
         const response = await axios.get(`http://localhost:3001/api/stations/${this.stationId}`);
-        this.stationData = response.data;
+        if (response.data) {
+          this.stationData = response.data; // Ensure this is the correct path in your response object
+        } else {
+          console.error("No data returned from the API");
+          this.error = "No data returned from the API";
+        }
       } catch (error) {
         console.error("Error fetching station data:", error);
         this.error = error;
       }
     }
-  },
-  props: {
-    stationId: String
   },
   watch: {
     stationId(newVal) {

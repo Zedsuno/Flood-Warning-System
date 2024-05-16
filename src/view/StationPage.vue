@@ -3,11 +3,11 @@
     <div class="Station-Blog-all">
       <div class="Space-Top"></div>
       <div class="Station-Blog-Space">
-        <NameBlogStation />
+        <NameBlogStation :station-id="selectedStationId" />
         <NavBlogStation />
         <div class="row" style="width: 100%;">
           <div class="col-5">
-            <BlogKPI />
+            <BlogKPI :station-id="selectedStationId" />
           </div>
           <div class="col-7">
             <Mapstation />
@@ -23,15 +23,37 @@
 <script>
 import NameBlogStation from '../components/StationPage/NameBlogStation';
 import NavBlogStation from '../components/StationPage/NavBlogStation';
-import BlogKPI from '../components/StationPage/ฺBlogKPI';
+import BlogKPI from "../components/StationPage/ฺBlogKPI.vue"
 import Mapstation from '../components/StationPage/MapStation';
+
 export default {
   name: 'StationPage',
   components: {
-    NameBlogStation, NavBlogStation, BlogKPI, Mapstation,
-    // ... other components ...
+    NameBlogStation, 
+    NavBlogStation, 
+    BlogKPI, 
+    Mapstation
   },
-  // ... other options ...
+  data() {
+    return {
+      selectedStationId: null,
+    };
+  },
+  methods: {
+    fetchStationId() {
+      // Fetch the station ID from the URL parameters
+      this.selectedStationId = this.$route.params.stationId;
+    }
+  },
+  watch: {
+    // React to changes in the route parameters
+    '$route.params.stationId'(newVal) {
+      this.selectedStationId = newVal;
+    }
+  },
+  created() {
+    this.fetchStationId();
+  }
 };
 </script>
 

@@ -5,9 +5,9 @@
         <div class="css-qazj7a"></div>
         <div class="css-1cidjeq">
           <div class="css-1xhj18k">
-            <a type="button" class="css-1e8m577" href="/station/mid/f0368/" previewlistener="true">รายละเอียดสถานี</a>
+            <a type="button" class="css-1e8m577" href="/station/${stationId}'" previewlistener="true">รายละเอียดสถานี</a>
             <!-- <a type="button" class="css-1y30hzu" href="/station/forecast/mid/f0368/" previewlistener="true">กราฟ</a> -->
-            <a type="button" class="css-1akyhig" href="/station/map/mid/f0368" previewlistener="true">แผนที่</a>
+            <a type="button" class="css-1akyhig" href="/Map" previewlistener="true">แผนที่</a>
           </div>
 
         </div>

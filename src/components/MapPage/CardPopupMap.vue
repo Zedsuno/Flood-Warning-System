@@ -84,7 +84,7 @@
               <i class="fa fa-water" aria-hidden="true"></i>
               <div class="css-0">
                 <div class="css-1pfve51">
-                  <p class="css-6romxb">{{ stationData.bankLevel }}</p>
+                  <p class="css-6romxb">{{ stationData.waterline }}</p>
                   <p class="css-8nuan8">ซม</p>
                 </div>
                 <p class="popup-label">ระดับตลิ่ง</p>
@@ -94,7 +94,7 @@
           <button
             type="button"
             class="popup-action-btn"
-            @click="redirectToHello"
+            @click="redirectToDashboard"
           >
             แดชบอร์ดสถานี
           </button>
@@ -133,9 +133,13 @@ export default {
     closePopup() {
       this.$emit("close-popup");
     },
-    redirectToDashboard() {
-      this.$router.push("/station-dashboard");
-    },
+     redirectToDashboard() {
+    if (this.stationData && this.stationData._id) {
+      this.$router.push({ name: 'Station', params: { stationId: this.stationData._id } });
+    } else {
+      console.error('Station data is missing or incomplete');
+    }
+  }
   },
   data() {
     return {

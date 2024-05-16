@@ -1,7 +1,12 @@
 <template>
-  <div class="css-p9eill"></div>
   <div class="css-p9eill">
-    <div class="css-exci64">
+    <!-- Only render the inner content if stationData is not null and waterLevelPercentage is available -->
+    <div
+      v-if="
+        stationData && typeof stationData.waterLevelPercentage !== 'undefined'
+      "
+      class="css-exci64"
+    >
       <div class="css-1pzn42j">
         <div class="css-1lekzkb">
           <div class="css-1xhj18k">
@@ -36,188 +41,241 @@
                   </g>
                 </svg>
               </div>
-              <div class="css-11iq4zb"><p class="css-ig04zd">51</p></div>
+              <div class="css-11iq4zb">
+                <p class="css-ig04zd">{{ stationData.waterLevelPercentage }}</p>
+              </div>
               <div class="css-1cklb6d"><p class="css-10imrpe">%</p></div>
             </div>
-            <p class="css-1cr4kj8">ระดับน้ำ</p>
+            <p class="css-1cr4kj8">Water Level</p>
           </div>
         </div>
       </div>
     </div>
+    <div v-else>
+      <!-- Display a loading message or error message if no data -->
+      <p v-if="error">{{ error }}</p>
+      <p v-else>Loading station data...</p>
+    </div>
   </div>
 </template>
 
-
 <script>
+import axios from "axios";
 
+export default {
+  name: "BlogKPI",
+  props: {
+    stationId: String, // This is necessary to fetch the data
+  },
+  data() {
+    return {
+      stationData: null, // This will store the fetched data
+      error: null, // To handle errors
+    };
+  },
+  methods: {
+    async fetchStationData() {
+      if (!this.stationId) {
+        this.error = "Station ID is not provided.";
+        return;
+      }
+      try {
+        const response = await axios.get(
+          `http://localhost:3001/api/stations/${this.stationId}`
+        );
+        if (response && response.data) {
+          this.stationData = response.data;
+        } else {
+          throw new Error("No data returned from the API.");
+        }
+      } catch (error) {
+        console.error("Error fetching station data:", error);
+        this.error = "Failed to load station data.";
+      }
+    },
+  },
+  watch: {
+    stationId(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        this.fetchStationData();
+      }
+    },
+  },
+  created() {
+    this.fetchStationData(); // This ensures data is fetched on component creation if stationId is available
+  },
+};
 </script>
-
 <style scoped>
-@media screen and (min-width: 48em){
-
-.css-p9eill {
+@media screen and (min-width: 48em) {
+  .css-p9eill {
     flex-basis: 67%;
-}}
-
-.css-p9eill {
-    flex-basis: 100%;
-    margin-left: 0.5rem;
-    margin-right: 0.5rem;
-    -webkit-box-flex: 1;
-    flex-grow: 1;
+  }
 }
 
-@media screen and (min-width: 62em){
-.css-exci64 {
+.css-p9eill {
+  flex-basis: 100%;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+  -webkit-box-flex: 1;
+  flex-grow: 1;
+}
+
+@media screen and (min-width: 62em) {
+  .css-exci64 {
     border-radius: 0.75em;
     padding: 32px;
-}}
+  }
+}
 .css-exci64 {
-    background-color: rgb(255, 255, 255);
-    border-radius: 0.5rem;
-    padding: 16px;
-    box-shadow: rgba(0, 0, 0, 0.04) 0px 0px 2px 0px, rgba(0, 0, 0, 0.16) 0px 1px 4px 0px;
-    margin-bottom: 16px;
-    position: relative;
-    height: calc(100% - 16px);
+  background-color: rgb(255, 255, 255);
+  border-radius: 0.5rem;
+  padding: 16px;
+  box-shadow: rgba(0, 0, 0, 0.04) 0px 0px 2px 0px,
+    rgba(0, 0, 0, 0.16) 0px 1px 4px 0px;
+  margin-bottom: 16px;
+  position: relative;
+  height: calc(100% - 16px);
 }
 
 .css-1lekzkb {
-    display: flex;
-    -webkit-box-align: center;
-    align-items: center;
-    -webkit-box-pack: justify;
-    justify-content: space-between;
+  display: flex;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-box-pack: justify;
+  justify-content: space-between;
 }
 
 .css-1xhj18k {
-    display: -webkit-box;
-    display: -webkit-flex;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-flex-direction: row;
-    -ms-flex-direction: row;
-    flex-direction: row;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
 }
 
-@media screen and (min-width: 62em){
-.css-70kdvp {
+@media screen and (min-width: 62em) {
+  .css-70kdvp {
     font-size: 1.875rem;
-}}
+  }
+}
 .css-70kdvp {
-    font-size: 1.5rem;
-    line-height: 1;
-    font-weight: 700;
-    font-family: 'Prompt', sans-serif;
-     color: rgb(51, 51, 51);
-    margin-right: 8px;
+  font-size: 1.5rem;
+  line-height: 1;
+  font-weight: 700;
+  font-family: "Prompt", sans-serif;
+  color: rgb(51, 51, 51);
+  margin-right: 8px;
 }
 
 .css-q4tf6v {
-  font-family: 'Prompt', sans-serif;
-   margin: 8px 0px 0px 8px;
-    font-weight: 400;
-    font-size: 0.75rem;
-    color: rgb(87, 91, 96);
+  font-family: "Prompt", sans-serif;
+  margin: 8px 0px 0px 8px;
+  font-weight: 400;
+  font-size: 0.75rem;
+  color: rgb(87, 91, 96);
 }
 
-@media screen and (min-width: 62em){
-.css-nqqpfu {
+@media screen and (min-width: 62em) {
+  .css-nqqpfu {
     padding-left: 32px;
     padding-right: 32px;
-}}
-
-.css-nqqpfu {
-    display: flex;
-    /* -webkit-box-pack: center;
-    justify-content: center; */
-    flex-wrap: wrap;
-    margin-top: 16px;
-    padding-left: 8px;
-    padding-right: 8px;
+  }
 }
 
+.css-nqqpfu {
+  display: flex;
+  /* -webkit-box-pack: center;
+    justify-content: center; */
+  flex-wrap: wrap;
+  margin-top: 16px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
 
-@media screen and (min-width: 62em){
-.css-1gd74of {
+@media screen and (min-width: 62em) {
+  .css-1gd74of {
     margin-left: 10px;
     margin-right: 10px;
-}}
-@media screen and (min-width: 48em){
-.css-1gd74of {
+  }
+}
+@media screen and (min-width: 48em) {
+  .css-1gd74of {
     margin-left: 8px;
     margin-right: 8px;
-}}
+  }
+}
 .css-1gd74of {
-    margin: 16px;
+  margin: 16px;
 }
 
 .css-1adpr0j {
-    height: 160px;
-    width: 160px;
-    margin: 0px auto;
-    position: relative;
+  height: 160px;
+  width: 160px;
+  margin: 0px auto;
+  position: relative;
 }
 
 .css-cgh4lp {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 160px;
-    height: 160px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 160px;
+  height: 160px;
 }
 
 .css-1c0mkoe {
-    fill: none;
-    stroke-linecap: round;
+  fill: none;
+  stroke-linecap: round;
 }
 
 .css-11iq4zb {
-    position: absolute;
-    bottom: 55px;
-    left: 50%;
-    transform: translateX(-50%);
+  position: absolute;
+  bottom: 55px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .css-ig04zd {
-  font-family: 'Prompt', sans-serif;
-   margin: 0px;
-    font-weight: 600;
-    font-size: 40px;
-    letter-spacing: 0.025em;
-    line-height: 40px;
-    color: rgb(51, 51, 51);
-    bottom: auto;
-    left: auto;
+  font-family: "Prompt", sans-serif;
+  margin: 0px;
+  font-weight: 600;
+  font-size: 40px;
+  letter-spacing: 0.025em;
+  line-height: 40px;
+  color: rgb(51, 51, 51);
+  bottom: auto;
+  left: auto;
 }
 
 .css-1cklb6d {
-    position: absolute;
-    bottom: 35px;
-    left: 50%;
-    transform: translateX(-50%);
+  position: absolute;
+  bottom: 35px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .css-10imrpe {
-  font-family: 'Prompt', sans-serif;
+  font-family: "Prompt", sans-serif;
   margin: 0px;
-    font-weight: 400;
-    font-size: 14px;
-    color: rgb(87, 91, 96);
-    bottom: auto;
-    left: auto;
+  font-weight: 400;
+  font-size: 14px;
+  color: rgb(87, 91, 96);
+  bottom: auto;
+  left: auto;
 }
 
 .css-1cr4kj8 {
-  font-family: 'Prompt', sans-serif;
+  font-family: "Prompt", sans-serif;
   margin: -8px 0px 0px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    line-height: 1;
-    font-size: 0.875rem;
-    color: rgb(51, 51, 51);
-    text-align: center;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  font-size: 0.875rem;
+  color: rgb(51, 51, 51);
+  text-align: center;
 }
-
 </style>

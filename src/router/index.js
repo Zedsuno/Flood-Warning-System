@@ -69,9 +69,10 @@ const routes = [
     props: false
   },
   {
-    path: '/Station',
+    path: '/station/:stationId', // Notice the :stationId parameter
     name: 'Station',
     component: StationPage,
+    props: true // Enables the route to pass the stationId as a prop to the component
   },
 
   {
