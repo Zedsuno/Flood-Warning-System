@@ -6,7 +6,7 @@
         <div class="form-group" v-for="(threshold, index) in thresholds" :key="index">
           <div class="threshold-details">
             <input type="text" v-model="threshold.name" readonly />
-            <input type="number" placeholder="ค่าตั้งเกณฑ์ (%)" v-model.number="threshold.value" @blur="validateInput" />
+            <input type="number" placeholder="ค่าตั้งเกณฑ์ (%)" v-model.number="threshold.value" @blur="validateInput(index)" />
             <input type="color" v-model="threshold.color" class="color-input" />
           </div>
         </div>
@@ -20,8 +20,6 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
-
 export default {
   props: {
     initialThresholds: {
@@ -35,11 +33,9 @@ export default {
     };
   },
   methods: {
-    ...mapActions('waterLevels', ['saveThresholds']), // Ensure the action name matches what's in Vuex
-
     setupThresholds() {
       const defaultThresholds = [
-        { name: "น้อยวิกฤต", value: "", color: "#A52A2A" },
+      { name: "น้อยวิกฤต", value: "", color: "#A52A2A" },
         { name: "น้อย", value: "", color: "#FFFF00" },
         { name: "ปกติ", value: "", color: "#008000" },
         { name: "มาก", value: "", color: "#800080" },
@@ -50,11 +46,11 @@ export default {
         return { ...threshold, value: initial?.value || threshold.value, color: initial?.color || threshold.color };
       });
     },
-    validateInput(event) {
-      let value = parseFloat(event.target.value);
-      if (value < 0 || value > 100) {
-        alert('Threshold percentage must be between 0 and 100.');
-        event.target.value = 50; // Reset to a neutral default value
+    validateInput(index) {
+      let value = parseFloat(this.thresholds[index].value);
+      if (value < 0) {
+        alert('Threshold percentage must be at least 0.');
+        this.thresholds[index].value = 0;
       }
     },
     saveThreshold() {
@@ -63,12 +59,13 @@ export default {
         value: parseFloat(threshold.value),
         color: threshold.color
       }));
-      this.saveThresholds(thresholdsToSave); // This should match the Vuex action name
       this.$emit('save', thresholdsToSave);
     }
   }
 };
 </script>
+
+
 
 <style scoped>
 .threshold-modal {

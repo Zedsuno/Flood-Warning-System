@@ -309,6 +309,7 @@ export default {
     console.error("Failed to unlink hardware:", error);
   });
 },
+
     updateData() {
       this.$emit("update-profile", {
         ...this.existingData,

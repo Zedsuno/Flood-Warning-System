@@ -1,26 +1,19 @@
-ButtonMap.vue<template>
+<template>
   <div class="custom-button-map-container" @click="onClick">
     <div class="inner-wrapper">
-      <div class="centered-container">
-        <button class="custom-button">
-          <div class="content-container">
-            <div class="outer-ring"></div>
-            <div class="white-ring-container">
-              <div class="white-ring"></div>
-            </div>
-            <div class="inner-ring-container">
-              <div
-                class="inner-ring"
-                :style="{ backgroundColor: ButtonColor }"
-              ></div>
-            </div>
-            <div class="temperature-container">
-              <div class="temperature-display">
-                <p class="temperature-text">{{ waterLevel }}</p>
-              </div>
-            </div>
+        <div class="outer-ring"></div>
+        <div class="white-ring-container">
+          <div class="white-ring"></div>
+        </div>
+        <div class="inner-ring-container">
+          <div class="inner-ring"></div>
+        </div>
+        <div class="temperature-container">
+          <div class="temperature-display">
+            <p class="temperature-text">{{ waterLevel }}</p>
           </div>
-        </button>
+        </div>
+
         <div class="name-display-container">
           <svg viewBox="0 0 200 22" class="name-display-svg">
             <text x="100" y="17" class="station-name-text">
@@ -30,13 +23,9 @@ ButtonMap.vue<template>
         </div>
       </div>
     </div>
-  </div>
 </template>
 
 <script>
-import { mapGetters } from "vuex";
-import { mapActions } from "vuex";
-
 export default {
   name: "ButtonMap",
   props: {
@@ -56,38 +45,42 @@ export default {
       type: Number,
       required: true,
     },
+    status: {
+      type: String,
+      required: true,
+    },
   },
-  mounted() {
-    console.log("Component mounted, initial water level:", this.waterLevel);
-    console.log("Component mounted, station name:", this.StationName);
+  data() {
+    return {
+      markerColor: this.getMarkerColor(this.status),
+    };
   },
-  computed: {
-    ...mapGetters({
-      getThresholds: "waterLevels/getThresholds", // Specify the full path with namespace
-    }),
-    ButtonColor() {
-      console.log("Fetching thresholds..."); // Log fetching thresholds
-      const thresholds = this.getThresholds; // Retrieve thresholds from Vuex getter
-      console.log("Thresholds:", thresholds); // Log the thresholds to see what we're working with
-
-      // Find the threshold whose upper limit is greater than or equal to the current water level
-      const threshold = thresholds.find((t) => this.waterLevel <= t.upperLimit);
-      console.log("Current Water Level:", this.waterLevel); // Log current water level
-      console.log("Applicable Threshold:", threshold); // Log the applicable threshold if found
-
-      // Return the color from the found threshold, or a default color if no threshold matches
-      return threshold ? threshold.color : "#11abcd"; // Default color if no threshold is applicable
+  watch: {
+    status(newStatus) {
+      console.log(`Status changed to: ${newStatus}`);
+      this.markerColor = this.getMarkerColor(newStatus);
     },
   },
   methods: {
-    ...mapActions("waterLevels", [
-      "fetchSensorData",
-      "calculateWaterLevels",
-      "applyThresholds",
-    ]),
-
+    getMarkerColor(status) {
+      console.log(`Getting color for status: ${status}`);
+      switch (status) {
+        case "น้อยวิกฤต":
+          return "#A52A2A"; // Red
+        case "น้อย":
+          return "#FFFF00"; // Yellow
+        case "ปกติ":
+          return "#008000"; // Green
+        case "มาก":
+          return "#800080"; // Purple
+        case "ล้นตลิ่ง":
+          return "#FF0000"; // Red
+        default:
+          return "#23BBF1"; // Default blue
+      }
+    },
     onClick() {
-      console.log("Button clicked. Emitting event."); // Log when button is clicked
+      console.log("Button clicked. Emitting event.");
       this.$emit("station-selected", {
         StationName: this.StationName,
         waterLevel: this.waterLevel,
@@ -111,12 +104,19 @@ export default {
   z-index: 1;
 }
 
+.inner-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
 .centered-container {
   position: absolute;
-  top: 0;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
 }
+
 .custom-button {
   outline: none;
   border: none;
@@ -124,10 +124,6 @@ export default {
   padding: 0;
   cursor: pointer;
 }
-.content-container {
-  pointer-events: none;
-}
-
 .outer-ring {
   position: absolute;
   top: 50%;
@@ -138,6 +134,7 @@ export default {
   background-color: rgba(0, 0, 0, 0.7);
   border-radius: 50%;
 }
+
 .white-ring-container {
   position: absolute;
   top: 50%;
@@ -146,12 +143,14 @@ export default {
   width: 42px;
   height: 42px;
 }
+
 .white-ring {
   width: 42px;
   height: 42px;
   background-color: rgb(255, 255, 255);
   border-radius: 50%;
 }
+
 .inner-ring-container {
   position: absolute;
   top: 50%;
@@ -160,11 +159,19 @@ export default {
   width: 36px;
   height: 36px;
 }
+
 .inner-ring {
   width: 36px;
   height: 36px;
   background-color: #11abcd;
   border-radius: 50%;
+}
+
+.content-container {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  pointer-events: none;
 }
 
 .temperature-container {
@@ -178,6 +185,7 @@ export default {
   align-items: center;
   justify-content: center;
 }
+
 .temperature-display {
   font-size: 14px;
   color: #000;
@@ -193,8 +201,10 @@ export default {
   letter-spacing: 0.025em;
   line-height: normal;
   color: rgb(0, 0, 0);
-  background-color: rgba(255, 255, 255, 0.8); 
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 9999;
 }
+
 .name-display-container {
   position: absolute;
   top: 75px;
@@ -203,10 +213,12 @@ export default {
   width: 200px;
   height: 22px;
 }
+
 .name-display-svg {
   width: 200px;
   height: 22px;
 }
+
 .station-name-text {
   font-family: "Calibre", Helvetica, Arial;
   font-weight: 800;
@@ -217,6 +229,5 @@ export default {
   stroke-width: 1px;
   paint-order: stroke;
   text-rendering: optimizeLegibility;
-  background-color: rgba(0, 0, 0, 0.8);
 }
 </style>

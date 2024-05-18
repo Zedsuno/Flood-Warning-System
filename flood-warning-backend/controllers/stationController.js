@@ -1,5 +1,7 @@
 const Station = require('../models/Station');
 const mongoose = require('mongoose');
+const { updateStationData } = require('../services/waterLevelService');
+
  // Ensure this points to your Station model file
 
 // Controller method to create a new station
@@ -98,27 +100,41 @@ exports.getAllStation = async (req, res) => {
     }
   };
   exports.updateWaterLevel = async (req, res) => {
+    const { _id } = req.body;
+  
+    if (!_id) {
+      return res.status(400).json({ error: 'Station ID is required' });
+    }
+  
     try {
-      const { _id, waterLevel, bankLevel, waterLevelPercentage } = req.body;
-  
-      if (!_id) {
-        return res.status(400).json({ message: 'Station ID is required' });
-      }
-  
-      const station = await Station.findById(_id);
-      if (!station) {
-        return res.status(404).json({ message: 'Station not found' });
-      }
-  
-      station.waterLevel = waterLevel;
-      station.bankLevel = bankLevel;
-      station.waterLevelPercentage = waterLevelPercentage;
-      await station.save();
-  
-      res.status(200).json({ message: `Water level updated in DB for station: ${_id}` });
+      const updatedStation = await updateStationData(_id);
+      res.json(updatedStation);
     } catch (error) {
-      console.error('Error updating water level:', error);
-      res.status(500).json({ message: 'Error updating water level', error });
+      console.error('Error updating station data:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  };
+
+  exports.updateThresholds = async (req, res) => {
+    const { _id, thresholds } = req.body;
+  
+    if (!_id) {
+      return res.status(400).json({ error: 'Station ID is required' });
+    }
+  
+    try {
+      const updatedStation = await Station.findByIdAndUpdate(
+        _id,
+        { thresholds: thresholds },
+        { new: true, runValidators: true }
+      );
+      if (!updatedStation) {
+        return res.status(404).json({ error: 'Station not found' });
+      }
+      res.status(200).json(updatedStation);
+    } catch (error) {
+      console.error('Error updating thresholds:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
     }
   };
   

@@ -142,7 +142,7 @@
                       {{ station.WaterDepth }} cm
                     </td> -->
                     <td class="text-sm font-weight-normal">
-                      {{ selectedStationData?.status || 'ไม่ได้ส่ง Data เข้ามา' }}
+                      {{ getStatus(station) || 'ไม่ได้ส่ง Data เข้ามา' }}
                     </td>
                     <td class="text-sm font-weight-normal">
                       <span
@@ -200,7 +200,7 @@
 
 <script>
 import { mapState, mapActions } from 'vuex';
-
+import axios from 'axios';
 export default {
   data() {
     return {
@@ -211,13 +211,7 @@ export default {
   },
   computed: {
     ...mapState('stations', ['allStations']),
-    ...mapState('waterLevels', ['stations']),  // Assuming the 'stations' module is still relevant
-    selectedStationData() {
-    console.log('Fetching station data for ID:', this.stationId);
-    const station = this.$store.getters['waterLevels/getStationById'](this.stationId);
-    console.log('Selected station data:', station);
-    return station;
-  },
+  
     filteredStations() {
       return this.searchQuery
         ? this.allStations.filter(station =>
@@ -252,8 +246,10 @@ export default {
   },
   methods: {
     ...mapActions('stations', ['fetchAllStations']),
-    ...mapActions('waterLevels', ['fetchSensorData', 'calculateWaterLevels', 'applyThresholds']),
-
+ 
+    getStatus(station) {
+      return station.status;
+    },
     fetchStationsAndSensorReadings() {
       this.fetchAllStations().then(() => {
         this.allStations.forEach(station => {
@@ -264,6 +260,23 @@ export default {
       }).catch(error => {
         console.error("Failed to fetch stations:", error);
       });
+    },
+    async updateWaterLevel() {
+      if (!this.stationId) {
+        console.error("updateWaterLevel was called without a stationId.");
+        return;
+      }
+      console.log(`Updating water level for station ID ${this.stationId}`);
+      try {
+        const response = await axios.post(`http://localhost:3001/api/stations/updateWaterLevel`, {
+          _id: this.stationId,
+        });
+        console.log(`Water level updated for station ID ${this.stationId}:`, response.data);
+        this.stationData = response.data;
+        this.$emit("stationSaved", this.stationData);
+      } catch (error) {
+        console.error(`Error updating water level for station ID ${this.stationId}:`, error);
+      }
     },
     changePage(newPage) {
       this.currentPage = newPage;

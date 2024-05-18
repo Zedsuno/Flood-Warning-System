@@ -9,6 +9,6 @@ router.get('/stations', stationController.getAllStation);
 router.put('/stations/:id', stationController.updateStation);
 router.delete('/stations/:id', stationController.deleteStation);
 router.post('/updateWaterLevel', stationController.updateWaterLevel);
-
+router.post('/updateThresholds', stationController.updateThresholds);
 
 module.exports = router;

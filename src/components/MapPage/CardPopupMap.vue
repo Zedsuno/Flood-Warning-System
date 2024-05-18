@@ -37,7 +37,7 @@
                 </div>
                 <div class="css-1pzn42j">
                   <p class="popup-weather-condition" >
-                    {{   selectedStationData?.status || "ไม่ได้ส่ง Data เข้ามา" }}
+                    {{   stationData.status || "ไม่ได้ส่ง Data เข้ามา" }}
                   </p>
                 </div>
               </div>
