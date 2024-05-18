@@ -12,10 +12,11 @@
 <script>
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { createApp, defineComponent } from 'vue';
+import { createApp, defineComponent,h } from 'vue';
 import ButtonMap from './ButtonMap.vue';
 import CardPopupMap from './CardPopupMap.vue';
-import { mapActions, mapState } from 'vuex';
+import axios from 'axios';
+
 
 export default {
   name: "DynamicMap",
@@ -25,17 +26,20 @@ export default {
   data() {
     return {
       map: null,
+      allStations: [],
       selectedStation: null,
       popupPosition: { x: 0, y: 0 },
     };
   },
-  computed: {
-    ...mapState('stations', ['allStations', 'selectedStation']),
-  },
   methods: {
-    ...mapActions('stations', ['fetchAllStations', 'selectStation', 'deselectStation']),
-    ...mapActions('waterLevels', ['fetchSensorData', 'calculateWaterLevels', 'applyThresholds']),
-
+    async fetchAllStations() {
+      try {
+        const response = await axios.get('http://localhost:3001/api/stations');
+        this.allStations = response.data;
+      } catch (error) {
+        console.error("Error fetching stations:", error);
+      }
+    },
     initMap() {
       this.map = L.map(this.$refs.mapContainer, { center: [19.91048, 99.840576], zoom: 13 });
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -43,7 +47,6 @@ export default {
       }).addTo(this.map);
       this.initMarkers();
     },
-
     initMarkers() {
       this.allStations.forEach(station => {
         const markerElement = this.createMarkerApp(station);
@@ -64,58 +67,73 @@ export default {
       });
     },
     calculatePopupPosition(latitude, longitude) {
-    // Dummy function for demonstration: adjust as needed
-    return { x: longitude, y: latitude };
-  },
-  selectStation(stationId) {
-    const station = this.allStations.find(s => s._id === stationId);
-    if (station && station.location && station.location.latitude) {
-      this.selectedStation = station;
-      this.updatePopupPosition(station.location.latitude, station.location.longitude);
-    } else {
-      console.error("Station data is incomplete:", station);
-    }
-  },
-  updatePopupPosition(latitude, longitude) {
-    const position = this.calculatePopupPosition(latitude, longitude);
-    this.popupPosition = position;
-  },
-    createMarkerApp(station) {
-      const propsData = {
-        stationId: station._id,
-        StationName: station.stationName, // Ensure the correct prop name
-        waterLevel: station.waterLevel,
-        latitude: station.location.latitude,
-        longitude: station.location.longitude,
-      };
-
-      console.log('Creating marker app with props:', propsData); // Additional logging
-
-      const markerElement = document.createElement('div');
-      markerElement.className = 'custom-marker';
-      const MarkerComponent = defineComponent({
-        extends: ButtonMap,
-        data() {
-          return { ...propsData };
-        }
-      });
-
-      const app = createApp(MarkerComponent);
-      app.use(this.$store);
-      app.mount(markerElement);
-      return markerElement;
+      return { x: longitude, y: latitude };
     },
+    async selectStation(stationId) {
+      const station = this.allStations.find(s => s._id === stationId);
+      if (station && station.location && station.location.latitude) {
+        this.selectedStation = station;
+        this.updatePopupPosition(station.location.latitude, station.location.longitude);
 
-    ClosePopup() {
-  this.selectedStation = null;  // This will hide the popup by making v-if="selectedStation" false
+        // Call the backend service to update water level and fetch thresholds
+        await this.updateWaterLevel(station._id);
+      } else {
+        console.error("Station data is incomplete:", station);
+      }
+    },
+    async updateWaterLevel(stationId) {
+      try {
+        const response = await axios.post(`http://localhost:3001/api/stations/updateWaterLevel`, {
+          _id: stationId,
+        });
+        console.log(`Water level updated for station ID ${stationId}:`, response.data);
+        this.selectedStation = response.data;
+        this.initMap(); // Reinitialize map to update markers
+      } catch (error) {
+        console.error(`Error updating water level for station ID ${stationId}:`, error);
+      }
+    },
+    updatePopupPosition(latitude, longitude) {
+      const position = this.calculatePopupPosition(latitude, longitude);
+      this.popupPosition = position;
+    },
+    createMarkerApp(station) {
+  const propsData = {
+    waterLevel: station.waterLevel,
+    StationName: station.stationName,
+    latitude: station.location.latitude,
+    longitude: station.location.longitude,
+    status: station.status, // Ensure status is passed correctly
+  };
+
+  console.log('Creating marker app with props:', propsData);
+
+  const markerElement = document.createElement('div');
+  markerElement.className = 'custom-marker';
+  const MarkerComponent = defineComponent({
+    extends: ButtonMap,
+    props: ['waterLevel', 'StationName', 'latitude', 'longitude', 'status'], // Define props explicitly
+  });
+
+  const app = createApp({
+    render() {
+      return h(MarkerComponent, propsData);
+    }
+  });
+  app.mount(markerElement);
+  return markerElement;
 },
+    ClosePopup() {
+      this.selectedStation = null;  // This will hide the popup by making v-if="selectedStation" false
+    },
   },
-  mounted() {
-    this.fetchAllStations();
+  async mounted() {
+    await this.fetchAllStations();
     this.initMap();
   }
 };
 </script>
+
 
 <style>
 .map-container {

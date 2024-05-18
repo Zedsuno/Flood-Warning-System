@@ -7,7 +7,7 @@
             v-if="stationData && stationData.location"
             :latitude="stationData.location.latitude"
             :longitude="stationData.location.longitude"
-            :status="selectedStationData?.status || 'unknown'"
+            :status="stationData.status || 'unknown'"
             :waterLevel="stationData.waterLevel"
             :waterline="stationData.waterline"
           />
@@ -31,14 +31,14 @@
       </p>
       <div class="separator"></div>
       <div class="station-info">
-        <p  class="data-status">ระดับน้ำปัจจุบัน
-          {{   selectedStationData?.status || "ไม่ได้ส่ง Data เข้ามา" }}
+        <p class="data-status">ระดับน้ำปัจจุบัน
+          {{ stationData.status || "ไม่ได้ส่ง Data เข้ามา" }}
         </p>
       </div>
       <div class="station-actions">
-        <router-link to="/Station" type="button" class="action-btn dashboard"
-          >แดชบอร์ดสถานี</router-link
-        >
+        <router-link to="/Station" type="button" class="action-btn dashboard">
+          แดชบอร์ดสถานี
+        </router-link>
         <button
           type="button"
           class="action-btn edit"
@@ -54,7 +54,6 @@
 <script>
 import axios from "axios";
 import MapDash from "../AdminPage/MapDash";
-import { mapActions, mapState } from 'vuex';
 
 export default {
   components: { MapDash },
@@ -63,9 +62,9 @@ export default {
     status: String,
     stationId: {
       type: String,
-      required: true,  // Ensure this prop must be passed
-      default: null    // Consider how to handle defaults
-    }
+      required: true,
+      default: null,
+    },
   },
   data() {
     return {
@@ -74,7 +73,6 @@ export default {
       error: null,
     };
   },
-
   watch: {
     stationId(newVal, oldVal) {
       console.log(`Station ID changed from ${oldVal} to ${newVal}`);
@@ -83,18 +81,7 @@ export default {
       }
     },
   },
-  computed: {
-    ...mapState('waterLevels', ['stations']),
-    selectedStationData() {
-    console.log('Fetching station data for ID:', this.stationId);
-    const station = this.$store.getters['waterLevels/getStationById'](this.stationId);
-    console.log('Selected station data:', station);
-    return station;
-  }
-  },
   methods: {
-    ...mapActions("waterLevels", ["fetchStation", "applyThresholds"]),
-
     navigateToEditStation(stationId) {
       console.log(`Navigating to edit station with ID ${stationId}`);
       this.$router.push({ name: "EditStation", params: { stationId } });
@@ -112,12 +99,33 @@ export default {
         console.log(`Data fetched for station ID ${stationId}:`, response.data);
         this.error = null;
         this.$emit("stationSaved", this.stationData);
+
+        // Call the update method here
+        this.updateWaterLevel();
+
       } catch (error) {
         console.error(`Error fetching station data for ID ${stationId}:`, error);
         this.error = error;
       } finally {
         this.loading = false;
         console.log(`Fetching station data completed for ID ${stationId}`);
+      }
+    },
+    async updateWaterLevel() {
+      if (!this.stationId) {
+        console.error("updateWaterLevel was called without a stationId.");
+        return;
+      }
+      console.log(`Updating water level for station ID ${this.stationId}`);
+      try {
+        const response = await axios.post(`http://localhost:3001/api/stations/updateWaterLevel`, {
+          _id: this.stationId,
+        });
+        console.log(`Water level updated for station ID ${this.stationId}:`, response.data);
+        this.stationData = response.data;
+        this.$emit("stationSaved", this.stationData);
+      } catch (error) {
+        console.error(`Error updating water level for station ID ${this.stationId}:`, error);
       }
     },
   },
@@ -131,6 +139,9 @@ export default {
   },
 };
 </script>
+
+
+
 
 <style scoped>
 @media screen and (min-width: 62em) {

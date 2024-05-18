@@ -1,6 +1,5 @@
 import { createStore } from 'vuex';
 import axios from 'axios';
-import waterLevels from './module/waterLevels';
 import createPersistedState from 'vuex-persistedstate';
 
 const store = createStore({
@@ -70,7 +69,7 @@ const store = createStore({
         },
       },
     },
-    waterLevels
+    
   },
   plugins: [
     createPersistedState({
