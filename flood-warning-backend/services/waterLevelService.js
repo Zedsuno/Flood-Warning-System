@@ -25,6 +25,11 @@ function applyThresholds(waterLevelPercentage, thresholds) {
 
   // Sort thresholds by value in descending order
   thresholds.sort((a, b) => b.value - a.value);
+  
+  if (Thresholds.length === 1 && waterLevelPercentage <= Thresholds[0].value) {
+    console.log(`Threshold match found: ${Thresholds[0].name} for water level percentage: ${waterLevelPercentage}`);
+    return Thresholds[0].name;
+  }
 
   for (let i = 0; i < thresholds.length; i++) {
     console.log(`Checking threshold: ${thresholds[i].name} with value: ${thresholds[i].value}`);
@@ -34,7 +39,7 @@ function applyThresholds(waterLevelPercentage, thresholds) {
     }
   }
 
-  console.log(`No matching threshold found, defaulting to "ล้นตลิ่ง"`);
+  console.log(`No matching threshold found, defaulting to "ไม่พบค่า"`);
   return "ไม่พบค่า";
 }
 
