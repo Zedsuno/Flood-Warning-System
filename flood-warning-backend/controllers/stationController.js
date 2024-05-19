@@ -102,8 +102,16 @@ exports.getAllStation = async (req, res) => {
   exports.updateWaterLevel = async (req, res) => {
     const { _id } = req.body;
   
+    console.log('Received request to update water level for station ID:', _id);
+  
     if (!_id) {
+      console.error('Station ID is required');
       return res.status(400).json({ error: 'Station ID is required' });
+    }
+  
+    if (!mongoose.Types.ObjectId.isValid(_id)) {
+      console.error('Invalid Station ID format');
+      return res.status(400).json({ error: 'Invalid Station ID format' });
     }
   
     try {
@@ -111,7 +119,7 @@ exports.getAllStation = async (req, res) => {
       res.json(updatedStation);
     } catch (error) {
       console.error('Error updating station data:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+      res.status(500).json({ error: 'Internal Server Error', details: error.message });
     }
   };
 
