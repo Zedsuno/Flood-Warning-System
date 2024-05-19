@@ -26,9 +26,9 @@ function applyThresholds(waterLevelPercentage, thresholds) {
   // Sort thresholds by value in descending order
   thresholds.sort((a, b) => b.value - a.value);
   
-  if (Thresholds.length === 1 && waterLevelPercentage <= Thresholds[0].value) {
-    console.log(`Threshold match found: ${Thresholds[0].name} for water level percentage: ${waterLevelPercentage}`);
-    return Thresholds[0].name;
+  if (waterLevelPercentage < thresholds[thresholds.length - 1].value) {
+    console.log(`Threshold match found: ${thresholds[thresholds.length - 1].name} for water level percentage: ${waterLevelPercentage}`);
+    return thresholds[thresholds.length - 1].name;
   }
 
   for (let i = 0; i < thresholds.length; i++) {
