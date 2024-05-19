@@ -23,24 +23,30 @@ function applyThresholds(waterLevelPercentage, thresholds) {
   // Use the provided thresholds (user-defined thresholds)
   console.log('Thresholds:', thresholds);
 
-  // Sort thresholds by value in descending order
-  thresholds.sort((a, b) => b.value - a.value);
-  
-  if (waterLevelPercentage < thresholds[thresholds.length - 1].value) {
-    console.log(`Threshold match found: ${thresholds[thresholds.length - 1].name} for water level percentage: ${waterLevelPercentage}`);
-    return thresholds[thresholds.length - 1].name;
+  // Filter out thresholds that are not specified
+  const validThresholds = thresholds.filter(t => t.value !== undefined && t.value !== null);
+  console.log('Valid Thresholds:', validThresholds);
+
+  // Sort valid thresholds by value in descending order
+  validThresholds.sort((a, b) => b.value - a.value);
+
+  // Special case for values below the only specified threshold
+  if (validThresholds.length === 1 && waterLevelPercentage <= validThresholds[0].value) {
+    console.log(`Threshold match found: ${validThresholds[0].name} for water level percentage: ${waterLevelPercentage}`);
+    return validThresholds[0].name;
   }
 
-  for (let i = 0; i < thresholds.length; i++) {
-    console.log(`Checking threshold: ${thresholds[i].name} with value: ${thresholds[i].value}`);
-    if (waterLevelPercentage >= thresholds[i].value) {
-      console.log(`Threshold match found: ${thresholds[i].name} for water level percentage: ${waterLevelPercentage}`);
-      return thresholds[i].name;
+  // Check the sorted thresholds
+  for (let i = 0; i < validThresholds.length; i++) {
+    console.log(`Checking threshold: ${validThresholds[i].name} with value: ${validThresholds[i].value}`);
+    if (waterLevelPercentage >= validThresholds[i].value) {
+      console.log(`Threshold match found: ${validThresholds[i].name} for water level percentage: ${waterLevelPercentage}`);
+      return validThresholds[i].name;
     }
   }
 
-  console.log(`No matching threshold found, defaulting to "ไม่พบค่า"`);
-  return "ไม่พบค่า";
+  console.log(`No matching threshold found, defaulting to "Below น้อยวิกฤต"`);
+  return "น้อยวิกฤต";
 }
 
 async function updateStationData(stationId) {
