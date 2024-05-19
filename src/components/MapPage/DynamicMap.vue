@@ -12,11 +12,10 @@
 <script>
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { createApp, defineComponent,h } from 'vue';
+import { createApp, defineComponent, h } from 'vue';
 import ButtonMap from './ButtonMap.vue';
 import CardPopupMap from './CardPopupMap.vue';
 import axios from 'axios';
-
 
 export default {
   name: "DynamicMap",
@@ -98,31 +97,31 @@ export default {
       this.popupPosition = position;
     },
     createMarkerApp(station) {
-  const propsData = {
-    waterLevel: station.waterLevel,
-    StationName: station.stationName,
-    latitude: station.location.latitude,
-    longitude: station.location.longitude,
-    status: station.status, // Ensure status is passed correctly
-  };
+      const propsData = {
+        waterLevel: station.waterLevel,
+        StationName: station.stationName,
+        latitude: station.location.latitude,
+        longitude: station.location.longitude,
+        status: station.status, // Ensure status is passed correctly
+      };
 
-  console.log('Creating marker app with props:', propsData);
+      console.log('Creating marker app with props:', propsData);
 
-  const markerElement = document.createElement('div');
-  markerElement.className = 'custom-marker';
-  const MarkerComponent = defineComponent({
-    extends: ButtonMap,
-    props: ['waterLevel', 'StationName', 'latitude', 'longitude', 'status'], // Define props explicitly
-  });
+      const markerElement = document.createElement('div');
+      markerElement.className = 'custom-marker';
+      const MarkerComponent = defineComponent({
+        extends: ButtonMap,
+        props: ['waterLevel', 'StationName', 'latitude', 'longitude', 'status'], // Define props explicitly
+      });
 
-  const app = createApp({
-    render() {
-      return h(MarkerComponent, propsData);
-    }
-  });
-  app.mount(markerElement);
-  return markerElement;
-},
+      const app = createApp({
+        render() {
+          return h(MarkerComponent, propsData);
+        }
+      });
+      app.mount(markerElement);
+      return markerElement;
+    },
     ClosePopup() {
       this.selectedStation = null;  // This will hide the popup by making v-if="selectedStation" false
     },
@@ -133,7 +132,6 @@ export default {
   }
 };
 </script>
-
 
 <style>
 .map-container {
@@ -165,5 +163,8 @@ export default {
 }
 
 .custom-div-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>
