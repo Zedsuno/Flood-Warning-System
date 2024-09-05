@@ -45,8 +45,9 @@ export default {
     return {
       menuItems: [
         { label: "สถานี", path: "/Admin", icon: "fa-solid fa-tower-cell" },
-        { label: "โปรไฟล์", path: "/Account", icon: "fa-solid fa-user" },
-       
+        // { label: "โปรไฟล์", path: "/Account", icon: "fa-solid fa-user" },
+        { label: "ประวัติเตือนภัย", path: "/Admin/Alert", icon: "fa-solid fa-bell" },
+        { label: "เพิ่มอุปกรณ์", path: "/Admin/Hardware", icon: "fa-solid fa-plus" },
       ],
       activeIndex: null,
     };

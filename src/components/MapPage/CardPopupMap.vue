@@ -77,7 +77,7 @@
                   <p class="css-6romxb">{{ stationData.bankLevel }}</p>
                   <p class="css-8nuan8">ซม</p>
                 </div>
-                <p class="popup-label">ระยะห่างเซนเซอร์</p>
+                <p class="popup-label">BankLevel</p>
               </div>
             </div>
             <div class="popup-section">

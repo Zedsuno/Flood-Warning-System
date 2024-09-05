@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { updateStationData } = require('./services/waterLevelService');
+const { updateStationData } = require('../services/waterLevelService');
 
 // Replace with your MongoDB connection string
 const mongoURI = 'mongodb://localhost:27017/Flood_Warning';

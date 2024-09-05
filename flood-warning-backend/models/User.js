@@ -1,3 +1,4 @@
+// Defines the schema for users, including username, email, and password.
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 

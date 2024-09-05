@@ -1,3 +1,4 @@
+// Guards routes to prevent unauthorized access.
 import router from './router' // Your Vue router instance
 import store from '../store/index' // Your Vuex store instance
 import Swal from 'sweetalert2'

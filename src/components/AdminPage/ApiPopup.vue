@@ -1,3 +1,4 @@
+<!-- ApiPopup.vue -->
 <template>
   <div v-if="isPopupVisible" class="api-popup__overlay">
     <div class="setup-station-container">

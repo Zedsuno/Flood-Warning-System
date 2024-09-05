@@ -1,3 +1,4 @@
+// Handles hardware routes and integrates with the hardware controller.
 const express = require('express');
 const router = express.Router();
 const hardwareController = require('../controllers/hardwareController');
@@ -6,5 +7,5 @@ const hardwareController = require('../controllers/hardwareController');
 router.put('/update/:id', hardwareController.updateHardwareSettings);
 router.post('/hardware/link-and-fetch', hardwareController.linkHardwareToStationAndFetchData);
 router.post('/hardware/unlink', hardwareController.unlinkHardwareFromStation);
-
+    
 module.exports = router;

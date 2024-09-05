@@ -1,3 +1,4 @@
+// Seed data for hardware
 const mongoose = require('mongoose');
 const Hardware = require('./models/Hardware');
 
