@@ -47,12 +47,15 @@ export default {
       });
     },
     validateInput(index) {
-      let value = parseFloat(this.thresholds[index].value);
-      if (value < 0) {
-        alert('Threshold percentage must be at least 0.');
-        this.thresholds[index].value = 0;
-      }
-    },
+    let value = parseFloat(this.thresholds[index].value);
+    if (value < 0) {
+      alert('Threshold percentage must be at least 0%.');
+      this.thresholds[index].value = 0;
+    } else if (value > 100) {
+      alert('Threshold percentage must be no more than 100%.');
+      this.thresholds[index].value = 100;
+    }
+  },
     saveThreshold() {
       const thresholdsToSave = this.thresholds.map(threshold => ({
         name: threshold.name,

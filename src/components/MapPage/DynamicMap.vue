@@ -1,5 +1,6 @@
 <template>
   <div class="map-container" ref="mapContainer">
+   
     <CardPopupMap
       v-if="selectedStation"
       :station-data="selectedStation"
@@ -7,6 +8,7 @@
       :style="{ top: popupPosition.y + 'px', left: popupPosition.x + 'px' }"
     />
   </div>
+  <FloatingBadge :summary="summaryData" />
 </template>
 
 <script>
@@ -16,11 +18,14 @@ import { createApp, defineComponent, h } from 'vue';
 import ButtonMap from './ButtonMap.vue';
 import CardPopupMap from './CardPopupMap.vue';
 import axios from 'axios';
+import FloatingBadge from './FloatingBadge.vue';
 
 export default {
   name: "DynamicMap",
   components: {
     CardPopupMap,
+    FloatingBadge,
+
   },
   data() {
     return {
@@ -28,9 +33,19 @@ export default {
       allStations: [],
       selectedStation: null,
       popupPosition: { x: 0, y: 0 },
+      summaryData: {},
     };
   },
   methods: {
+    async fetchSummary() {
+      try {
+        const response = await axios.get('http://localhost:3001/api/station-summary');
+        this.summaryData = response.data;
+        console.log('Summary Data:', this.summaryData);
+      } catch (error) {
+        console.error("Error fetching summary data:", error);
+      }
+    },
     async fetchAllStations() {
       try {
         const response = await axios.get('http://localhost:3001/api/stations');
@@ -82,7 +97,7 @@ export default {
     },
     async updateWaterLevel(stationId) {
       try {
-        const response = await axios.post(`http://localhost:3001/api/stations/updateWaterLevel`, {
+        const response = await axios.post(`http://localhost:3001/api/updateWaterLevel`, {
           _id: stationId,
         });
         console.log(`Water level updated for station ID ${stationId}:`, response.data);
@@ -128,7 +143,9 @@ export default {
   },
   async mounted() {
     await this.fetchAllStations();
+    this.fetchSummary();
     this.initMap();
+    console.log('Passing Summary Data to FloatingBadge:', this.summaryData);
   }
 };
 </script>
@@ -137,6 +154,7 @@ export default {
 .map-container {
   width: 100%;
   height: 100vh;
+  z-index: 0;
 }
 
 .station-button {

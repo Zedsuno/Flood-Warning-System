@@ -22,7 +22,7 @@
               <div class="station-header">
                 <h3 class="station-label">สถานี</h3>
                 <h1 class="station-title"></h1>
-              </div>
+              </div>a
               <div class="station-details">
                 <div class="station-status-container">
                   <div class="station-status-badge">
@@ -83,6 +83,7 @@
           :existingData="stationData"
           @update-profile="updateStationProfile"
           :errors="errors"
+          :isEditMode="isEditMode"
         />
         <StationLocation
           :existingData="stationData.location"
@@ -227,7 +228,9 @@ export default {
 
     // Call this method when the save button is clicked
     async saveStation() {
+      
       if (!this.isEditMode) {
+        
         // Creating a new station
         const postData = { ...this.stationData };
         delete postData._id; // Remove _id when creating a new document

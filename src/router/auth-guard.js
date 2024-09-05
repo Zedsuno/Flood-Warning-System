@@ -1,3 +1,4 @@
+// Guards routes to prevent unauthorized access.
 export default function authGuard(to, from, next) {
   const token = localStorage.getItem('token');
   console.log('Auth Guard called, token:', token);

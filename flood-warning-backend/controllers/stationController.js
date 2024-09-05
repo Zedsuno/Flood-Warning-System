@@ -1,6 +1,9 @@
+//Manages CRUD operations for stations, connects hardware to stations, handles water level updates, and sends alerts.
 const Station = require('../models/Station');
 const mongoose = require('mongoose');
-const { updateStationData } = require('../services/waterLevelService');
+const { updateStationData, triggerAlert } = require('../services/waterLevelService');
+const { sendLineNotification } = require('../services/lineNotifyService'); 
+const Alert = require('../models/Alert'); // Import the Alert model to save the log
 
  // Ensure this points to your Station model file
 
@@ -99,29 +102,6 @@ exports.getAllStation = async (req, res) => {
       res.status(500).json({ message: "Error deleting station", error: error.toString() });
     }
   };
-  exports.updateWaterLevel = async (req, res) => {
-    const { _id } = req.body;
-  
-    console.log('Received request to update water level for station ID:', _id);
-  
-    if (!_id) {
-      console.error('Station ID is required');
-      return res.status(400).json({ error: 'Station ID is required' });
-    }
-  
-    if (!mongoose.Types.ObjectId.isValid(_id)) {
-      console.error('Invalid Station ID format');
-      return res.status(400).json({ error: 'Invalid Station ID format' });
-    }
-  
-    try {
-      const updatedStation = await updateStationData(_id);
-      res.json(updatedStation);
-    } catch (error) {
-      console.error('Error updating station data:', error);
-      res.status(500).json({ error: 'Internal Server Error', details: error.message });
-    }
-  };
 
   exports.updateThresholds = async (req, res) => {
     const { _id, thresholds } = req.body;
@@ -146,3 +126,77 @@ exports.getAllStation = async (req, res) => {
     }
   };
   
+  exports.updateWaterLevel = async (req, res) => {
+    const { _id } = req.body;
+  
+    console.log('Received request to update water level for station ID:', _id);
+  
+    if (!_id) {
+      console.error('Station ID is required');
+      return res.status(400).json({ error: 'Station ID is required' });
+    }
+  
+    if (!mongoose.Types.ObjectId.isValid(_id)) {
+      console.error('Invalid Station ID format');
+      return res.status(400).json({ error: 'Invalid Station ID format' });
+    }
+  
+    try {
+      const updatedStation = await updateStationData(_id);
+
+
+       // Log the station data to check for missing fields
+    console.log("Station Data:", {
+      stationName: updatedStation.stationName,
+      waterLevelPercentage: updatedStation.waterLevelPercentage,
+      status: updatedStation.status,
+      previousStatus: updatedStation.previousStatus
+
+    });
+
+    
+       // Ensure the updatedStation data is available
+    if (!updatedStation || !updatedStation.stationName || !updatedStation.waterLevelPercentage || !updatedStation.status) {
+      console.error('Error: Incomplete station data for LINE notification.');
+      return res.status(500).json({ error: 'Incomplete station data' });
+    }
+
+   // Trigger the alert only if the threshold has changed
+   await triggerAlert(updatedStation._id, updatedStation.waterLevelPercentage, updatedStation.status);
+
+
+      res.json(updatedStation);
+    } catch (error) {
+      console.error('Error updating station data:', error);
+      res.status(500).json({ error: 'Internal Server Error', details: error.message });
+    }
+  };
+
+ // Function for FloatingBadge
+  exports.getStationSummary = async (req, res) => {
+    try {
+      const stations = await Station.find();
+  
+      const summary = {
+        totalStations: stations.length,
+        "น้อยวิกฤต": 0,
+        "น้อย": 0,
+        "ปกติ": 0,
+        "มาก": 0,
+        "ล้นตลิ่ง": 0
+      };
+  
+      stations.forEach(station => {
+        if (station.status && summary[station.status] !== undefined) {
+          summary[station.status]++;
+        } else {
+          console.warn(`Unknown status found in station ${station.stationName}:`, station.status);
+        }
+      });
+  
+      res.json(summary);
+    } catch (error) {
+      console.error('Error fetching station summary:', error);
+      res.status(500).send('Error fetching station summary');
+    }
+  };

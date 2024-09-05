@@ -1,3 +1,4 @@
+<!-- AccountDash.vue -->
 <template>
   <div class="dashboard-container">
     <div class="dashboard-content">
@@ -44,7 +45,7 @@
 
 <script>
 import AccountCard from "../Account/AccountCard.vue";
-import axios from 'axios'; // Make sure to install axios via npm
+import axios from 'axios'; 
 
 export default {
   components: {

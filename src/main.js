@@ -9,6 +9,8 @@ import 'bootstrap';
 import 'jquery';
 import 'popper.js';
 import '@fortawesome/fontawesome-free/css/all.css';
+import './assets/main.css';
+
 
 const app = createApp(App);
 app.use(router);  // First apply the router

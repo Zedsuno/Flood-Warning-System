@@ -23,7 +23,7 @@
             สามารถประกอบด้วยตัวอักษรหรือตัวเลขเท่านั้นโดยไม่ต้องเว้นวรรค
           </p>
         </div>
-        <div class="Div-From-input-blog-all">
+        <div class="Div-From-input-blog-all" v-if="isEditMode">
           <div class="Div-From-input-blog">
             <div class="Div-Text">
               <label class="Labelname">Hardware</label>
@@ -156,21 +156,24 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    isEditMode: {
+    type: Boolean,
+    default: false,
+  },
   },
   data() {
     return {
       stationName: this.existingData.stationName || "",
-      active: this.existingData.active || false,
+      active: !!this.existingData.hardwareID,
       waterLevel: this.existingData.waterLevel || 0,
       sensorDistance: this.existingData.sensorDistance || "",
       waterline: this.existingData.waterline || "",
       referenceArea: this.existingData.referenceArea || "",
       thresholds: this.existingData.thresholds || [],
       showApiPopup: false,
-      isHardwareLinked: false,
+      isHardwareLinked: !!this.existingData.hardwareID,
       isThresholdModalVisible: false,
       hardwareID: this.existingData.hardwareID || "",
-
       // Data property to control the visibility of the modal
     };
   },
@@ -216,7 +219,9 @@ export default {
         return;
       }
       this.isHardwareLinked = true;
+      this.active = true;
       this.connectHardware(this.hardwareID);
+      this.updateData();
     },
 
     connectHardware(hardwareID) {
@@ -269,10 +274,21 @@ export default {
             confirmButtonColor: "#25adfc",
           });
           console.error("Failed to link hardware:", error);
+          this.isHardwareLinked = false; // Reset the state if linking fails
         });
     },
     unlinkHardware() {
-  console.log("Unlinking Hardware ID: ", this.hardwareIDInput);
+      if (!this.hardwareID) {
+    Swal.fire({
+      icon: "error",
+      title: "Hardware ID Required",
+      text: "กรุณากรอก Hardware ID เพื่อยกเลิกการเชื่อมต่อ",
+      confirmButtonText: "ตกลง",
+      confirmButtonColor: "#25adfc",
+    });
+    return;  // ถ้าค่า hardwareID ยังไม่ได้ถูกกำหนด ให้ return ออกก่อน
+  }
+  console.log("Unlinking Hardware ID: ", this.hardwareID);
   Swal.fire({
     title: "Unlinking from sensor...",
     html: "Please wait a moment...",
@@ -284,7 +300,7 @@ export default {
     showConfirmButton: false,
   });
   axios.post("http://localhost:3001/api/hardware/unlink", {
-    hardwareId: this.hardwareIDInput,
+    hardwareId: this.hardwareID,
   })
   .then((response) => {
     Swal.fire({
@@ -296,13 +312,17 @@ export default {
     });
     console.log("Hardware unlinked successfully, server response:", response.data);
     this.isHardwareLinked = false;
-    this.hardwareIDInput = '';
+    this.active = false;
+    this.hardwareID = '';
+    this.updateData();
   })
   .catch((error) => {
     Swal.fire({
       icon: "error",
       title: "Failed to Unlink Sensor",
-      text: "There was a problem unlinking the sensor.",
+      text: error.response && error.response.data && error.response.data.message
+        ? error.response.data.message
+        : "There was a problem unlinking the sensor.",
       confirmButtonText: "OK",
       confirmButtonColor: "#25adfc",
     });
@@ -311,6 +331,7 @@ export default {
 },
 
     updateData() {
+      console.log("Updating data with hardwareID:", this.hardwareID);
       this.$emit("update-profile", {
         ...this.existingData,
         stationName: this.stationName,

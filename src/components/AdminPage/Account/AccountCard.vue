@@ -1,3 +1,4 @@
+<!-- AccountCard.vue -->
 <template>
   <div class="account-card">
     <div class="account-card-section">

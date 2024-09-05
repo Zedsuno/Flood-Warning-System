@@ -1,33 +1,26 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light" >
-    <div class="container-fluid">
-      <a class="navbar-brand custom-brand" href="#">
-        <img  src="@/assets/Logo/Logo (Replace).png"  
-          width="30" 
-          height="24" 
-          class="d-inline-block align-text-top"
-          alt="Logo"
-        >
-        เตือนภัยน้ำท่วม
+  <nav class="bg-white shadow-md z-50 ">
+    <div class="container mx-auto flex items-center justify-between px-4 py-4">
+      <a class="flex items-center space-x-2 text-gray-900">
+        <img src="@/assets/Logo/Logo (Replace).png" alt="Logo" class="h-8 w-auto">
+        <span class="text-xl font-bold">เตือนภัยน้ำท่วม</span>
       </a>
-      <!-- Navbar toggle for responsive -->
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarContent">
-        <!-- Place other navbar items here if needed -->
-        <!-- ... -->
-        <!-- User profile dropdown -->
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              <img class="rounded-circle" src="@/assets/Logo/avatar.png" alt="Guest avatar" width="30" height="30"> ADMIN
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <li><a class="dropdown-item" href="#/help">ช่วยเหลือ</a></li>
-              <li>
-  <router-link class="dropdown-item" to="/login">เข้าสู่ระบบ</router-link>
-</li>            </ul>
+      
+      <!-- User profile dropdown -->
+      <div class="relative">
+        <button @click="toggleDropdown" class="flex items-center space-x-2 text-gray-900 focus:outline-none">
+          <img class="h-10 w-10 rounded-full" src="@/assets/Logo/avatar.png" alt="Guest avatar">
+          <span>ADMIN</span>
+          <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </button>
+        <ul v-show="dropdownOpen" class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg py-2 z-60">
+          <li>
+            <a href="#/help" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">ช่วยเหลือ</a>
+          </li>
+          <li>
+            <router-link to="/login" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">เข้าสู่ระบบ</router-link>
           </li>
         </ul>
       </div>
@@ -37,51 +30,19 @@
 
 <script>
 export default {
-  name: 'TopBar',
+  data() {
+    return {
+      dropdownOpen: false
+    };
+  },
   methods: {
-    // Your methods here
+    toggleDropdown() {
+      this.dropdownOpen = !this.dropdownOpen;
+    }
   }
 };
 </script>
 
-<style>
-.navbar {
-  position: sticky;
-  top: 0;
-  z-index: 1030;
-}
-
-.custom-navbar {
-  padding-top: 15px; /* Increase padding to increase height */
-  padding-bottom: 15px; /* Increase padding to increase height */
-}
-
-/* Adjust the image and brand name size as needed */
-.custom-brand img {
-  height: 40px; /* New height for the logo */
-  width: auto;
-  margin-right: 10px; /* Adjust width automatically */
-}
-
-.custom-brand {
-  font-size: 1.5rem; /* Increase font size for brand name */
-  display: flex;
-  align-items: center;
-  margin-left: 10px; /* Align logo and text vertically */
-}
-
-/* Adjust the size and margin of the avatar in the dropdown */
-.navbar-nav .nav-item .nav-link .rounded-circle {
-  width: 40px; /* New width for the avatar */
-  height: 40px; /* New height for the avatar */
-  margin-right: 10px; /* Add some space between avatar and text */
-}
-@media (min-width: 992px) {
-  /* This matches Bootstrap's lg breakpoint */
-  .navbar  .dropdown:hover .dropdown-menu,
-  .navbar  .dropdown .dropdown-menu:hover {
-    display: block;
-  }
-}
-
+<style scoped>
+/* No additional styles required, managed by Tailwind CSS */
 </style>

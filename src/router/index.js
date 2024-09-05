@@ -1,3 +1,4 @@
+//  Handles routing configuration.
 import { createRouter, createWebHistory } from 'vue-router';
 import HomePage from '../view/HomePage.vue';
 import DefendFlood from '../view/DefendFlood.vue';
@@ -13,6 +14,9 @@ import WaterResource from '../view/WaterResource.vue';
 import MapPage from "../view/MapPage.vue";
 import AccountPage from '../view/AccoutPage.vue';
 import authGuard from '@/router/auth-guard';
+import AlertPage from '@/view/AlertPage.vue';
+import HardwarePage from '@/view/HardwarePage.vue';
+
 const routes = [
   {
     path: '/',
@@ -74,7 +78,11 @@ const routes = [
     component: StationPage,
     props: true // Enables the route to pass the stationId as a prop to the component
   },
-
+  {
+    path: '/Admin/Hardware',
+    name: 'Hardware',
+    component: HardwarePage
+  },
   {
     path: '/admin/edit-station/:stationId',
     name: 'EditStation',
@@ -87,9 +95,14 @@ const routes = [
   component: MapPage,
 },
 {
-  path: '/Account',
+  path: '/Admin/Account',
   name: 'Account',
   component: AccountPage,
+},
+{
+  path: '/Admin/Alert',
+  name: 'Alert',
+  component: AlertPage,
 }
   
 
